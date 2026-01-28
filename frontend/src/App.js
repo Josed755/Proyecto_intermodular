@@ -7,7 +7,7 @@ function App() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("./components/InicioSesion.js"); 
+    navigate("/login"); 
   };
 
 

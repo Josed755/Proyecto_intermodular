@@ -1,8 +1,39 @@
 import '../App.css';
+import './InicioSesion.css'
 
-function InicioSesion (){
-
-    return{
-    
-    };
+function InicioSesion() {
+    return (
+        <div className="App">
+            <header className="App-header">
+                <div className="title">CafES App</div>
+            </header>
+            <main className="App-main">
+                <div className="cont_sesion">
+                    <div className='form-cont'>
+                        <div className="form-group">
+                            <label>Gmail:</label>
+                            <input
+                                type="text"
+                                name="gmail"
+                                required
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label>Contraseña:</label>
+                            <input
+                                type="password"
+                                name="password"
+                                required
+                            />
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <footer className="App-footer">
+                <div>© IES José Zerpa - etc...</div>
+            </footer>
+        </div>
+    );
 }
+
+export default InicioSesion; 
