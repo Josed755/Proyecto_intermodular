@@ -1,7 +1,14 @@
 import '../App.css';
 import './InicioSesion.css'
+import { useNavigate } from 'react-router-dom';
 
 function InicioSesion() {
+    const navigate = useNavigate();
+
+    const handleVolver = () => {
+        navigate('/');
+    };
+
     return (
         <div className="App">
             <header className="App-header">
@@ -25,6 +32,10 @@ function InicioSesion() {
                                 name="password"
                                 required
                             />
+                        </div>
+                        <div className="btn-container">
+                            <button className="btn-volver" onClick={handleVolver}>Volver</button>
+                            <button type="submit" className="btn-confirmar">Confirmar</button>
                         </div>
                     </div>
                 </div>

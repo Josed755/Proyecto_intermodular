@@ -1,10 +1,9 @@
-
-.form-cont{
-    border-radius: 20px;
-    height: 270px;
-    width: 400px;
-    margin: 11px;
-    background: linear-gradient(0deg, #274363 0%, #4a76a8 60%);
+.form-cont {
+  border-radius: 20px;
+  height: 350px;
+  width: 400px;
+  margin: 11px;
+  background: linear-gradient(0deg, #274363 0%, #4a76a8 60%);
 
 }
 
@@ -14,6 +13,7 @@
   margin-bottom: 5px;
   align-items: center;
 }
+
 .form-group label {
   margin-bottom: 0.5rem;
   font-weight: 500;
@@ -24,13 +24,60 @@
   margin-top: 25px;
 }
 
-.form-group input{
-    width: 300px;
-    height: 30px;
-    border-radius: 5px;
-    font-size: 16px;
-    font-family: Arial;
-    border: 4px;
-    border-style: solid;
-    border-color: #282c34;
+.form-group input {
+  width: 300px;
+  height: 30px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-family: Arial;
+  border: 4px;
+  border-style: solid;
+  border-color: #282c34;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 50px;
+  align-items: center;
+}
+
+.btn-confirmar {
+  border-radius: 10px;
+  height: 40px;
+  width: 130px;
+  color: white;
+  background-color: orange;
+  font-size: 20px;
+  font-family: Arial;
+  font-weight: bold;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  transition: 0.3s ease;
+  border: 4px solid rgb(255, 153, 0);
+  cursor: pointer;
+}
+
+.btn-confirmar:hover {
+  background-color: #d17d00;
+  border-color: #b06a00;
+}
+
+.btn-volver {
+  border-radius: 10px;
+  height: 40px;
+  width: 130px;
+  color: white;
+  background-color: #d32f2f;
+  font-size: 20px;
+  font-family: Arial;
+  font-weight: bold;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  transition: 0.3s ease;
+  border: 4px solid #b71c1c;
+  cursor: pointer;
+}
+
+.btn-volver:hover {
+  background-color: #b71c1c;
+  border-color: #7f0000;
 }

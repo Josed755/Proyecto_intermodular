@@ -10,8 +10,8 @@ function App() {
     navigate("/login"); 
   };
 
-
-
+  
+  
   return (
     <div className="App">
       <header className="App-header">
