@@ -1,5 +1,5 @@
 import '../App.css';
-import './InicioSesion.css'
+import './EstiloSesiones.css'
 import { useNavigate } from 'react-router-dom';
 
 function InicioSesion() {

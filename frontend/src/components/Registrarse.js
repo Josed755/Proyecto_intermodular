@@ -1,5 +1,5 @@
 import '../App.css';
-import './Registrarse.css'
+import './EstiloSesiones.css'
 import { useNavigate } from 'react-router-dom';
 
 function Registrarse() {
