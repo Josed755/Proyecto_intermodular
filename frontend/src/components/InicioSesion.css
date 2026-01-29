@@ -18,10 +18,10 @@
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: white;
-  font-size: 40px;
+  font-size: 35px;
   font-weight: bold;
   font-family: Arial;
-  margin-top: 25px;
+  margin-top: 15px;
 }
 
 .form-group input {
@@ -58,8 +58,8 @@
 }
 
 .btn-confirmar:hover {
-  background-color: #d17d00;
-  border-color: #b06a00;
+  background-color: #005f7a;
+  border-color: #00546b;
 }
 
 .btn-volver {
@@ -78,6 +78,6 @@
 }
 
 .btn-volver:hover {
-  background-color: #b71c1c;
-  border-color: #7f0000;
+  background-color: #005f7a;
+  border-color: #00546b;
 }

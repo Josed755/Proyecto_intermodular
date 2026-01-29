@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'; 
 import InicioSesion from './components/InicioSesion';
+import Registrarse from './components/Registrarse';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -13,6 +14,7 @@ root.render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/login" element={<InicioSesion />} />
+        <Route path="/register" element={<Registrarse />} />
       </Routes>
     </React.StrictMode>
   </BrowserRouter>

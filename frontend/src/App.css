@@ -2,8 +2,8 @@
   text-align: center;
   font-family: Arial;
   font-weight: bold;
-background: linear-gradient(0deg, #274363 0%, #4a76a8 70%);
-  
+  background: linear-gradient(0deg, #274363 0%, #4a76a8 70%);
+
 }
 
 .App-logo {
@@ -28,11 +28,11 @@ background: linear-gradient(0deg, #274363 0%, #4a76a8 70%);
   color: white;
 }
 
-.title{
+.title {
   font-size: 50px;
 }
 
-.App-main{
+.App-main {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,31 +41,31 @@ background: linear-gradient(0deg, #274363 0%, #4a76a8 70%);
   border-top: 11px rgb(255, 153, 0);
   border-bottom: 11px rgb(255, 153, 0);
   border-style: solid;
-  
+
 }
 
-.cont_sesion{
+.cont_sesion {
   background-color: #282c34;
   height: 500px;
   width: 700px;
   border-radius: 50px;
   align-items: center;
   justify-content: center;
-  display: flex; 
+  display: flex;
   flex-direction: column;
   border: 10px;
   border-color: rgb(255, 153, 0);
   border-style: solid;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
-  
+
 }
 
-.CafeImg{
+.CafeImg {
   width: 235px;
   height: auto;
 }
 
-.sesion_inicio{
+.sesion_inicio {
   border-radius: 10px;
   height: 45px;
   width: 200px;
@@ -87,10 +87,9 @@ background: linear-gradient(0deg, #274363 0%, #4a76a8 70%);
 .sesion_inicio:hover {
   background-color: #005f7a;
   border-color: #00546b;
-  color: #fff;
 }
 
-.sesion_regis{
+.sesion_regis {
   border-radius: 10px;
   height: 45px;
   width: 200px;
@@ -108,13 +107,13 @@ background: linear-gradient(0deg, #274363 0%, #4a76a8 70%);
   border-style: solid;
   cursor: pointer;
 }
+
 .sesion_regis:hover {
   background-color: #005f7a;
   border-color: #00546b;
-  color: #fff;
 }
 
-.App-footer{
+.App-footer {
   background-color: #282c34;
   min-height: 9.7vh;
   color: white;
@@ -131,6 +130,7 @@ background: linear-gradient(0deg, #274363 0%, #4a76a8 70%);
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

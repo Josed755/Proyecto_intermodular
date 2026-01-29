@@ -6,8 +6,12 @@ function App() {
 
   const navigate = useNavigate();
 
-  const handleClick = () => {
+  const handleInicioSesion = () => {
     navigate("/login"); 
+  };
+
+  const handleRegistro = () => {
+    navigate("/register");
   };
 
   
@@ -20,8 +24,8 @@ function App() {
       <main className="App-main">
         <div className="cont_sesion">
             <img src={cafeImg} alt={""} className="CafeImg"/>
-            <button className="sesion_inicio" onClick={handleClick}>Iniciar Sesión</button>
-            <button className="sesion_regis" >Registrarse</button>
+            <button className="sesion_inicio" onClick={handleInicioSesion}>Iniciar Sesión</button>
+            <button className="sesion_regis" onClick={handleRegistro}>Registrarse</button>
         </div>
       </main>
       <footer className="App-footer">
