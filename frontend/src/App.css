@@ -87,6 +87,7 @@
 .sesion_inicio:hover {
   background-color: #005f7a;
   border-color: #00546b;
+  transform: translateY(-1px);
 }
 
 .sesion_regis {
@@ -111,6 +112,7 @@
 .sesion_regis:hover {
   background-color: #005f7a;
   border-color: #00546b;
+  transform: translateY(-1px);
 }
 
 .App-footer {

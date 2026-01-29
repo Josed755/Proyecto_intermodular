@@ -60,6 +60,7 @@
 .btn-confirmar:hover {
   background-color: #005f7a;
   border-color: #00546b;
+  transform: translateY(-1px);
 }
 
 .btn-volver {
@@ -80,4 +81,5 @@
 .btn-volver:hover {
   background-color: #005f7a;
   border-color: #00546b;
+  transform: translateY(-1px);
 }
