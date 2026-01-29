@@ -12,7 +12,7 @@ function Registrarse() {
     return (
         <div className="App">
             <header className="App-header">
-                <div className="title">CafES App</div>
+                <div className="title">Registrarse</div>
             </header>
             <main className="App-main">
                 <div className="cont_sesion">

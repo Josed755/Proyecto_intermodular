@@ -12,7 +12,7 @@ function InicioSesion() {
     return (
         <div className="App">
             <header className="App-header">
-                <div className="title">CafES App</div>
+                <div className="title">Inicio de Sesión</div>
             </header>
             <main className="App-main">
                 <div className="cont_sesion">
