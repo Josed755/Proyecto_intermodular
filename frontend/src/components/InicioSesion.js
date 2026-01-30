@@ -9,6 +9,10 @@ function InicioSesion() {
         navigate('/');
     };
 
+    const handleConfirmar = () => {
+        navigate('/home');
+    };
+
     return (
         <div className="App">
             <header className="App-header">
@@ -35,7 +39,7 @@ function InicioSesion() {
                         </div>
                         <div className="btn-container">
                             <button className="btn-volver" onClick={handleVolver}>Volver</button>
-                            <button type="submit" className="btn-confirmar">Confirmar</button>
+                            <button type="submit" className="btn-confirmar" onClick={handleConfirmar}>Confirmar</button>
                         </div>
                     </div>
                 </div>
