@@ -1,22 +1,12 @@
 .App {
   text-align: center;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   font-weight: bold;
+  min-height: 100vh;
   background: linear-gradient(0deg, #274363 0%, #4a76a8 70%);
-
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
+/* header */
 .App-header {
   background-color: #282c34;
   min-height: 18vh;
@@ -24,116 +14,107 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  font-size: clamp(14px, 2vw, 22px);
   color: white;
 }
 
 .title {
-  font-size: 50px;
+  font-size: clamp(28px, 5vw, 50px);
 }
 
+/* main */
 .App-main {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 70vh;
-  border: 0px;
-  border-top: 11px rgb(255, 153, 0);
-  border-bottom: 11px rgb(255, 153, 0);
-  border-style: solid;
-
+  border-top: 11px solid rgb(255, 153, 0);
+  border-bottom: 11px solid rgb(255, 153, 0);
+  padding: 20px;
 }
 
+/* Contenedor de sesion */
 .cont_sesion {
   background-color: #282c34;
-  height: 500px;
-  width: 700px;
-  border-radius: 50px;
-  align-items: center;
-  justify-content: center;
+  width: 90%;
+  max-width: 700px;
+  min-height: 420px;
+  padding: 30px 20px;
+  border-radius: 40px;
   display: flex;
   flex-direction: column;
-  border: 10px;
-  border-color: rgb(255, 153, 0);
-  border-style: solid;
+  align-items: center;
+  justify-content: center;
+  border: 8px solid rgb(255, 153, 0);
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
-
 }
 
+/* Imagen */
 .CafeImg {
-  width: 235px;
+  width: clamp(150px, 40vw, 235px);
   height: auto;
 }
 
-.sesion_inicio {
-  border-radius: 10px;
+/* Botones */
+.sesion_inicio,
+.sesion_regis {
+  width: min(80%, 220px);
   height: 45px;
-  width: 200px;
-  color: rgb(255, 255, 255);
-  background-color: orange;
-  font-size: 25px;
-  font-family: Arial;
+  font-size: clamp(16px, 3vw, 22px);
+  border-radius: 10px;
   font-weight: bold;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
-  transition: 0.3s ease, color 0.3s ease;
-  margin: 20px;
-  margin-top: 50px;
-  border: 4px;
-  border-color: rgb(255, 153, 0);
-  border-style: solid;
+  font-family: Arial;
+  margin: 15px;
   cursor: pointer;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  transition: 0.3s ease;
+}
+
+/* Botón iniciar */
+.sesion_inicio {
+  background-color: orange;
+  color: white;
+  border: 4px solid rgb(255, 153, 0);
 }
 
 .sesion_inicio:hover {
   background-color: #005f7a;
   border-color: #00546b;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
+/* Botón registro */
 .sesion_regis {
-  border-radius: 10px;
-  height: 45px;
-  width: 200px;
-  color: rgb(255, 255, 255);
   background-color: rgb(63, 161, 32);
-  border: none;
-  font-size: 25px;
-  font-weight: bold;
-  font-family: Arial;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
-  transition: 0.3s ease, color 0.3s ease;
-  margin: 20px;
-  border: 4px;
-  border-color: rgb(57, 148, 29);
-  border-style: solid;
-  cursor: pointer;
+  color: white;
+  border: 4px solid rgb(57, 148, 29);
 }
 
 .sesion_regis:hover {
   background-color: #005f7a;
   border-color: #00546b;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
+/* Footer */
 .App-footer {
   background-color: #282c34;
-  min-height: 9.7vh;
+  min-height: 15vh;
   color: white;
-  justify-content: center;
-  align-items: center;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(12px, 2vw, 16px);
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Esto es para mobil en un futuro */
+@media (max-width: 480px) {
+  .cont_sesion {
+    border-radius: 25px;
+    padding: 20px 15px;
   }
 
-  to {
-    transform: rotate(360deg);
+  .App-main {
+    min-height: auto;
   }
 }

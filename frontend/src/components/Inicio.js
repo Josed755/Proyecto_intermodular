@@ -51,18 +51,16 @@ function Inicio() {
             {/* Standard App Header */}
             <header className="App-header">
                 <div className="title">CafES App</div>
-                {/* Optional: Add Theme Button here if desired, or keep it in the dashboard */}
+                {/* Esto lo voy a dejar asi que no esta funcionando ahora mismo */}
                 {/* <button className="btn btn-sm btn-outline-light mt-2" onClick={alternarModo}>
                         {modoOscuro ? '☀️' : '🌑'}
                 </button> */}
             </header>
 
-            {/* Main Area with Orange Borders */}
             <main className="App-main">
                 <div className="dashboard-container">
 
                     <div className="row g-4">
-                        {/* Left Column: Product Grid */}
                         <div className="col-lg-8">
                             <h2 className="text-white mb-4 border-bottom pb-2">Menú</h2>
                             <div className="row g-3">

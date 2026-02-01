@@ -1,97 +1,108 @@
-.form-cont {
+.form-cont,
+.form-conte {
   border-radius: 20px;
-  height: 300px;
-  width: 400px;
-  margin: 11px;
+  width: 90%;
+  max-width: 400px;
+  min-height: 300px;
+  margin: 15px;
+  padding: 20px 15px;
   background: linear-gradient(0deg, #274363 0%, #4a76a8 60%);
+  box-sizing: border-box;
+}
 
+/* Altura extra para el registro */
+.form-conte {
+  min-height: 390px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   align-items: flex-start;
-  margin-left: 43px;
+  width: 100%;
 }
 
+/* LABEL */
 .form-group label {
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: white;
-  font-size: 20px;
+  margin-bottom: 6px;
   font-weight: bold;
-  margin-top: 15px;
-  margin-left: 3px;
+  color: white;
+  font-size: clamp(16px, 3vw, 20px);
+  margin-top: 10px;
+  margin-left: 5px;
 }
 
+/* INPUT */
 .form-group input {
-  width: 300px;
-  height: 30px;
-  border-radius: 5px;
+  width: 100%;
+  max-width: 300px;
+  height: 36px;
+  border-radius: 6px;
   font-size: 16px;
-  font-family: Arial;
-  border: 4px;
-  border-style: solid;
-  border-color: #282c34;
+  font-family: Arial, sans-serif;
+  border: 3px solid #282c34;
+  padding: 4px 8px;
+  box-sizing: border-box;
 }
 
+/* Botones */
 .btn-container {
   display: flex;
   justify-content: space-evenly;
-  margin-top: 50px;
   align-items: center;
+  margin-top: 35px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
-.btn-confirmar {
+/* Botón confirmar */
+.btn-confirmar,
+.btn-volver {
+  width: min(80%, 140px);
+  height: 42px;
   border-radius: 10px;
-  height: 40px;
-  width: 130px;
   color: white;
-  background-color: orange;
-  font-size: 20px;
+  font-size: clamp(16px, 3vw, 20px);
   font-family: Arial;
   font-weight: bold;
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
   transition: 0.3s ease;
-  border: 4px solid rgb(255, 153, 0);
   cursor: pointer;
+}
+
+/* Confirmar */
+.btn-confirmar {
+  background-color: orange;
+  border: 4px solid rgb(255, 153, 0);
 }
 
 .btn-confirmar:hover {
   background-color: #005f7a;
   border-color: #00546b;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
+/* Volver */
 .btn-volver {
-  border-radius: 10px;
-  height: 40px;
-  width: 130px;
-  color: white;
   background-color: #d32f2f;
-  font-size: 20px;
-  font-family: Arial;
-  font-weight: bold;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
-  transition: 0.3s ease;
   border: 4px solid #b71c1c;
-  cursor: pointer;
 }
 
 .btn-volver:hover {
   background-color: #005f7a;
   border-color: #00546b;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
 }
 
-/*Registrarse*/
+/* Movil */
+@media (max-width: 480px) {
+  .form-cont,
+  .form-conte {
+    padding: 15px 10px;
+  }
 
-.form-conte {
-    border-radius: 20px;
-    height: 390px;
-    width: 400px;
-    margin: 11px;
-    background: linear-gradient(0deg, #274363 0%, #4a76a8 60%);
-
+  .btn-container {
+    margin-top: 25px;
+  }
 }

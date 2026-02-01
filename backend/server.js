@@ -1,163 +1,247 @@
 const express = require('express');
 const cors = require('cors');
-const { pool, createTable } = require('./database/config');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { pool, testConnection } = require('./database/config');
 
+// Crea la app de Express y usa el puerto 5000 por defecto
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Permite peticiones desde React
 app.use(cors({
-  origin: 'http://localhost:3000',  
+  origin: 'http://localhost:3000',
   credentials: true
 }));
 app.use(express.json());
 
-// Inicializa la base de datos
-createTable();
-
-// Obtiene todos los alumnos
-app.get('/api/cafeteria', async (req, res) => {
-  try {
-    const [rows] = await pool.execute(
-      'SELECT * FROM Alumnos WHERE Activo = TRUE ORDER BY Nombre'
-    );
-    res.json(rows);
-  } catch (error) {
-    console.error('Error GET /api/alumnos:', error);
-    res.status(500).json({ error: error.message });
-  }
+// Esto imprime en consola cada petición
+// Para ver qué está llegando al backend por si hay problemas
+app.use((req, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
 });
 
-// Obtiene todas las estadísticas
-app.get('/api/estadisticas', async (req, res) => {
+// Probar conexión a la base de datos
+testConnection();
+
+// Recibe el correo nombre y contraseña
+app.post('/api/registro', async (req, res) => {
+  console.log('Registro recibido:', req.body);
+  
+  const { correo, nombre, contrasena } = req.body;
+  
+  // Validación básica
+  if (!correo || !nombre || !contrasena) {
+    console.log('Datos incompletos');
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  }
+
+  if (contrasena.length < 8) {
+    console.log('Contraseña muy corta');
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+  }
+
+  let connection;
   try {
-    // Por sexo
-    const [sexoStats] = await pool.execute(`
-      SELECT 
-        Sexo,
-        COUNT(*) as cantidad,
-        ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM Alumnos WHERE Activo = TRUE)), 2) as porcentaje
-      FROM Alumnos 
-      WHERE Activo = TRUE
-      GROUP BY Sexo
-    `);
+    connection = await pool.getConnection();
+    console.log('Conexión a DB obtenida');
 
-    // Por repetidor
-    const [repetidorStats] = await pool.execute(`
-      SELECT 
-        CASE 
-          WHEN Repetidor = TRUE THEN 'Repetidor'
-          ELSE 'No Repetidor'
-        END as tipo,
-        COUNT(*) as cantidad,
-        ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM Alumnos WHERE Activo = TRUE)), 2) as porcentaje
-      FROM Alumnos 
-      WHERE Activo = TRUE
-      GROUP BY Repetidor
-    `);
+    // Verificar si el correo ya existe
+    console.log('Verificando si correo existe:', correo);
+    const [usuarioExistente] = await connection.execute(
+      'SELECT id FROM usuarios WHERE correo = ?',
+      [correo]
+    );
+    
+    console.log('Resultado verificación:', usuarioExistente);
+    
+    if (usuarioExistente.length > 0) {
+      console.log('Correo ya registrado');
+      return res.status(400).json({ error: 'El correo ya está registrado' });
+    }
 
-    res.json({
-      sexo: sexoStats,
-      repetidor: repetidorStats
+    // Hash de la contraseña (Cifra la contraseña)
+    // Se guarda el hash, no la contraseña real por proteccion
+    console.log('Generando hash de contraseña...');
+    const salt = await bcrypt.genSalt(10);
+    const contrasenaHash = await bcrypt.hash(contrasena, salt);
+    console.log('Hash generado');
+
+    // Inserta el usuario
+    console.log('Insertando usuario en DB...');
+    const [result] = await connection.execute(
+      'INSERT INTO usuarios (correo, nombre, contrasena_hash) VALUES (?, ?, ?)',
+      [correo, nombre, contrasenaHash]
+    );
+
+    console.log('Usuario insertado, ID:', result.insertId);
+
+    res.status(201).json({ 
+      success: true, 
+      message: 'Usuario registrado exitosamente',
+      usuarioId: result.insertId 
     });
   } catch (error) {
-    console.error('Error GET /api/estadisticas:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Para crear nuevo alumno
-app.post('/api/alumnos', async (req, res) => {
-  const { matricula, nombre, sexo, edad, email, repetidor } = req.body;
-  
-  try {
-    const [result] = await pool.execute(
-      'INSERT INTO Alumnos (Matricula, Nombre, Sexo, Edad, Email, Repetidor) VALUES (?, ?, ?, ?, ?, ?)',
-      [matricula, nombre, sexo, edad || null, email || null, repetidor || false]
-    );
+    console.error('Error en registro:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error code:', error.code);
+    console.error('Error sqlMessage:', error.sqlMessage);
     
-    const [newAlumno] = await pool.execute(
-      'SELECT * FROM Alumnos WHERE Id = ?',
-      [result.insertId]
-    );
-    
-    res.status(201).json(newAlumno[0]);
-  } catch (error) {
-    console.error('Error POST /api/alumnos:', error);
+    let errorMessage = 'Error en el registro';
     if (error.code === 'ER_DUP_ENTRY') {
-      res.status(400).json({ error: 'La matrícula ya existe' });
-    } else {
-      res.status(500).json({ error: error.message });
+      errorMessage = 'El correo ya está registrado';
+    } else if (error.code === 'ER_NO_SUCH_TABLE') {
+      errorMessage = 'Error de base de datos: tabla no encontrada';
+    }
+    
+    res.status(500).json({ 
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  } finally {
+    if (connection) {
+      connection.release();
+      console.log('Conexión liberada');
     }
   }
 });
 
-// Para actualizar alumno
-app.put('/api/alumnos/:id', async (req, res) => {
-  const { id } = req.params;
-  const { matricula, nombre, sexo, edad, email, repetidor } = req.body;
+// Inicio de sesión
+app.post('/api/login', async (req, res) => {
+  console.log('Login recibido:', { correo: req.body.correo });
   
+  const { correo, contrasena } = req.body;
+  
+  if (!correo || !contrasena) {
+    return res.status(400).json({ error: 'Correo y contraseña requeridos' });
+  }
+
   try {
-    await pool.execute(
-      `UPDATE Alumnos 
-       SET Matricula = ?, Nombre = ?, Sexo = ?, Edad = ?, Email = ?, Repetidor = ?
-       WHERE Id = ?`,
-      [matricula, nombre, sexo, edad || null, email || null, repetidor || false, id]
+    console.log('Buscando usuario:', correo);
+    const [usuarios] = await pool.execute(
+      'SELECT * FROM usuarios WHERE correo = ?',
+      [correo]
     );
     
-    res.json({ success: true, message: 'Alumno actualizado' });
-  } catch (error) {
-    console.error('Error PUT /api/alumnos/:id:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
+    console.log('Usuarios encontrados:', usuarios.length);
+    
+    if (usuarios.length === 0) {
+      console.log('Usuario no encontrado');
+      return res.status(401).json({ error: 'Credenciales incorrectas' });
+    }
 
-// Para eliminar alumno 
-app.delete('/api/alumnos/:id', async (req, res) => {
-  const { id } = req.params;
-  
-  try {
-    await pool.execute(
-      'UPDATE Alumnos SET Activo = FALSE WHERE Id = ?',
-      [id]
+    const usuario = usuarios[0];
+    console.log('Usuario encontrado:', usuario.nombre);
+
+    // Verificar contraseña
+    console.log('Verificando contraseña...');
+    const contrasenaValida = await bcrypt.compare(contrasena, usuario.contrasena_hash);
+    console.log('Resultado verificación:', contrasenaValida);
+    
+    if (!contrasenaValida) {
+      console.log('Contraseña incorrecta');
+      return res.status(401).json({ error: 'Credenciales incorrectas' });
+    }
+
+    // Genera un token JWT, identifica al usuario y dura 24 horas se usa para proteger rutas privadas
+    console.log('Generando token...');
+    const token = jwt.sign(
+      { 
+        id: usuario.id, 
+        correo: usuario.correo,
+        nombre: usuario.nombre,
+        tipo: usuario.tipo 
+      },
+      process.env.JWT_SECRET || 'secret_key_cafes',
+      { expiresIn: '24h' }
     );
-    
-    res.json({ success: true, message: 'Alumno dado de baja' });
-  } catch (error) {
-    console.error('Error DELETE /api/alumnos/:id:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
 
-// Datos para el PDF
-app.get('/api/alumnos/pdf', async (req, res) => {
-  try {
-    const [alumnos] = await pool.execute('SELECT * FROM Alumnos WHERE Activo = TRUE ORDER BY Nombre');
-    const [estadisticas] = await pool.execute(`
-      SELECT 
-        (SELECT COUNT(*) FROM Alumnos WHERE Activo = TRUE AND Sexo = "Masculino") as masculinos,
-        (SELECT COUNT(*) FROM Alumnos WHERE Activo = TRUE AND Sexo = "Femenino") as femeninos,
-        (SELECT COUNT(*) FROM Alumnos WHERE Activo = TRUE AND Repetidor = TRUE) as repetidores,
-        (SELECT COUNT(*) FROM Alumnos WHERE Activo = TRUE AND Repetidor = FALSE) as noRepetidores,
-        (SELECT COUNT(*) FROM Alumnos WHERE Activo = TRUE) as total
-    `);
-    
+    console.log('Login exitoso para:', usuario.nombre);
+
     res.json({
-      alumnos,
-      estadisticas: estadisticas[0],
-      fechaGeneracion: new Date().toLocaleDateString('es-ES')
+      success: true,
+      message: 'Login exitoso',
+      token,
+      usuario: {
+        id: usuario.id,
+        correo: usuario.correo,
+        nombre: usuario.nombre,
+        tipo: usuario.tipo
+      }
     });
   } catch (error) {
-    console.error('Error GET /api/alumnos/pdf:', error);
+    console.error('Error en login:', error);
+    res.status(500).json({ 
+      error: 'Error en el servidor',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+// RUTAS DE PRODUCTOS
+app.get('/api/productos', async (req, res) => {
+  console.log('Solicitando productos...');
+  /*Devuelve los productos activos y
+  incluye el nombre de la categoría
+  ordenados alfabéticamente */
+  // Esto es lo que usa el frontend para mostrar el catálogo.
+  try {
+    const [rows] = await pool.execute(
+      `SELECT p.*, c.nombre as categoria_nombre 
+       FROM productos p 
+       LEFT JOIN categorias c ON p.categoria_id = c.id 
+       WHERE p.activo = TRUE 
+       ORDER BY p.nombre`
+    );
+    console.log(`Productos encontrados: ${rows.length}`);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error GET /api/productos:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Backend funcionando' });
+// Health check para comprobar que todo funciona
+app.get('/api/health', async (res) => {
+  try {
+    // Verificar conexión a DB
+    const [result] = await pool.execute('SELECT 1 as test');
+    const dbStatus = result ? 'CONNECTED' : 'DISCONNECTED';
+    
+    // Contar tablas
+    const [tables] = await pool.execute(
+      'SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = ?',
+      [process.env.DB_NAME || 'cafes_db']
+    );
+    
+    res.json({ 
+      status: 'OK', 
+      message: 'Backend de CafES App funcionando',
+      timestamp: new Date().toISOString(),
+      database: dbStatus,
+      table_count: tables[0].count
+    });
+  } catch (error) {
+    res.json({ 
+      status: 'ERROR', 
+      message: 'Problema con la base de datos',
+      error: error.message 
+    });
+  }
 });
 
+// Para comporbar que el servidor responde
+app.get('/api/test', (res) => {
+  res.json({ message: 'API funcionando', timestamp: new Date() });
+});
+
+//Inicia el backend y muestra todas las rutas importantes por consola
 app.listen(PORT, () => {
   console.log(`Backend ejecutándose en: http://localhost:${PORT}`);
-  console.log(`API disponible en: http://localhost:${PORT}/api/alumnos`);
   console.log(`Health check: http://localhost:${PORT}/api/health`);
+  console.log(`Test endpoint: http://localhost:${PORT}/api/test`);
+  console.log(`Registro: POST http://localhost:${PORT}/api/registro`);
+  console.log(`Login: POST http://localhost:${PORT}/api/login`);
+  console.log(`Productos: GET http://localhost:${PORT}/api/productos`);
 });
