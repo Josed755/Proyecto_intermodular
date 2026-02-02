@@ -17,7 +17,7 @@ app.use(express.json());
 
 // Esto imprime en consola cada petición
 // Para ver qué está llegando al backend por si hay problemas
-app.use((req, next) => {
+app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   next();
 });
@@ -203,7 +203,7 @@ app.get('/api/productos', async (req, res) => {
 });
 
 // Health check para comprobar que todo funciona
-app.get('/api/health', async (res) => {
+app.get('/api/health', async (req, res) => {
   try {
     // Verificar conexión a DB
     const [result] = await pool.execute('SELECT 1 as test');
@@ -232,7 +232,7 @@ app.get('/api/health', async (res) => {
 });
 
 // Para comporbar que el servidor responde
-app.get('/api/test', (res) => {
+app.get('/api/test', (req, res) => {
   res.json({ message: 'API funcionando', timestamp: new Date() });
 });
 

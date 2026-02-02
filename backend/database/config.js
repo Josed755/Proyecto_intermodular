@@ -4,7 +4,7 @@ require('dotenv').config();
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '8414',
+  password: process.env.DB_PASSWORD || 'Root.123',
   database: process.env.DB_NAME || 'cafes_db',
   waitForConnections: true,
   connectionLimit: 10,
@@ -16,11 +16,11 @@ const testConnection = async () => {
   try {
     const connection = await pool.getConnection();
     console.log('Conexión a MySQL establecida correctamente');
-    
+
     // Verifica que las tablas existen
     const [tables] = await connection.query('SHOW TABLES');
     console.log('Tablas en la base de datos:', tables.map(t => Object.values(t)[0]));
-    
+
     connection.release();
   } catch (error) {
     console.error('Error conectando a MySQL:', error.message);

@@ -36,7 +36,7 @@
 /* INPUT */
 .form-group input {
   width: 100%;
-  max-width: 300px;
+  max-width: 390px;
   height: 36px;
   border-radius: 6px;
   font-size: 16px;
@@ -54,6 +54,115 @@
   margin-top: 35px;
   flex-wrap: wrap;
   gap: 15px;
+}
+
+.header-container {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 100px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.hamburger-btn {
+  background: transparent;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 22px;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+  margin-right: 40px;
+}
+
+.hamburger-btn span {
+  width: 100%;
+  height: 2px;
+  background-color: white;
+  border-radius: 2px;
+  transition: all 0.3s linear;
+}
+
+.hamburger-btn:hover span {
+  background-color: orange;
+}
+
+.session-dropdown {
+  width: 180px !important;
+  right: 0 !important;
+  top: 50px !important;
+}
+
+/* Reusing modal styles if needed, or ensuring consistency */
+.prefs-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.prefs-modal {
+  background: rgba(30, 35, 45, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  color: white;
+}
+
+.modal-content-area {
+  min-height: 100px;
+  margin: 20px 0;
+}
+
+.btn-group-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 5px;
+  border-radius: 12px;
+  gap: 5px;
+}
+
+.btn-group-toggle button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: white;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.btn-group-toggle button.active {
+  background: orange;
+  box-shadow: 0 4px 10px rgba(255, 165, 0, 0.3);
+}
+
+.btn-confirm-prefs {
+  width: 100%;
+  padding: 12px;
+  background: orange;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
 }
 
 /* Botón confirmar */
@@ -97,6 +206,7 @@
 
 /* Movil */
 @media (max-width: 480px) {
+
   .form-cont,
   .form-conte {
     padding: 15px 10px;
