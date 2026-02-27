@@ -25,7 +25,7 @@ function Inicio() {
     const [filtro, setFiltro] = useState('todo');
     const [idioma, setIdioma] = useState(localStorage.getItem('idioma') || 'es');
     const [menuAbierto, setMenuAbierto] = useState(false);
-    const [modalActivo, setModalActivo] = useState(null); // 'perfil', 'historial', 'favoritos', 'preferencias', 'ayuda', 'acerca'
+    const [modalActivo, setModalActivo] = useState(null); // 'perfil', 'historial', 'preferencias', 'ayuda', 'acerca'
 
     const getIniciales = (nombre) => {
         if (!nombre) return '?';
@@ -55,7 +55,6 @@ function Inicio() {
             cerrar: 'Cerrar',
             perfil: 'Mi Perfil',
             historial: 'Historial',
-            favoritos: 'Favoritos',
             ayuda: 'Ayuda',
             acerca: 'Acerca de',
             ayudaContenido: 'Para realizar un pedido: 1. Elige tus productos. 2. Revisa el resumen. 3. Pulsa "Confirmar".',
@@ -86,7 +85,6 @@ function Inicio() {
             cerrar: 'Close',
             perfil: 'Profile',
             historial: 'History',
-            favoritos: 'Favorites',
             ayuda: 'Help',
             acerca: 'About',
             ayudaContenido: 'To place an order: 1. Choose your products. 2. Review the summary. 3. Press "Confirm".',
