@@ -9,11 +9,7 @@ const api = axios.create({
   }
 });
 
-// Interceptor para agregar token a las peticiones
-/*Se ejecuta antes de enviar cada petición, 
-busca el token JWT en localStorage y
-si existe, lo agrega automáticamente a los headers */
-// Para que no tengas que agregar manualmente el token en cada petición
+// Interceptor token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -25,17 +21,11 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor para manejar errores de autenticación
-/*Si el servidor responde con error 401 (No autorizado):
-  -Borra el token expirado/inválido
-  -Borra los datos del usuario
-  -Redirige automáticamente al login */
-// Esto evita que el usuario se quede "atascado" con un token inválido
+// Interceptor errores
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expirado o inválido
       localStorage.removeItem('token');
       localStorage.removeItem('usuario');
       window.location.href = '/login';
@@ -44,39 +34,54 @@ api.interceptors.response.use(
   }
 );
 
-// Registro y login
+// Auth
 export const registrarUsuario = (datos) => api.post('/registro', datos);
 export const loginUsuario = (datos) => api.post('/login', datos);
 
 // Productos
 export const getProductos = () => api.get('/productos');
 
+// ADMIN PRODUCTOS
+export const getAdminProductos = () => api.get('/admin/productos');
+
+export const addProducto = (datos) => api.post('/productos', datos);
+
+export const updateProducto = (id, datos) => api.put(`/productos/${id}`, datos);
+
+export const deleteProducto = (id) => api.delete(`/productos/${id}`);
+
+// NUEVA FUNCION ACTIVAR / DESACTIVAR
+export const toggleProductoEstado = (id, activo) => {
+  return api.patch(`/admin/productos/${id}/estado`, { activo });
+};
+
 // Pedidos
 export const crearPedido = (datos) => api.post('/pedidos', datos);
 export const getHistorialPedidos = () => api.get('/pedidos/historial');
 
+export const getAdminPedidos = () => api.get('/admin/pedidos');
+
+// Usuarios
+export const getAdminUsuarios = () => api.get('/admin/usuarios');
+
+export const updateUsuarioStatus = (id, datos) =>
+  api.put(`/admin/usuarios/${id}`, datos);
+
 // Perfil
 export const getPerfil = () => api.get('/perfil');
 
-// Estadisticas (solo admin)
+// Estadisticas
 export const getEstadisticas = () => api.get('/estadisticas');
 
-// Tokens
+// Auth helpers
 export const setAuthToken = (token) => {
-  if (token) {
-    localStorage.setItem('token', token);
-  } else {
-    localStorage.removeItem('token');
-  }
+  if (token) localStorage.setItem('token', token);
+  else localStorage.removeItem('token');
 };
 
-// Para guardar el usuario
 export const setUsuario = (usuario) => {
-  if (usuario) {
-    localStorage.setItem('usuario', JSON.stringify(usuario));
-  } else {
-    localStorage.removeItem('usuario');
-  }
+  if (usuario) localStorage.setItem('usuario', JSON.stringify(usuario));
+  else localStorage.removeItem('usuario');
 };
 
 export const getUsuario = () => {

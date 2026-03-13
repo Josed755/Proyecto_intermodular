@@ -169,7 +169,7 @@ function InicioSesion() {
         <div className="cont_sesion">
           <form className='form-cont' onSubmit={handleSubmit}>
             {error && (
-              <div className="alert alert-danger" style={{ color: 'red', marginBottom: '15px' }}>
+              <div className="alert alert-danger error-alert">
                 {error}
               </div>
             )}

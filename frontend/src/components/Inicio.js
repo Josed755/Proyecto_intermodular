@@ -63,7 +63,8 @@ function Inicio() {
             impuesto: 'IGIC (7%)',
             pedidoConfirmado: 'Pedido confirmado. Total: ',
             confirmarSalir: '¿Estás seguro de que quieres salir?',
-            pedidoVacio: 'El pedido está vacío.'
+            pedidoVacio: 'El pedido está vacío.',
+            panelControl: 'Panel de Control'
         },
         en: {
             titulo: 'CafES App',
@@ -87,6 +88,7 @@ function Inicio() {
             historial: 'History',
             ayuda: 'Help',
             acerca: 'About',
+            panelControl: 'Admin Panel',
             ayudaContenido: 'To place an order: 1. Choose your products. 2. Review the summary. 3. Press "Confirm".',
             acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
             subtotal: 'Subtotal',
@@ -198,6 +200,14 @@ function Inicio() {
                                     <button className="dropdown-item" onClick={() => { setModalActivo('acerca'); setMenuAbierto(false); }}>
                                         <span className="item-icon"></span> {t.acerca}
                                     </button>
+                                    {usuario?.tipo === 'admin' && (
+                                        <>
+                                            <div className="dropdown-divider"></div>
+                                            <button className="dropdown-item text-warning" onClick={() => navigate('/admin')}>
+                                                <span className="item-icon">⚙️</span> {t.panelControl}
+                                            </button>
+                                        </>
+                                    )}
                                     <div className="dropdown-divider"></div>
                                     <button className="dropdown-item logout" onClick={handleLogout}>
                                         <span className="item-icon"></span> {t.cerrarSesion}
@@ -241,7 +251,7 @@ function Inicio() {
 
                             {modalActivo === 'historial' && (
                                 <div className="text-center py-4 text-white-50">
-                                    <span style={{ fontSize: '3rem' }}>🕒</span>
+                                    <span className="history-icon">🕒</span>
                                     <p className="mt-3">Aún no has realizado ningún pedido.</p>
                                 </div>
                             )}
