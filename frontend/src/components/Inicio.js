@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 /* Import App.css to inherit global styles (Header, Main, Footer, Gradient) */
 import '../App.css';
 import "./EstiloInicio.css";
+import "./EstiloIngredientes.css";
 
 import { useNavigate } from 'react-router-dom';
 import Productos from './Productos';
@@ -26,6 +27,8 @@ function Inicio() {
     const [idioma, setIdioma] = useState(localStorage.getItem('idioma') || 'es');
     const [menuAbierto, setMenuAbierto] = useState(false);
     const [modalActivo, setModalActivo] = useState(null); // 'perfil', 'historial', 'preferencias', 'ayuda', 'acerca'
+    const [productoParaPersonalizar, setProductoParaPersonalizar] = useState(null);
+    const [allIngredientes, setAllIngredientes] = useState([]);
 
     const getIniciales = (nombre) => {
         if (!nombre) return '?';
@@ -122,7 +125,7 @@ function Inicio() {
         calcularVentasTotales,
         calcularImpuesto,
         calcularTotalConImpuesto
-    } = Calculos({ productos });
+    } = Calculos({ productos, allIngredientes });
 
     const {
         aumentarCantidad,
@@ -161,6 +164,86 @@ function Inicio() {
     useEffect(() => {
         localStorage.setItem('idioma', idioma);
     }, [idioma]);
+
+    useEffect(() => {
+        fetch("http://localhost:5000/api/ingredientes")
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    setAllIngredientes(data);
+                } else {
+                    console.error("Ingredients data is not an array:", data);
+                    setAllIngredientes([]);
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching ingredients:", err);
+                setAllIngredientes([]);
+            });
+    }, []);
+
+    const abrirModalIngredientes = (producto) => {
+        // Solo abrir para productos de la categoría 3 (Bocadillos/Sandwiches/Croissants)
+        if (producto.categoria_id !== 3) {
+            aumentarCantidad(producto.id);
+            return;
+        }
+
+        // Si ya tiene ingredientes personalizados, los usamos.
+        // Si no, cargamos los por defecto.
+        if (producto.ingredientesPersonalizados && producto.ingredientesPersonalizados.length > 0) {
+            setProductoParaPersonalizar({ ...producto });
+        } else {
+            fetch(`http://localhost:5000/api/productos/${producto.id}/ingredientes`)
+                .then(res => res.json())
+                .then(data => {
+                    const idsDefault = Array.isArray(data) ? data.map(i => i.id) : [];
+                    const updatedProducto = {
+                        ...producto,
+                        defaultIngredientesIds: idsDefault,
+                        ingredientesPersonalizados: idsDefault
+                    };
+                    setProductoParaPersonalizar(updatedProducto);
+
+                    // También actualizamos el producto en la lista principal para que Calculos lo sepa
+                    const nuevosProductos = productos.map(p => {
+                        if (p.id === producto.id) return updatedProducto;
+                        return p;
+                    });
+                    setProductos(nuevosProductos);
+                })
+                .catch(err => {
+                    console.error("Error default ingredients:", err);
+                    setProductoParaPersonalizar({ ...producto });
+                });
+        }
+    };
+
+    const toggleIngrediente = (ingId) => {
+        setProductoParaPersonalizar(prev => {
+            const currentSelected = prev.ingredientesPersonalizados || [];
+            if (currentSelected.includes(ingId)) {
+                return { ...prev, ingredientesPersonalizados: currentSelected.filter(id => id !== ingId) };
+            } else {
+                return { ...prev, ingredientesPersonalizados: [...currentSelected, ingId] };
+            }
+        });
+    };
+
+    const guardarPersonalizacion = () => {
+        const nuevosProductos = productos.map(p => {
+            if (p.id === productoParaPersonalizar.id) {
+                return {
+                    ...p,
+                    ingredientesPersonalizados: productoParaPersonalizar.ingredientesPersonalizados,
+                    cantidad: p.cantidad === 0 ? 1 : p.cantidad // Si es 0, lo ponemos a 1 al personalizar
+                };
+            }
+            return p;
+        });
+        setProductos(nuevosProductos);
+        setProductoParaPersonalizar(null);
+    };
 
     return (
         /* Use the 'App' class to get the main container style */
@@ -308,25 +391,46 @@ function Inicio() {
                             <div className="row g-3">
                                 {productosFiltrados.map(producto => (
                                     <div className="col-6 col-md-4 col-xl-3" key={producto.id}>
-                                        <div className="dash-card">
+                                        <div
+                                            className="dash-card"
+                                            onClick={() => abrirModalIngredientes(producto)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
                                             <div className="icon-wrapper">
-                                                {producto.nombre === 'Agua' && '💧'}
-                                                {producto.nombre === 'Refresco' && '🥤'}
-                                                {producto.nombre === 'Croissant' && '🥐'}
-                                                {producto.nombre === 'Ensalada' && '🥗'}
-                                                {producto.nombre === 'Hamburguesa' && '🍔'}
-                                                {producto.nombre === 'Perrito' && '🌭'}
-                                                {producto.nombre === 'Sandwich' && '🥪'}
-                                                {producto.nombre === 'Postre' && '🍰'}
-                                                {producto.nombre === 'Paquete de papas' && '🍟'}
+                                                {producto.nombre.includes('Café') && '☕'}
+                                                {producto.nombre.includes('Infusión') && '🍵'}
+                                                {producto.nombre.includes('Cacao') && '🍫'}
+                                                {producto.nombre.includes('Botella de Agua') && '💧'}
+                                                {producto.nombre.includes('Refresco') && '🥤'}
+                                                {producto.nombre.includes('Zumo') && '🍹'}
+                                                {producto.nombre.includes('Croissant') && '🥐'}
+                                                {producto.nombre.includes('Sandwich') && '🥪'}
+                                                {producto.nombre.includes('Bocadillo') && '🥖'}
+                                                {producto.nombre.includes('Pulgita') && '🥖'}
+                                                {producto.nombre.includes('Papas') && '🍟'}
+                                                {producto.nombre.includes('Galletas') && '🍪'}
+                                                {producto.nombre.includes('Barquillo') && '🧇'}
+                                                {producto.nombre.includes('Caramelos') && '🍬'}
+                                                {producto.nombre.includes('Tortitas') && '🥞'}
+                                                {producto.nombre.includes('Barritas') && '🍫'}
+                                                {!['Café', 'Infusión', 'Cacao', 'Agua', 'Refresco', 'Zumo', 'Croissant', 'Sandwich', 'Bocadillo', 'Pulgita', 'Papas', 'Galletas', 'Barquillo', 'Caramelos', 'Tortitas', 'Barritas'].some(key => producto.nombre.includes(key)) && '🍴'}
                                             </div>
                                             <h3 className="item-name">{tradNombre(producto.nombre)}</h3>
                                             <div className="item-price">{Dinero(producto.precio)}</div>
 
+                                            {producto.categoria_id === 3 && producto.ingredientes && (
+                                                <button
+                                                    className="btn-ingredientes-verde"
+                                                    onClick={(e) => { e.stopPropagation(); abrirModalIngredientes(producto); }}
+                                                >
+                                                    Ingredientes
+                                                </button>
+                                            )}
+
                                             <div className="control-group">
                                                 <button
                                                     className="btn btn-round"
-                                                    onClick={() => disminuirCantidad(producto.id)}
+                                                    onClick={(e) => { e.stopPropagation(); disminuirCantidad(producto.id); }}
                                                     disabled={producto.cantidad === 0}
                                                 >
                                                     -
@@ -334,7 +438,7 @@ function Inicio() {
                                                 <span className="qty-badge">{producto.cantidad}</span>
                                                 <button
                                                     className="btn btn-round"
-                                                    onClick={() => aumentarCantidad(producto.id)}
+                                                    onClick={(e) => { e.stopPropagation(); aumentarCantidad(producto.id); }}
                                                 >
                                                     +
                                                 </button>
@@ -353,12 +457,33 @@ function Inicio() {
                                 <div className="flex-grow-1">
                                     {hayPedidos ? (
                                         productosConPedidos.map(producto => (
-                                            <div key={producto.id} className="order-item">
-                                                <div>
-                                                    <span className="fw-bold text-warning me-2">{producto.cantidad}x</span>
-                                                    {tradNombre(producto.nombre)}
+                                            <div key={producto.id} className="order-item flex-wrap">
+                                                <div className="d-flex justify-content-between w-100">
+                                                    <div>
+                                                        <span className="fw-bold text-warning me-2">{producto.cantidad}x</span>
+                                                        {tradNombre(producto.nombre)}
+                                                    </div>
+                                                    <div>{Dinero(calcularVentasProducto(producto))}</div>
                                                 </div>
-                                                <div>{Dinero(calcularVentasProducto(producto))}</div>
+                                                {producto.ingredientesPersonalizados && allIngredientes.length > 0 && (
+                                                    <div className="ps-4 small text-white-50 w-100">
+                                                        {allIngredientes
+                                                            .filter(ing => {
+                                                                const isSelected = producto.ingredientesPersonalizados.includes(ing.id);
+                                                                const isDefault = (producto.defaultIngredientesIds || []).includes(ing.id);
+                                                                return (isSelected && !isDefault) || (!isSelected && isDefault);
+                                                            })
+                                                            .map(ing => {
+                                                                const isSelected = producto.ingredientesPersonalizados.includes(ing.id);
+                                                                return (
+                                                                    <div key={ing.id}>
+                                                                        {isSelected ? `+ ${ing.nombre}` : `- No ${ing.nombre}`}
+                                                                    </div>
+                                                                );
+                                                            })
+                                                        }
+                                                    </div>
+                                                )}
                                             </div>
                                         ))
                                     ) : (
@@ -413,6 +538,45 @@ function Inicio() {
                         </div>
                     </div>
                 </div>
+
+                {productoParaPersonalizar && (
+                    <div className="ingredients-modal-overlay">
+                        <div className="ingredients-modal">
+                            <h2>{tradNombre(productoParaPersonalizar.nombre)}</h2>
+                            {productoParaPersonalizar.descripcion && (
+                                <p className="product-description">{productoParaPersonalizar.description || productoParaPersonalizar.descripcion}</p>
+                            )}
+                            <p className="text-center text-white-50 mb-4">Personaliza tus ingredientes</p>
+
+                            <div className="ingredients-list">
+                                {Array.isArray(allIngredientes) && allIngredientes
+                                    .filter(ing => productoParaPersonalizar.defaultIngredientesIds?.includes(ing.id))
+                                    .map(ing => (
+                                        <div
+                                            key={ing.id}
+                                            className={`ingredient-item ${productoParaPersonalizar.ingredientesPersonalizados.includes(ing.id) ? 'selected' : ''}`}
+                                            onClick={() => toggleIngrediente(ing.id)}
+                                        >
+                                            <div className="ingredient-info">
+                                                <span className="ingredient-name">{ing.nombre}</span>
+                                                {ing.precio > 0 && <span className="ingredient-price">+{Dinero(ing.precio)}</span>}
+                                            </div>
+                                            <div className="ingredient-checkbox"></div>
+                                        </div>
+                                    ))}
+                            </div>
+
+                            <div className="modal-footer">
+                                <button className="btn-cancel-ingredients" onClick={() => setProductoParaPersonalizar(null)}>
+                                    Cancelar
+                                </button>
+                                <button className="btn-save-ingredients" onClick={guardarPersonalizacion}>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
 
             {/* Standard App Footer */}

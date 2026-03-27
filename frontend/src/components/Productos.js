@@ -27,7 +27,8 @@ function Productos() {
                 const productosConCantidad = data.map(p => ({
                     ...p,
                     cantidad: 0,
-                    categoria: mapCategoria(p.categoria_nombre)
+                    categoria: mapCategoria(p.categoria_nombre),
+                    ingredientesPersonalizados: [] // Almacenará los IDs de los ingredientes seleccionados
                 }));
 
                 setProductos(productosConCantidad);

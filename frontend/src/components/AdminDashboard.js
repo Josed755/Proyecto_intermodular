@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProductos, addProducto, updateProducto, deleteProducto, getAdminPedidos, getAdminUsuarios, updateUsuarioStatus } from '../services/api';
+import { getProductos, addProducto, updateProducto, deleteProducto, getAdminPedidos, getAdminUsuarios, updateUsuarioStatus, addUsuario } from '../services/api';
 import './EstiloInicio.css'; // Reutilizamos estilos base
 import './EstiloSesiones.css'; // Para modales y formularios
 import './EstiloAdmin.css';
@@ -12,6 +12,7 @@ const AdminDashboard = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [vista, setVista] = useState('productos'); // 'productos', 'pedidos' o 'usuarios'
     const [modalProducto, setModalProducto] = useState(null); // null o { product data }
+    const [modalUsuario, setModalUsuario] = useState(null); // null o { user data }
     const [error, setError] = useState('');
     const [menuAbierto, setMenuAbierto] = useState(false);
     const menuRef = useRef(null);
@@ -61,13 +62,21 @@ const AdminDashboard = () => {
     const handleSaveProducto = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
+        const data = { ...modalProducto, ...Object.fromEntries(formData.entries()) };
 
         try {
             if (modalProducto.id) {
-                await updateProducto(modalProducto.id, data);
+                await updateProducto(modalProducto.id, {
+                    ...data,
+                    precio: parseFloat(data.precio),
+                    categoria_id: parseInt(data.categoria_id)
+                });
             } else {
-                await addProducto(data);
+                await addProducto({
+                    ...data,
+                    precio: parseFloat(data.precio),
+                    categoria_id: parseInt(data.categoria_id)
+                });
             }
             setModalProducto(null);
             cargarDatos();
@@ -93,6 +102,20 @@ const AdminDashboard = () => {
             cargarDatos();
         } catch (err) {
             setError('Error al actualizar usuario: ' + err.message);
+        }
+    };
+
+    const handleSaveUsuario = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            await addUsuario(data);
+            setModalUsuario(null);
+            cargarDatos();
+        } catch (err) {
+            setError('Error creando empleado: ' + err.message);
         }
     };
 
@@ -180,7 +203,7 @@ const AdminDashboard = () => {
                                             <td>{p.precio}€</td>
                                             <td>{p.activo ? '✅' : '❌'}</td>
                                             <td>
-                                                <button className="btn btn-sm btn-primary me-2" onClick={() => setModalProducto(p)}>Editar</button>
+                                                <button className="btn btn-sm btn-success me-2" onClick={() => setModalProducto(p)}>Editar</button>
                                                 <button
                                                     className={`btn btn-sm ${p.activo ? 'btn-danger' : 'btn-success'}`}
                                                     onClick={() => toggleProducto(p)}
@@ -225,7 +248,12 @@ const AdminDashboard = () => {
 
                     {vista === 'usuarios' && (
                         <div>
-                            <h3>Gestión de Empleados</h3>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h3 className="mb-0">Gestión de Empleados</h3>
+                                <button className="btn btn-success" onClick={() => setModalUsuario({ nombre: '', correo: '', contrasena: '', tipo: 'empleado' })}>
+                                    + Añadir Empleado
+                                </button>
+                            </div>
                             <table className="table table-dark table-hover">
                                 <thead>
                                     <tr>
@@ -251,7 +279,7 @@ const AdminDashboard = () => {
                                                     <option value="admin">Administrador</option>
                                                 </select>
                                             </td>
-                                            <td>{u.activo ? '✅ Activo' : '❌ Baneado'}</td>
+                                            <td>{u.activo ? '✅ Activo' : '❌ Inactivo'}</td>
                                             <td>
                                                 <button
                                                     className={`btn btn-sm ${u.activo ? 'btn-danger' : 'btn-success'}`}
@@ -292,6 +320,38 @@ const AdminDashboard = () => {
                                 <div className="d-flex gap-2">
                                     <button type="submit" className="btn-confirm-prefs">Guardar</button>
                                     <button type="button" className="btn btn-secondary" onClick={() => setModalProducto(null)}>Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
+                {modalUsuario && (
+                    <div className="prefs-overlay">
+                        <div className="prefs-modal shadow-lg admin-modal">
+                            <h3>Nuevo Empleado</h3>
+                            <form onSubmit={handleSaveUsuario}>
+                                <div className="mb-3">
+                                    <label>Nombre</label>
+                                    <input type="text" name="nombre" className="form-control" required />
+                                </div>
+                                <div className="mb-3">
+                                    <label>Correo Electrónico</label>
+                                    <input type="email" name="correo" className="form-control" required />
+                                </div>
+                                <div className="mb-3">
+                                    <label>Contraseña</label>
+                                    <input type="password" name="contrasena" className="form-control" required minLength="8" />
+                                </div>
+                                <div className="mb-3">
+                                    <label>Rol</label>
+                                    <select name="tipo" className="form-select" defaultValue="empleado">
+                                        <option value="empleado">Empleado</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                </div>
+                                <div className="d-flex gap-2">
+                                    <button type="submit" className="btn-confirm-prefs">Guardar</button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => setModalUsuario(null)}>Cancelar</button>
                                 </div>
                             </form>
                         </div>

@@ -118,6 +118,60 @@ app.get('/api/productos', async (req, res) => {
   }
 });
 
+// Listar todos los ingredientes
+app.get('/api/ingredientes', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM ingredientes WHERE activo = TRUE ORDER BY nombre');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Listar ingredientes de un producto específico
+app.get('/api/productos/:id/ingredientes', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await pool.execute(
+      `SELECT i.* FROM ingredientes i
+       JOIN producto_ingredientes pi ON i.id = pi.ingrediente_id
+       WHERE pi.producto_id = ? AND i.activo = TRUE
+       ORDER BY i.nombre`,
+      [id]
+    );
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Listar todos los ingredientes
+app.get('/api/ingredientes', async (req, res) => {
+  try {
+    const [rows] = await pool.execute('SELECT * FROM ingredientes WHERE activo = TRUE ORDER BY nombre');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Listar ingredientes de un producto específico
+app.get('/api/productos/:id/ingredientes', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await pool.execute(
+      `SELECT i.* FROM ingredientes i
+       JOIN producto_ingredientes pi ON i.id = pi.ingrediente_id
+       WHERE pi.producto_id = ? AND i.activo = TRUE
+       ORDER BY i.nombre`,
+      [id]
+    );
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // RUTAS ADMIN PRODUCTOS
 
 // Listar todos los productos (incluyendo desactivados)
@@ -149,11 +203,11 @@ app.patch('/api/admin/productos/:id/estado', verificarAdmin, async (req, res) =>
 
 // Crear producto
 app.post('/api/admin/productos', verificarAdmin, async (req, res) => {
-  const { nombre, descripcion, precio, imagen_url, categoria_id } = req.body;
+  const { nombre, descripcion, precio, categoria_id } = req.body;
   try {
     const [result] = await pool.execute(
-      'INSERT INTO productos (nombre, descripcion, precio, imagen_url, categoria_id, activo) VALUES (?, ?, ?, ?, ?, TRUE)',
-      [nombre, descripcion, precio, imagen_url, categoria_id]
+      'INSERT INTO productos (nombre, descripcion, precio, categoria_id, activo) VALUES (?, ?, ?, ?, TRUE)',
+      [nombre, descripcion, precio, categoria_id]
     );
     res.status(201).json({ success: true, id: result.insertId });
   } catch (error) {
@@ -164,11 +218,11 @@ app.post('/api/admin/productos', verificarAdmin, async (req, res) => {
 // Modificar producto
 app.put('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
   const { id } = req.params;
-  const { nombre, descripcion, precio, imagen_url, categoria_id, activo } = req.body;
+  const { nombre, descripcion, precio, categoria_id, activo } = req.body;
   try {
     await pool.execute(
-      'UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, imagen_url = ?, categoria_id = ?, activo = ? WHERE id = ?',
-      [nombre, descripcion, precio, imagen_url, categoria_id, activo, id]
+      'UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, categoria_id = ?, activo = ? WHERE id = ?',
+      [nombre, descripcion, precio, categoria_id, activo, id]
     );
     res.json({ success: true });
   } catch (error) {
@@ -205,7 +259,7 @@ app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
 // RUTAS ADMIN USUARIOS
 app.get('/api/admin/usuarios', verificarAdmin, async (req, res) => {
   try {
-    const [rows] = await pool.execute('SELECT id, correo, nombre, tipo, activo, fecha_registro FROM usuarios ORDER BY fecha_registro DESC');
+    const [rows] = await pool.execute("SELECT id, correo, nombre, tipo, activo, fecha_registro FROM usuarios WHERE tipo IN ('admin', 'empleado') ORDER BY fecha_registro DESC");
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -218,6 +272,27 @@ app.put('/api/admin/usuarios/:id', verificarAdmin, async (req, res) => {
   try {
     await pool.execute('UPDATE usuarios SET tipo = ?, activo = ? WHERE id = ?', [tipo, activo, id]);
     res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/admin/usuarios', verificarAdmin, async (req, res) => {
+  const { correo, nombre, contrasena, tipo } = req.body;
+  if (!correo || !nombre || !contrasena || !tipo) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const contrasenaHash = await bcrypt.hash(contrasena, salt);
+
+    const [result] = await pool.execute(
+      'INSERT INTO usuarios (correo, nombre, contrasena_hash, tipo, activo) VALUES (?, ?, ?, ?, TRUE)',
+      [correo, nombre, contrasenaHash, tipo]
+    );
+
+    res.status(201).json({ success: true, id: result.insertId });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -1,19 +1,29 @@
 
-const Calculos = ({ productos }) => {
-
+const Calculos = ({ productos, allIngredientes }) => {
 
     // Calcula el total de un producto individualmente
     const calcularVentasProducto = (producto) => {
-        return (producto.cantidad * producto.precio).toFixed(2);
+        let precioExtra = 0;
+        if (producto.ingredientesPersonalizados && allIngredientes.length > 0) {
+            const defaults = producto.defaultIngredientesIds || [];
+            producto.ingredientesPersonalizados.forEach(ingId => {
+                // Si el ingrediente NO estaba por defecto, sumamos su precio
+                if (!defaults.includes(ingId)) {
+                    const ingredient = allIngredientes.find(i => i.id === ingId);
+                    if (ingredient) {
+                        precioExtra += parseFloat(ingredient.precio || 0);
+                    }
+                }
+            });
+        }
+        return (producto.cantidad * (parseFloat(producto.precio) + precioExtra)).toFixed(2);
     };
 
     const calcularVentasTotales = () => {
         let total = 0;
-        // Por cada producto de productos(un for literalmente) multiplica la cantidad por el precio y ese es el total 
         productos.forEach(producto => {
-            total += producto.cantidad * producto.precio;
+            total += parseFloat(calcularVentasProducto(producto));
         });
-        // toFixed limita los decimales a dos para que no te devuelva un número como pi de largo 
         return total.toFixed(2);
     };
 

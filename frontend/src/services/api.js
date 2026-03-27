@@ -44,11 +44,11 @@ export const getProductos = () => api.get('/productos');
 // ADMIN PRODUCTOS
 export const getAdminProductos = () => api.get('/admin/productos');
 
-export const addProducto = (datos) => api.post('/productos', datos);
+export const addProducto = (datos) => api.post('/admin/productos', datos);
 
-export const updateProducto = (id, datos) => api.put(`/productos/${id}`, datos);
+export const updateProducto = (id, datos) => api.put(`/admin/productos/${id}`, datos);
 
-export const deleteProducto = (id) => api.delete(`/productos/${id}`);
+export const deleteProducto = (id) => api.delete(`/admin/productos/${id}`);
 
 // NUEVA FUNCION ACTIVAR / DESACTIVAR
 export const toggleProductoEstado = (id, activo) => {
@@ -66,6 +66,8 @@ export const getAdminUsuarios = () => api.get('/admin/usuarios');
 
 export const updateUsuarioStatus = (id, datos) =>
   api.put(`/admin/usuarios/${id}`, datos);
+
+export const addUsuario = (datos) => api.post('/admin/usuarios', datos);
 
 // Perfil
 export const getPerfil = () => api.get('/perfil');
