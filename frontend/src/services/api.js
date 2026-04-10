@@ -71,6 +71,7 @@ export const addUsuario = (datos) => api.post('/admin/usuarios', datos);
 
 // Perfil
 export const getPerfil = () => api.get('/perfil');
+export const updatePerfil = (id, datos) => api.put(`/usuarios/${id}/perfil`, datos);
 
 // Estadisticas
 export const getEstadisticas = () => api.get('/estadisticas');

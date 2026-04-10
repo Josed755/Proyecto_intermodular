@@ -9,7 +9,8 @@ function Registrarse() {
     correo: '',
     nombre: '',
     contrasena: '',
-    confirmarContrasena: ''
+    confirmarContrasena: '',
+    centro: 'IES José Zerpa'
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -41,7 +42,9 @@ function Registrarse() {
       espanyol: 'Español',
       ingles: 'Inglés',
       ayudaContenido: 'Crea una cuenta para realizar tus pedidos en la cafetería. Necesitarás un correo válido y una contraseña con al menos 8 caracteres.',
-      acercaContenido: 'CaffES App v1.0 - IES José Zerpa'
+      acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
+      centroRecogida: 'Centro de Recogida:',
+      seleccionarCentro: 'Selecciona un centro'
     },
     en: {
       titulo: 'Register',
@@ -62,7 +65,9 @@ function Registrarse() {
       espanyol: 'Spanish',
       ingles: 'English',
       ayudaContenido: 'Create an account to place your orders at the cafeteria. You will need a valid email and a password with at least 8 characters.',
-      acercaContenido: 'CaffES App v1.0 - IES José Zerpa'
+      acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
+      centroRecogida: 'Collection Point:',
+      seleccionarCentro: 'Select a center'
     }
   };
 
@@ -96,7 +101,8 @@ function Registrarse() {
       const datosRegistro = {
         correo: formData.correo,
         nombre: formData.nombre,
-        contrasena: formData.contrasena
+        contrasena: formData.contrasena,
+        centro: formData.centro
       };
 
       await registrarUsuario(datosRegistro);
@@ -245,6 +251,21 @@ function Registrarse() {
                 onChange={handleChange}
                 required
               />
+            </div>
+            <div className="form-group">
+              <label>{t.centroRecogida}</label>
+              <select
+                name="centro"
+                value={formData.centro}
+                onChange={handleChange}
+                required
+                className="form-control bg-dark text-white"
+                style={{ border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '10px' }}
+              >
+                <option value="IES José Zerpa">IES José Zerpa</option>
+                <option value="Centro Ejemplo A">Centro Ejemplo A</option>
+                <option value="Centro Ejemplo B">Centro Ejemplo B</option>
+              </select>
             </div>
             <div className="btn-container">
               <button

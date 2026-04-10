@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import Productos from './Productos';
 import Calculos from './CalculosInic';
 import Botones from './BotonesInic';
-import { logout, getUsuario } from '../services/api';
+import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal } from '../services/api';
 
 function Inicio() {
     const navigate = useNavigate();
@@ -29,6 +29,8 @@ function Inicio() {
     const [modalActivo, setModalActivo] = useState(null); // 'perfil', 'historial', 'preferencias', 'ayuda', 'acerca'
     const [productoParaPersonalizar, setProductoParaPersonalizar] = useState(null);
     const [allIngredientes, setAllIngredientes] = useState([]);
+    const [isEditingPerfil, setIsEditingPerfil] = useState(false);
+    const [tempPerfil, setTempPerfil] = useState({ nombre: usuario?.nombre, centro: usuario?.centro || 'IES José Zerpa' });
 
     const getIniciales = (nombre) => {
         if (!nombre) return '?';
@@ -67,7 +69,11 @@ function Inicio() {
             pedidoConfirmado: 'Pedido confirmado. Total: ',
             confirmarSalir: '¿Estás seguro de que quieres salir?',
             pedidoVacio: 'El pedido está vacío.',
-            panelControl: 'Panel de Control'
+            panelControl: 'Panel de Control',
+            centroRecogida: 'Centro de Recogida',
+            guardar: 'Guardar',
+            editar: 'Editar',
+            nombre: 'Nombre'
         },
         en: {
             titulo: 'CafES App',
@@ -99,6 +105,10 @@ function Inicio() {
             pedidoConfirmado: 'Order confirmed. Total: ',
             confirmarSalir: 'Are you sure you want to exit?',
             pedidoVacio: 'The order is empty.',
+            centroRecogida: 'Collection Point',
+            guardar: 'Save',
+            editar: 'Edit',
+            nombre: 'Name',
             nombresProductos: {
                 'Agua': ' Water',
                 'Refresco': ' Soda',
@@ -132,6 +142,19 @@ function Inicio() {
         disminuirCantidad,
         reiniciarTodo
     } = Botones({ productos, productosIniciales, setProductos })
+
+    const alergenosProductos = {
+        'Bocadillo Un Embutido': 'GLUTEN',
+        'Bocadillo Dos Embutidos': 'GLUTEN, SOJA, LECHE',
+        'Bocadillo Jamón Serrano': 'GLUTEN, SULFITOS',
+        'Bocadillo Tortilla de Papas': 'GLUTEN, HUEVO',
+        'Bocadillo de Lomo o Pechuga': 'GLUTEN, SOJA',
+        'Bocadillo de Vegetal Atún': 'GLUTEN, PESCADO, SOJA, HUEVO, SULFITOS',
+        'Sandwich Mixto': 'GLUTEN, SOJA, LECHE',
+        'Sandwich Vegetal + Mixto Triple': 'GLUTEN, PESCADO, SOJA, HUEVO, LECHE, SULFITOS',
+        'Croissant Mixto': 'GLUTEN, SOJA, LECHE',
+        'Croissant Vegetal': 'GLUTEN, SOJA, PESCADO, HUEVO, SULFITOS'
+    };
 
 
 
@@ -325,10 +348,58 @@ function Inicio() {
 
                             {modalActivo === 'perfil' && (
                                 <div className="profile-details text-center">
-                                    <div className="profile-large-avatar mb-3">{getIniciales(usuario?.nombre)}</div>
-                                    <h4 className="mb-1 text-warning">{usuario?.nombre}</h4>
-                                    <p className="text-white-50">{usuario?.correo}</p>
-                                    <div className="badge bg-warning text-dark px-3 py-2 mt-2">USUARIO REGISTRADO</div>
+                                    <div className="profile-large-avatar mb-3">{getIniciales(isEditingPerfil ? tempPerfil.nombre : usuario?.nombre)}</div>
+
+                                    {isEditingPerfil ? (
+                                        <div className="edit-profile-form text-start">
+                                            <div className="mb-3">
+                                                <label className="text-white-50 small mb-1">{t.nombre}</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-control bg-dark text-white border-secondary"
+                                                    value={tempPerfil.nombre}
+                                                    onChange={(e) => setTempPerfil({ ...tempPerfil, nombre: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="mb-3">
+                                                <label className="text-white-50 small mb-1">{t.centroRecogida}</label>
+                                                <select
+                                                    className="form-control bg-dark text-white border-secondary"
+                                                    value={tempPerfil.centro}
+                                                    onChange={(e) => setTempPerfil({ ...tempPerfil, centro: e.target.value })}
+                                                >
+                                                    <option value="IES José Zerpa">IES José Zerpa</option>
+                                                    <option value="Centro Ejemplo A">Centro Ejemplo A</option>
+                                                    <option value="Centro Ejemplo B">Centro Ejemplo B</option>
+                                                </select>
+                                            </div>
+                                            <button className="btn-confirm-prefs" onClick={async () => {
+                                                try {
+                                                    await updatePerfil(usuario.id, tempPerfil);
+                                                    const nuevoUsuario = { ...usuario, ...tempPerfil };
+                                                    setUsuarioLocal(nuevoUsuario);
+                                                    setIsEditingPerfil(false);
+                                                } catch (err) {
+                                                    alert('Error al actualizar perfil');
+                                                }
+                                            }}>
+                                                {t.guardar}
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <h4 className="mb-1 text-warning">{usuario?.nombre}</h4>
+                                            <p className="text-white-50">{usuario?.correo}</p>
+                                            <p className="text-info small mb-2">{t.centroRecogida}: {usuario?.centro || 'IES José Zerpa'}</p>
+                                            <div className="badge bg-warning text-dark px-3 py-2 mt-2">USUARIO REGISTRADO</div>
+                                            <button className="btn btn-sm btn-outline-warning mt-3 w-100" onClick={() => {
+                                                setTempPerfil({ nombre: usuario.nombre, centro: usuario.centro || 'IES José Zerpa' });
+                                                setIsEditingPerfil(true);
+                                            }}>
+                                                {t.editar}
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             )}
 
@@ -390,7 +461,7 @@ function Inicio() {
                             <h2 className="text-white mb-4 border-bottom pb-2">Menú</h2>
                             <div className="row g-3">
                                 {productosFiltrados.map(producto => (
-                                    <div className="col-6 col-md-4 col-xl-3" key={producto.id}>
+                                    <div className="col-6" key={producto.id}>
                                         <div
                                             className="dash-card"
                                             onClick={() => abrirModalIngredientes(producto)}
@@ -417,6 +488,12 @@ function Inicio() {
                                             </div>
                                             <h3 className="item-name">{tradNombre(producto.nombre)}</h3>
                                             <div className="item-price">{Dinero(producto.precio)}</div>
+
+                                            {alergenosProductos[producto.nombre] && (
+                                                <div className="allergen-warning">
+                                                    ⚠️ ALÉRGENOS: {alergenosProductos[producto.nombre]}
+                                                </div>
+                                            )}
 
                                             {producto.categoria_id === 3 && producto.ingredientes && (
                                                 <button

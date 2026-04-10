@@ -61,8 +61,8 @@ app.post('/api/registro', async (req, res) => {
     const contrasenaHash = await bcrypt.hash(contrasena, salt);
 
     const [result] = await connection.execute(
-      'INSERT INTO usuarios (correo, nombre, contrasena_hash) VALUES (?, ?, ?)',
-      [correo, nombre, contrasenaHash]
+      'INSERT INTO usuarios (correo, nombre, contrasena_hash, centro) VALUES (?, ?, ?, ?)',
+      [correo, nombre, contrasenaHash, req.body.centro || 'IES José Zerpa']
     );
 
     res.status(201).json({ success: true, message: 'Usuario registrado exitosamente', usuarioId: result.insertId });
@@ -243,14 +243,42 @@ app.delete('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
 
 // RUTAS ADMIN PEDIDOS
 app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
+  const { centro } = req.query;
   try {
-    const [rows] = await pool.execute(`
+    let query = `
       SELECT p.*, u.nombre as usuario_nombre 
       FROM pedidos p 
       JOIN usuarios u ON p.usuario_id = u.id 
-      ORDER BY p.fecha DESC
-    `);
+    `;
+    let params = [];
+
+    if (centro) {
+      query += ' WHERE p.centro = ? ';
+      params.push(centro);
+    }
+
+    query += ' ORDER BY p.fecha DESC';
+
+    const [rows] = await pool.execute(query, params);
     res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// RUTA PERFIL USUARIO
+app.put('/api/usuarios/:id/perfil', async (req, res) => {
+  const { id } = req.params;
+  const { nombre, centro } = req.body;
+
+  if (!nombre || !centro) return res.status(400).json({ error: 'Nombre y centro son requeridos' });
+
+  try {
+    await pool.execute(
+      'UPDATE usuarios SET nombre = ?, centro = ? WHERE id = ?',
+      [nombre, centro, id]
+    );
+    res.json({ success: true, message: 'Perfil actualizado' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -259,7 +287,7 @@ app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
 // RUTAS ADMIN USUARIOS
 app.get('/api/admin/usuarios', verificarAdmin, async (req, res) => {
   try {
-    const [rows] = await pool.execute("SELECT id, correo, nombre, tipo, activo, fecha_registro FROM usuarios WHERE tipo IN ('admin', 'empleado') ORDER BY fecha_registro DESC");
+    const [rows] = await pool.execute("SELECT id, correo, nombre, tipo, activo, turno, fecha_registro FROM usuarios WHERE tipo IN ('admin', 'empleado') ORDER BY fecha_registro DESC");
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -268,9 +296,9 @@ app.get('/api/admin/usuarios', verificarAdmin, async (req, res) => {
 
 app.put('/api/admin/usuarios/:id', verificarAdmin, async (req, res) => {
   const { id } = req.params;
-  const { tipo, activo } = req.body;
+  const { tipo, activo, turno } = req.body;
   try {
-    await pool.execute('UPDATE usuarios SET tipo = ?, activo = ? WHERE id = ?', [tipo, activo, id]);
+    await pool.execute('UPDATE usuarios SET tipo = ?, activo = ?, turno = ? WHERE id = ?', [tipo, activo, turno, id]);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -278,7 +306,7 @@ app.put('/api/admin/usuarios/:id', verificarAdmin, async (req, res) => {
 });
 
 app.post('/api/admin/usuarios', verificarAdmin, async (req, res) => {
-  const { correo, nombre, contrasena, tipo } = req.body;
+  const { correo, nombre, contrasena, tipo, turno } = req.body;
   if (!correo || !nombre || !contrasena || !tipo) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
@@ -288,8 +316,8 @@ app.post('/api/admin/usuarios', verificarAdmin, async (req, res) => {
     const contrasenaHash = await bcrypt.hash(contrasena, salt);
 
     const [result] = await pool.execute(
-      'INSERT INTO usuarios (correo, nombre, contrasena_hash, tipo, activo) VALUES (?, ?, ?, ?, TRUE)',
-      [correo, nombre, contrasenaHash, tipo]
+      'INSERT INTO usuarios (correo, nombre, contrasena_hash, tipo, activo, turno) VALUES (?, ?, ?, ?, TRUE, ?)',
+      [correo, nombre, contrasenaHash, tipo, turno || 'mañana']
     );
 
     res.status(201).json({ success: true, id: result.insertId });

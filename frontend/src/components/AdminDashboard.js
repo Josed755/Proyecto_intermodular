@@ -13,6 +13,7 @@ const AdminDashboard = () => {
     const [vista, setVista] = useState('productos'); // 'productos', 'pedidos' o 'usuarios'
     const [modalProducto, setModalProducto] = useState(null); // null o { product data }
     const [modalUsuario, setModalUsuario] = useState(null); // null o { user data }
+    const [filtroCentro, setFiltroCentro] = useState('');
     const [error, setError] = useState('');
     const [menuAbierto, setMenuAbierto] = useState(false);
     const menuRef = useRef(null);
@@ -50,14 +51,20 @@ const AdminDashboard = () => {
         try {
             const prodData = await getAdminProductos();
             setProductos(prodData.data || prodData);
-            const pedData = await getAdminPedidos();
+
+            const pedData = await getAdminPedidos({ centro: filtroCentro });
             setPedidos(pedData.data || pedData);
+
             const userData = await getAdminUsuarios();
             setUsuarios(userData.data || userData);
         } catch (err) {
             setError('Error cargando datos: ' + err.message);
         }
     };
+
+    useEffect(() => {
+        cargarDatos();
+    }, [filtroCentro, vista]);
 
     const handleSaveProducto = async (e) => {
         e.preventDefault();
@@ -220,7 +227,23 @@ const AdminDashboard = () => {
 
                     {vista === 'pedidos' && (
                         <div>
-                            <h3>Historial de Pedidos (Global)</h3>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h3>Historial de Pedidos (Global)</h3>
+                                <div className="d-flex align-items-center gap-2">
+                                    <label className="text-white-50 small">Filtrar por centro:</label>
+                                    <select
+                                        className="form-select form-select-sm bg-dark text-white border-secondary"
+                                        style={{ width: '200px' }}
+                                        value={filtroCentro}
+                                        onChange={(e) => setFiltroCentro(e.target.value)}
+                                    >
+                                        <option value="">Todos los centros</option>
+                                        <option value="IES José Zerpa">IES José Zerpa</option>
+                                        <option value="Centro Ejemplo A">Centro Ejemplo A</option>
+                                        <option value="Centro Ejemplo B">Centro Ejemplo B</option>
+                                    </select>
+                                </div>
+                            </div>
                             <table className="table table-dark table-hover">
                                 <thead>
                                     <tr>
@@ -260,6 +283,7 @@ const AdminDashboard = () => {
                                         <th>Nombre</th>
                                         <th>Correo</th>
                                         <th>Rol</th>
+                                        <th>Turno</th>
                                         <th>Estado Account</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -273,17 +297,27 @@ const AdminDashboard = () => {
                                                 <select
                                                     className="form-select form-select-sm bg-dark text-white"
                                                     defaultValue={u.tipo}
-                                                    onChange={(e) => handleUpdateUsuario(u.id, { tipo: e.target.value, activo: u.activo })}
+                                                    onChange={(e) => handleUpdateUsuario(u.id, { tipo: e.target.value, activo: u.activo, turno: u.turno })}
                                                 >
                                                     <option value="empleado">Empleado</option>
                                                     <option value="admin">Administrador</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select
+                                                    className="form-select form-select-sm bg-dark text-white"
+                                                    defaultValue={u.turno || 'mañana'}
+                                                    onChange={(e) => handleUpdateUsuario(u.id, { tipo: u.tipo, activo: u.activo, turno: e.target.value })}
+                                                >
+                                                    <option value="mañana">Mañana</option>
+                                                    <option value="tarde">Tarde</option>
                                                 </select>
                                             </td>
                                             <td>{u.activo ? '✅ Activo' : '❌ Inactivo'}</td>
                                             <td>
                                                 <button
                                                     className={`btn btn-sm ${u.activo ? 'btn-danger' : 'btn-success'}`}
-                                                    onClick={() => handleUpdateUsuario(u.id, { tipo: u.tipo, activo: !u.activo })}
+                                                    onClick={() => handleUpdateUsuario(u.id, { tipo: u.tipo, activo: !u.activo, turno: u.turno })}
                                                 >
                                                     {u.activo ? 'Bloquear' : 'Desbloquear'}
                                                 </button>
@@ -347,6 +381,13 @@ const AdminDashboard = () => {
                                     <select name="tipo" className="form-select" defaultValue="empleado">
                                         <option value="empleado">Empleado</option>
                                         <option value="admin">Administrador</option>
+                                    </select>
+                                </div>
+                                <div className="mb-3">
+                                    <label>Turno</label>
+                                    <select name="turno" className="form-select" defaultValue="mañana">
+                                        <option value="mañana">Mañana</option>
+                                        <option value="tarde">Tarde</option>
                                     </select>
                                 </div>
                                 <div className="d-flex gap-2">
