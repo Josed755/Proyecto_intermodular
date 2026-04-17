@@ -241,6 +241,73 @@ app.delete('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
   }
 });
 
+// RUTAS DE PEDIDOS
+
+// Crear nuevo pedido
+app.post('/api/pedidos', async (req, res) => {
+  const { usuario_id, total, items, metodo_pago, centro } = req.body;
+
+  if (!usuario_id || !total || !items || !items.length) {
+    return res.status(400).json({ error: 'Datos de pedido incompletos' });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    // 1. Insertar en pedidos
+    const [result] = await connection.execute(
+      'INSERT INTO pedidos (usuario_id, total, fecha, centro, metodo_pago, estado) VALUES (?, ?, NOW(), ?, ?, ?)',
+      [usuario_id, total, centro || 'IES José Zerpa', metodo_pago || 'efectivo', 'pendiente']
+    );
+
+    const pedidoId = result.insertId;
+
+    // 2. Insertar detalles del pedido
+    // Nota: Asumimos que existe la tabla detalles_pedido con las columnas: 
+    // pedido_id, producto_id, cantidad, precio_unitario, ingredientes
+    for (const item of items) {
+      const ingredientesStr = item.ingredientesPersonalizados
+        ? JSON.stringify(item.ingredientesPersonalizados)
+        : null;
+
+      await connection.execute(
+        'INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario, ingredientes) VALUES (?, ?, ?, ?, ?)',
+        [pedidoId, item.id, item.cantidad, item.precio, ingredientesStr]
+      );
+    }
+
+    await connection.commit();
+    res.status(201).json({ success: true, message: 'Pedido creado exitosamente', pedidoId });
+  } catch (error) {
+    if (connection) await connection.rollback();
+    console.error('Error al crear pedido:', error);
+    res.status(500).json({ error: 'Error al procesar el pedido', details: error.message });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+// Obtener historial de pedidos del usuario
+app.get('/api/pedidos/historial', async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: 'No autorizado' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key_cafes');
+    const [rows] = await pool.execute(
+      'SELECT * FROM pedidos WHERE usuario_id = ? ORDER BY fecha DESC',
+      [decoded.id]
+    );
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // RUTAS ADMIN PEDIDOS
 app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
   const { centro } = req.query;

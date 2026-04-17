@@ -593,8 +593,25 @@ function Inicio() {
                                         className="btn-confirm"
                                         onClick={() => {
                                             const total = calcularTotalConImpuesto();
-                                            if (total > 0) alert(t.pedidoConfirmado + Dinero(total));
-                                            else alert(t.pedidoVacio);
+                                            if (total > 0) {
+                                                // Guardar pedido en localStorage para la página de pago
+                                                const pedidoParaCheckout = {
+                                                    items: productosConPedidos.map(p => ({
+                                                        id: p.id,
+                                                        nombre: p.nombre,
+                                                        cantidad: p.cantidad,
+                                                        precio: p.precio,
+                                                        ingredientesPersonalizados: p.ingredientesPersonalizados
+                                                    })),
+                                                    total: total,
+                                                    subtotal: calcularVentasTotales(),
+                                                    impuesto: calcularImpuesto()
+                                                };
+                                                localStorage.setItem('carrito', JSON.stringify(pedidoParaCheckout));
+                                                navigate('/pago');
+                                            } else {
+                                                alert(t.pedidoVacio);
+                                            }
                                         }}
                                     >
                                         {t.confirmar}

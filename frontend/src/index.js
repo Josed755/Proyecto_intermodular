@@ -8,6 +8,7 @@ import InicioSesion from './components/InicioSesion';
 import Registrarse from './components/Registrarse';
 import Inicio from './components/Inicio';
 import AdminDashboard from './components/AdminDashboard';
+import Pago from './components/Pago';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -19,6 +20,7 @@ root.render(
         <Route path="/register" element={<Registrarse />} />
         <Route path="/home" element={<Inicio />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/pago" element={<Pago />} />
       </Routes>
     </React.StrictMode>
   </BrowserRouter>
