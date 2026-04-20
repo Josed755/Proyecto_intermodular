@@ -19,14 +19,128 @@ const AdminDashboard = () => {
     const menuRef = useRef(null);
     const navigate = useNavigate();
 
-    const usuario = JSON.parse(localStorage.getItem('usuario'));
+    const [idioma] = useState(localStorage.getItem('idioma') || 'es');
+
+    const textos = {
+        es: {
+            volver: 'Volver',
+            panelAdmin: 'Panel Admin - CafES',
+            inicio: 'Inicio',
+            cerrarSesion: 'Cerrar Sesión',
+            productos: 'Productos',
+            pedidos: 'Pedidos',
+            empleados: 'Empleados',
+            gestionProductos: 'Gestión de Productos',
+            nuevoProducto: '+ Nuevo Producto',
+            nombre: 'Nombre',
+            precio: 'Precio',
+            estado: 'Estado',
+            acciones: 'Acciones',
+            editar: 'Editar',
+            desactivar: 'Desactivar',
+            activar: 'Activar',
+            historialPedidos: 'Historial de Pedidos (Global)',
+            filtrarCentro: 'Filtrar por centro:',
+            todosCentros: 'Todos los centros',
+            id: 'ID',
+            usuario: 'Usuario',
+            fecha: 'Fecha',
+            total: 'Total',
+            gestionEmpleados: 'Gestión de Empleados',
+            nuevoEmpleado: '+ Añadir Empleado',
+            correo: 'Correo',
+            rol: 'Rol',
+            turno: 'Turno',
+            estadoCuenta: 'Estado Account',
+            empleado: 'Empleado',
+            admin: 'Administrador',
+            manyana: 'Mañana',
+            tarde: 'Tarde',
+            activo: 'Activo',
+            inactivo: 'Inactivo',
+            bloquear: 'Bloquear',
+            desbloquear: 'Desbloquear',
+            editarProducto: 'Editar Producto',
+            crearProducto: 'Nuevo Producto',
+            descripcion: 'Descripción',
+            categoriaId: 'Categoría ID',
+            guardar: 'Guardar',
+            cancelar: 'Cancelar',
+            crearEmpleado: 'Nuevo Empleado',
+            contrasena: 'Contraseña',
+            seguroEliminar: '¿Estás seguro de desactivar este producto?',
+            errorCargando: 'Error cargando datos: ',
+            errorCambioEstado: 'Error cambiando estado: ',
+            errorGuardar: 'Error al guardar: ',
+            errorEliminar: 'Error al eliminar: ',
+            errorActUsuario: 'Error al actualizar usuario: ',
+            errorCrearEmpleado: 'Error creando empleado: '
+        },
+        en: {
+            volver: 'Back',
+            panelAdmin: 'Admin Panel - CafES',
+            inicio: 'Home',
+            cerrarSesion: 'Logout',
+            productos: 'Products',
+            pedidos: 'Orders',
+            empleados: 'Employees',
+            gestionProductos: 'Product Management',
+            nuevoProducto: '+ New Product',
+            nombre: 'Name',
+            precio: 'Price',
+            estado: 'Status',
+            acciones: 'Actions',
+            editar: 'Edit',
+            desactivar: 'Deactivate',
+            activar: 'Activate',
+            historialPedidos: 'Order History (Global)',
+            filtrarCentro: 'Filter by center:',
+            todosCentros: 'All centers',
+            id: 'ID',
+            usuario: 'User',
+            fecha: 'Date',
+            total: 'Total',
+            gestionEmpleados: 'Employee Management',
+            nuevoEmpleado: '+ Add Employee',
+            correo: 'Email',
+            rol: 'Role',
+            turno: 'Shift',
+            estadoCuenta: 'Account Status',
+            empleado: 'Employee',
+            admin: 'Admin',
+            manyana: 'Morning',
+            tarde: 'Afternoon',
+            activo: 'Active',
+            inactivo: 'Inactive',
+            bloquear: 'Block',
+            desbloquear: 'Unblock',
+            editarProducto: 'Edit Product',
+            crearProducto: 'New Product',
+            descripcion: 'Description',
+            categoriaId: 'Category ID',
+            guardar: 'Save',
+            cancelar: 'Cancel',
+            crearEmpleado: 'New Employee',
+            contrasena: 'Password',
+            seguroEliminar: 'Are you sure you want to deactivate this product?',
+            errorCargando: 'Error loading data: ',
+            errorCambioEstado: 'Error changing status: ',
+            errorGuardar: 'Error saving: ',
+            errorEliminar: 'Error deleting: ',
+            errorActUsuario: 'Error updating user: ',
+            errorCrearEmpleado: 'Error creating employee: '
+        }
+    };
+
+    const t = textos[idioma];
+    const usuarioLogged = JSON.parse(localStorage.getItem('usuario'));
 
     const toggleProducto = async (producto) => {
         try {
             await toggleProductoEstado(producto.id, !producto.activo);
             cargarDatos();
         } catch (err) {
-            setError('Error cambiando estado: ' + err.message);
+            setError(t.errorCambioEstado + err.message);
         }
     };
 
@@ -58,7 +172,7 @@ const AdminDashboard = () => {
             const userData = await getAdminUsuarios();
             setUsuarios(userData.data || userData);
         } catch (err) {
-            setError('Error cargando datos: ' + err.message);
+            setError(t.errorCargando + err.message);
         }
     };
 
@@ -88,17 +202,17 @@ const AdminDashboard = () => {
             setModalProducto(null);
             cargarDatos();
         } catch (err) {
-            setError('Error al guardar: ' + err.message);
+            setError(t.errorGuardar + err.message);
         }
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('¿Estás seguro de desactivar este producto?')) {
+        if (window.confirm(t.seguroEliminar)) {
             try {
                 await deleteProducto(id);
                 cargarDatos();
             } catch (err) {
-                setError('Error al eliminar: ' + err.message);
+                setError(t.errorEliminar + err.message);
             }
         }
     };
@@ -108,7 +222,7 @@ const AdminDashboard = () => {
             await updateUsuarioStatus(uId, campos);
             cargarDatos();
         } catch (err) {
-            setError('Error al actualizar usuario: ' + err.message);
+            setError(t.errorActUsuario + err.message);
         }
     };
 
@@ -122,7 +236,7 @@ const AdminDashboard = () => {
             setModalUsuario(null);
             cargarDatos();
         } catch (err) {
-            setError('Error creando empleado: ' + err.message);
+            setError(t.errorCrearEmpleado + err.message);
         }
     };
 
@@ -144,10 +258,10 @@ const AdminDashboard = () => {
             <header className="App-header">
                 <div className="header-container">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                        <button className="btn-circle-back" title="Volver" onClick={() => navigate('/home')}>
+                        <button className="btn-circle-back" title={t.volver} onClick={() => navigate('/home')}>
                             <span>❮</span>
                         </button>
-                        <div className="title">Panel Admin - CafES</div>
+                        <div className="title">{t.panelAdmin}</div>
                     </div>
 
                     <div className="header-right">
@@ -156,19 +270,19 @@ const AdminDashboard = () => {
                                 className={`user-profile ${menuAbierto ? 'active' : ''}`}
                                 onClick={() => setMenuAbierto(!menuAbierto)}
                             >
-                                <div className="user-avatar">{getIniciales(usuario?.nombre)}</div>
-                                <span className="user-name">{usuario?.nombre || 'Admin'}</span>
+                                <div className="user-avatar">{getIniciales(usuarioLogged?.nombre)}</div>
+                                <span className="user-name">{usuarioLogged?.nombre || 'Admin'}</span>
                                 <span className="chevron">▼</span>
                             </div>
 
                             {menuAbierto && (
                                 <div className="user-dropdown shadow-lg">
                                     <button className="dropdown-item" onClick={() => navigate('/home')}>
-                                        🏠 Inicio
+                                        🏠 {t.inicio}
                                     </button>
                                     <div className="dropdown-divider"></div>
                                     <button className="dropdown-item logout" onClick={handleLogout}>
-                                        🚪 Cerrar Sesión
+                                        🚪 {t.cerrarSesion}
                                     </button>
                                 </div>
                             )}
@@ -181,26 +295,25 @@ const AdminDashboard = () => {
                 {error && <div className="alert alert-danger">{error}</div>}
 
                 <div className="glass-panel p-4">
-                    {/* Botones de navegación encima de la lista */}
                     <div className="tabs-container mb-4" style={{ justifyContent: 'flex-start' }}>
-                        <button className={`sesion_inicio ${vista === 'productos' ? 'active-tab' : ''}`} onClick={() => setVista('productos')}>Productos</button>
-                        <button className={`sesion_inicio ${vista === 'pedidos' ? 'active-tab' : ''}`} onClick={() => setVista('pedidos')}>Pedidos</button>
-                        <button className={`sesion_inicio ${vista === 'usuarios' ? 'active-tab' : ''}`} onClick={() => setVista('usuarios')}>Empleados</button>
+                        <button className={`sesion_inicio ${vista === 'productos' ? 'active-tab' : ''}`} onClick={() => setVista('productos')}>{t.productos}</button>
+                        <button className={`sesion_inicio ${vista === 'pedidos' ? 'active-tab' : ''}`} onClick={() => setVista('pedidos')}>{t.pedidos}</button>
+                        <button className={`sesion_inicio ${vista === 'usuarios' ? 'active-tab' : ''}`} onClick={() => setVista('usuarios')}>{t.empleados}</button>
                     </div>
 
                     {vista === 'productos' && (
                         <div>
                             <div className="d-flex justify-content-between mb-3">
-                                <h3>Gestión de Productos</h3>
-                                <button className="btn btn-success" onClick={() => setModalProducto({ nombre: '', precio: 0, descripcion: '', categoria_id: 1 })}>+ Nuevo Producto</button>
+                                <h3>{t.gestionProductos}</h3>
+                                <button className="btn btn-success" onClick={() => setModalProducto({ nombre: '', precio: 0, descripcion: '', categoria_id: 1 })}>{t.nuevoProducto}</button>
                             </div>
                             <table className="table table-dark table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Nombre</th>
-                                        <th>Precio</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
+                                        <th>{t.nombre}</th>
+                                        <th>{t.precio}</th>
+                                        <th>{t.estado}</th>
+                                        <th>{t.acciones}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -210,12 +323,12 @@ const AdminDashboard = () => {
                                             <td>{p.precio}€</td>
                                             <td>{p.activo ? '✅' : '❌'}</td>
                                             <td>
-                                                <button className="btn btn-sm btn-success me-2" onClick={() => setModalProducto(p)}>Editar</button>
+                                                <button className="btn btn-sm btn-success me-2" onClick={() => setModalProducto(p)}>{t.editar}</button>
                                                 <button
                                                     className={`btn btn-sm ${p.activo ? 'btn-danger' : 'btn-success'}`}
                                                     onClick={() => toggleProducto(p)}
                                                 >
-                                                    {p.activo ? 'Desactivar' : 'Activar'}
+                                                    {p.activo ? t.desactivar : t.activar}
                                                 </button>
                                             </td>
                                         </tr>
@@ -228,16 +341,16 @@ const AdminDashboard = () => {
                     {vista === 'pedidos' && (
                         <div>
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h3>Historial de Pedidos (Global)</h3>
+                                <h3>{t.historialPedidos}</h3>
                                 <div className="d-flex align-items-center gap-2">
-                                    <label className="text-white-50 small">Filtrar por centro:</label>
+                                    <label className="text-white-50 small">{t.filtrarCentro}</label>
                                     <select
                                         className="form-select form-select-sm bg-dark text-white border-secondary"
                                         style={{ width: '200px' }}
                                         value={filtroCentro}
                                         onChange={(e) => setFiltroCentro(e.target.value)}
                                     >
-                                        <option value="">Todos los centros</option>
+                                        <option value="">{t.todosCentros}</option>
                                         <option value="IES José Zerpa">IES José Zerpa</option>
                                         <option value="Centro Ejemplo A">Centro Ejemplo A</option>
                                         <option value="Centro Ejemplo B">Centro Ejemplo B</option>
@@ -247,11 +360,11 @@ const AdminDashboard = () => {
                             <table className="table table-dark table-hover">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Usuario</th>
-                                        <th>Fecha</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
+                                        <th>{t.id}</th>
+                                        <th>{t.usuario}</th>
+                                        <th>{t.fecha}</th>
+                                        <th>{t.total}</th>
+                                        <th>{t.estado}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -272,20 +385,20 @@ const AdminDashboard = () => {
                     {vista === 'usuarios' && (
                         <div>
                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h3 className="mb-0">Gestión de Empleados</h3>
+                                <h3 className="mb-0">{t.gestionEmpleados}</h3>
                                 <button className="btn btn-success" onClick={() => setModalUsuario({ nombre: '', correo: '', contrasena: '', tipo: 'empleado' })}>
-                                    + Añadir Empleado
+                                    {t.nuevoEmpleado}
                                 </button>
                             </div>
                             <table className="table table-dark table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Nombre</th>
-                                        <th>Correo</th>
-                                        <th>Rol</th>
-                                        <th>Turno</th>
-                                        <th>Estado Account</th>
-                                        <th>Acciones</th>
+                                        <th>{t.nombre}</th>
+                                        <th>{t.correo}</th>
+                                        <th>{t.rol}</th>
+                                        <th>{t.turno}</th>
+                                        <th>{t.estadoCuenta}</th>
+                                        <th>{t.acciones}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -299,8 +412,8 @@ const AdminDashboard = () => {
                                                     defaultValue={u.tipo}
                                                     onChange={(e) => handleUpdateUsuario(u.id, { tipo: e.target.value, activo: u.activo, turno: u.turno })}
                                                 >
-                                                    <option value="empleado">Empleado</option>
-                                                    <option value="admin">Administrador</option>
+                                                    <option value="empleado">{t.empleado}</option>
+                                                    <option value="admin">{t.admin}</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -309,17 +422,17 @@ const AdminDashboard = () => {
                                                     defaultValue={u.turno || 'mañana'}
                                                     onChange={(e) => handleUpdateUsuario(u.id, { tipo: u.tipo, activo: u.activo, turno: e.target.value })}
                                                 >
-                                                    <option value="mañana">Mañana</option>
-                                                    <option value="tarde">Tarde</option>
+                                                    <option value="mañana">{t.manyana}</option>
+                                                    <option value="tarde">{t.tarde}</option>
                                                 </select>
                                             </td>
-                                            <td>{u.activo ? '✅ Activo' : '❌ Inactivo'}</td>
+                                            <td>{u.activo ? `✅ ${t.activo}` : `❌ ${t.inactivo}`}</td>
                                             <td>
                                                 <button
                                                     className={`btn btn-sm ${u.activo ? 'btn-danger' : 'btn-success'}`}
                                                     onClick={() => handleUpdateUsuario(u.id, { tipo: u.tipo, activo: !u.activo, turno: u.turno })}
                                                 >
-                                                    {u.activo ? 'Bloquear' : 'Desbloquear'}
+                                                    {u.activo ? t.bloquear : t.desbloquear}
                                                 </button>
                                             </td>
                                         </tr>
@@ -333,27 +446,27 @@ const AdminDashboard = () => {
                 {modalProducto && (
                     <div className="prefs-overlay">
                         <div className="prefs-modal shadow-lg admin-modal">
-                            <h3>{modalProducto.id ? 'Editar Producto' : 'Nuevo Producto'}</h3>
+                            <h3>{modalProducto.id ? t.editarProducto : t.crearProducto}</h3>
                             <form onSubmit={handleSaveProducto}>
                                 <div className="mb-3">
-                                    <label>Nombre</label>
+                                    <label>{t.nombre}</label>
                                     <input type="text" name="nombre" className="form-control" defaultValue={modalProducto.nombre} required />
                                 </div>
                                 <div className="mb-3">
-                                    <label>Precio</label>
+                                    <label>{t.precio}</label>
                                     <input type="number" step="0.01" name="precio" className="form-control" defaultValue={modalProducto.precio} required />
                                 </div>
                                 <div className="mb-3">
-                                    <label>Descripción</label>
+                                    <label>{t.descripcion}</label>
                                     <textarea name="descripcion" className="form-control" defaultValue={modalProducto.descripcion}></textarea>
                                 </div>
                                 <div className="mb-3">
-                                    <label>Categoría ID</label>
+                                    <label>{t.categoriaId}</label>
                                     <input type="number" name="categoria_id" className="form-control" defaultValue={modalProducto.categoria_id} required />
                                 </div>
                                 <div className="d-flex gap-2">
-                                    <button type="submit" className="btn-confirm-prefs">Guardar</button>
-                                    <button type="button" className="btn btn-secondary" onClick={() => setModalProducto(null)}>Cancelar</button>
+                                    <button type="submit" className="btn-confirm-prefs">{t.guardar}</button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => setModalProducto(null)}>{t.cancelar}</button>
                                 </div>
                             </form>
                         </div>
@@ -362,37 +475,37 @@ const AdminDashboard = () => {
                 {modalUsuario && (
                     <div className="prefs-overlay">
                         <div className="prefs-modal shadow-lg admin-modal">
-                            <h3>Nuevo Empleado</h3>
+                            <h3>{t.crearEmpleado}</h3>
                             <form onSubmit={handleSaveUsuario}>
                                 <div className="mb-3">
-                                    <label>Nombre</label>
+                                    <label>{t.nombre}</label>
                                     <input type="text" name="nombre" className="form-control" required />
                                 </div>
                                 <div className="mb-3">
-                                    <label>Correo Electrónico</label>
+                                    <label>{t.correo}</label>
                                     <input type="email" name="correo" className="form-control" required />
                                 </div>
                                 <div className="mb-3">
-                                    <label>Contraseña</label>
+                                    <label>{t.contrasena}</label>
                                     <input type="password" name="contrasena" className="form-control" required minLength="8" />
                                 </div>
                                 <div className="mb-3">
-                                    <label>Rol</label>
+                                    <label>{t.rol}</label>
                                     <select name="tipo" className="form-select" defaultValue="empleado">
-                                        <option value="empleado">Empleado</option>
-                                        <option value="admin">Administrador</option>
+                                        <option value="empleado">{t.empleado}</option>
+                                        <option value="admin">{t.admin}</option>
                                     </select>
                                 </div>
                                 <div className="mb-3">
-                                    <label>Turno</label>
+                                    <label>{t.turno}</label>
                                     <select name="turno" className="form-select" defaultValue="mañana">
-                                        <option value="mañana">Mañana</option>
-                                        <option value="tarde">Tarde</option>
+                                        <option value="mañana">{t.manyana}</option>
+                                        <option value="tarde">{t.tarde}</option>
                                     </select>
                                 </div>
                                 <div className="d-flex gap-2">
-                                    <button type="submit" className="btn-confirm-prefs">Guardar</button>
-                                    <button type="button" className="btn btn-secondary" onClick={() => setModalUsuario(null)}>Cancelar</button>
+                                    <button type="submit" className="btn-confirm-prefs">{t.guardar}</button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => setModalUsuario(null)}>{t.cancelar}</button>
                                 </div>
                             </form>
                         </div>

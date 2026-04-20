@@ -147,14 +147,14 @@ function InicioSesion() {
               )}
               {modalActivo === 'ayuda' && (
                 <div className="help-info text-center">
-                  <p>Introduce tus credenciales para acceder a tu cuenta.</p>
-                  <p className="small text-white-50">Si no tienes cuenta, ve a la página principal y regístrate.</p>
+                  <p>{t.ayudaP1}</p>
+                  <p className="small text-white-50">{t.ayudaP2}</p>
                 </div>
               )}
               {modalActivo === 'acerca' && (
                 <div className="text-center">
-                  <h5 className="text-warning">CaffES App v1.0</h5>
-                  <p className="small">IES José Zerpa</p>
+                  <h5 className="text-warning">{t.acercaH5}</h5>
+                  <p className="small">{t.acercaP}</p>
                 </div>
               )}
             </div>

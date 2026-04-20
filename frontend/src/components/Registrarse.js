@@ -44,7 +44,8 @@ function Registrarse() {
       ayudaContenido: 'Crea una cuenta para realizar tus pedidos en la cafetería. Necesitarás un correo válido y una contraseña con al menos 8 caracteres.',
       acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
       centroRecogida: 'Centro de Recogida:',
-      seleccionarCentro: 'Selecciona un centro'
+      seleccionarCentro: 'Selecciona un centro',
+      errorRegistro: 'Error en el registro'
     },
     en: {
       titulo: 'Register',
@@ -67,7 +68,8 @@ function Registrarse() {
       ayudaContenido: 'Create an account to place your orders at the cafeteria. You will need a valid email and a password with at least 8 characters.',
       acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
       centroRecogida: 'Collection Point:',
-      seleccionarCentro: 'Select a center'
+      seleccionarCentro: 'Select a center',
+      errorRegistro: 'Error registering'
     }
   };
 
@@ -112,7 +114,7 @@ function Registrarse() {
         navigate('/login');
       }, 2000);
     } catch (error) {
-      setError(error.response?.data?.error || 'Error en el registro');
+      setError(error.response?.data?.error || t.errorRegistro);
     } finally {
       setLoading(false);
     }

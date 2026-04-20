@@ -37,7 +37,9 @@ function Pago() {
             numTarjeta: 'Número de Tarjeta',
             fecExp: 'Fecha Expiración (MM/YY)',
             cvv: 'CVV',
-            titular: 'Nombre del Titular'
+            titular: 'Nombre del Titular',
+            rellenaCampos: 'Por favor, rellena todos los campos de la tarjeta',
+            nombrePlaceholder: 'Juan Pérez'
         },
         en: {
             titulo: 'Checkout',
@@ -56,7 +58,9 @@ function Pago() {
             numTarjeta: 'Card Number',
             fecExp: 'Expiry Date (MM/YY)',
             cvv: 'CVV',
-            titular: 'Cardholder Name'
+            titular: 'Cardholder Name',
+            rellenaCampos: 'Please fill all card details',
+            nombrePlaceholder: 'John Doe'
         }
     };
 
@@ -86,7 +90,7 @@ function Pago() {
     const handlePago = async () => {
         if (!carrito || procesando) return;
         if (!isFormValid()) {
-            alert(idioma === 'es' ? 'Por favor, rellena todos los campos de la tarjeta' : 'Please fill all card details');
+            alert(t.rellenaCampos);
             return;
         }
 
@@ -168,7 +172,7 @@ function Pago() {
                                 <input
                                     type="text"
                                     name="nombre"
-                                    placeholder="Juan Pérez"
+                                    placeholder={t.nombrePlaceholder}
                                     value={cardData.nombre}
                                     onChange={handleInputChange}
                                 />

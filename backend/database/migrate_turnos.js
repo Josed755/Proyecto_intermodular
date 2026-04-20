@@ -5,7 +5,7 @@ async function runMigration() {
     const pool = mysql.createPool({
         host: process.env.DB_HOST || 'localhost',
         user: process.env.DB_USER || 'root',
-        password: process.env.DB_PASSWORD || 'Root.123',
+        password: process.env.DB_PASSWORD || '8414',
         database: process.env.DB_NAME || 'cafes_db',
     });
 
@@ -13,8 +13,16 @@ async function runMigration() {
 
     try {
         console.log('Adding "turno" column to "usuarios" table...');
-        await connection.execute('ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS turno VARCHAR(20) DEFAULT "mañana"');
-        console.log('Migration successful: Column "turno" added.');
+        try {
+            await connection.execute('ALTER TABLE usuarios ADD COLUMN turno VARCHAR(20) DEFAULT "mañana"');
+            console.log('Migration successful: Column "turno" added.');
+        } catch (e) {
+            if (e.code === 'ER_DUP_FIELDNAME' || e.message.includes('Duplicate column name')) {
+                console.log('La columna "turno" ya existe en "usuarios"');
+            } else {
+                throw e;
+            }
+        }
     } catch (error) {
         console.error('Migration failed:', error.message);
     } finally {

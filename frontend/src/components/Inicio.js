@@ -73,7 +73,16 @@ function Inicio() {
             centroRecogida: 'Centro de Recogida',
             guardar: 'Guardar',
             editar: 'Editar',
-            nombre: 'Nombre'
+            guardar: 'Guardar',
+            editar: 'Editar',
+            nombre: 'Nombre',
+            historialVacio: 'Aún no has realizado ningún pedido.',
+            contacto: 'Contacto: soporte@cafesapp.es',
+            cancelar: 'Cancelar',
+            guardarCambios: 'Guardar Cambios',
+            personaliza: 'Personaliza tus ingredientes',
+            usuarioRegistrado: 'USUARIO REGISTRADO',
+            ingredientes: 'Ingredientes'
         },
         en: {
             titulo: 'CafES App',
@@ -108,7 +117,16 @@ function Inicio() {
             centroRecogida: 'Collection Point',
             guardar: 'Save',
             editar: 'Edit',
+            guardar: 'Save',
+            editar: 'Edit',
             nombre: 'Name',
+            historialVacio: "You haven't made any orders yet.",
+            contacto: 'Contact: support@cafesapp.es',
+            cancelar: 'Cancel',
+            guardarCambios: 'Save Changes',
+            personaliza: 'Customize your ingredients',
+            usuarioRegistrado: 'REGISTERED USER',
+            ingredientes: 'Ingredients',
             nombresProductos: {
                 'Agua': ' Water',
                 'Refresco': ' Soda',
@@ -391,7 +409,7 @@ function Inicio() {
                                             <h4 className="mb-1 text-warning">{usuario?.nombre}</h4>
                                             <p className="text-white-50">{usuario?.correo}</p>
                                             <p className="text-info small mb-2">{t.centroRecogida}: {usuario?.centro || 'IES José Zerpa'}</p>
-                                            <div className="badge bg-warning text-dark px-3 py-2 mt-2">USUARIO REGISTRADO</div>
+                                            <div className="badge bg-warning text-dark px-3 py-2 mt-2">{t.usuarioRegistrado}</div>
                                             <button className="btn btn-sm btn-outline-warning mt-3 w-100" onClick={() => {
                                                 setTempPerfil({ nombre: usuario.nombre, centro: usuario.centro || 'IES José Zerpa' });
                                                 setIsEditingPerfil(true);
@@ -406,14 +424,14 @@ function Inicio() {
                             {modalActivo === 'historial' && (
                                 <div className="text-center py-4 text-white-50">
                                     <span className="history-icon">🕒</span>
-                                    <p className="mt-3">Aún no has realizado ningún pedido.</p>
+                                    <p className="mt-3">{t.historialVacio}</p>
                                 </div>
                             )}
 
                             {modalActivo === 'ayuda' && (
                                 <div className="help-info text-center">
                                     <p>{t.ayudaContenido}</p>
-                                    <p className="mt-3 small text-white-50">Contacto: soporte@cafesapp.es</p>
+                                    <p className="mt-3 small text-white-50">{t.contacto}</p>
                                 </div>
                             )}
 
@@ -442,19 +460,19 @@ function Inicio() {
                                     className={`btn-filter ${filtro === 'todo' ? 'active' : ''}`}
                                     onClick={() => setFiltro('todo')}
                                 >
-                                    Todo
+                                    {t.todo}
                                 </button>
                                 <button
                                     className={`btn-filter ${filtro === 'comida' ? 'active' : ''}`}
                                     onClick={() => setFiltro('comida')}
                                 >
-                                    Comida 🍔
+                                    {t.comida} 🍔
                                 </button>
                                 <button
                                     className={`btn-filter ${filtro === 'bebida' ? 'active' : ''}`}
                                     onClick={() => setFiltro('bebida')}
                                 >
-                                    Bebida 🥤
+                                    {t.bebida} 🥤
                                 </button>
                             </div>
 
@@ -500,7 +518,7 @@ function Inicio() {
                                                     className="btn-ingredientes-verde"
                                                     onClick={(e) => { e.stopPropagation(); abrirModalIngredientes(producto); }}
                                                 >
-                                                    Ingredientes
+                                                    {t.ingredientes}
                                                 </button>
                                             )}
 
@@ -640,7 +658,7 @@ function Inicio() {
                             {productoParaPersonalizar.descripcion && (
                                 <p className="product-description">{productoParaPersonalizar.description || productoParaPersonalizar.descripcion}</p>
                             )}
-                            <p className="text-center text-white-50 mb-4">Personaliza tus ingredientes</p>
+                            <p className="text-center text-white-50 mb-4">{t.personaliza}</p>
 
                             <div className="ingredients-list">
                                 {Array.isArray(allIngredientes) && allIngredientes
@@ -662,10 +680,10 @@ function Inicio() {
 
                             <div className="modal-footer">
                                 <button className="btn-cancel-ingredients" onClick={() => setProductoParaPersonalizar(null)}>
-                                    Cancelar
+                                    {t.cancelar}
                                 </button>
                                 <button className="btn-save-ingredients" onClick={guardarPersonalizacion}>
-                                    Guardar Cambios
+                                    {t.guardarCambios}
                                 </button>
                             </div>
                         </div>
