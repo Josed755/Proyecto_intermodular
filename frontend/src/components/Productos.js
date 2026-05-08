@@ -11,24 +11,31 @@ function Productos() {
             .then(res => res.json())
             .then(data => {
                 // Añadimos cantidad inicial a cada producto
-                const mapCategoria = (nombreCategoria) => {
-                    if (!nombreCategoria) return "otro";
+                const mapCategoria = (nombreCategoria, nombreProd) => {
+                    const nombre = nombreProd.toLowerCase();
+                    const cat = (nombreCategoria || "").toLowerCase();
 
-                    const nombre = nombreCategoria.toLowerCase();
+                    if (nombre.includes("café") || nombre.includes("infusión") || nombre.includes("cacao") || nombre.includes("descafeinado"))
+                        return "bebidasCalientes";
 
-                    if (nombre.includes("bebida") || nombre.includes("café") || nombre.includes("zumo"))
-                        return "bebida";
+                    if (nombre.includes("agua") || nombre.includes("refresco") || nombre.includes("zumo"))
+                        return "bebidasFrias";
 
-                    if (nombre.includes("bocadillo") || nombre.includes("sandwich") || nombre.includes("croissant"))
-                        return "comida";
+                    if (nombre.includes("bocadillo") || nombre.includes("sandwich") || nombre.includes("croissant") || nombre.includes("pulgita"))
+                        return "bocadillos";
+
+                    if (nombre.includes("galletas") || nombre.includes("barquillo") || nombre.includes("papas") || nombre.includes("barritas") || nombre.includes("tortitas") || nombre.includes("caramelos"))
+                        return "golosinas";
 
                     return "otro";
                 };
                 const productosConCantidad = data.map(p => ({
                     ...p,
+                    id: p._id, // Mapeamos _id a id para compatibilidad
                     cantidad: 0,
-                    categoria: mapCategoria(p.categoria_nombre),
-                    ingredientesPersonalizados: [] // Almacenará los IDs de los ingredientes seleccionados
+                    categoria: mapCategoria(p.categoria || p.categoria_nombre, p.nombre),
+                    categoria_id: p.categoria_id, // Preservamos el ID de categoría para los ingredientes
+                    ingredientesPersonalizados: []
                 }));
 
                 setProductos(productosConCantidad);

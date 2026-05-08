@@ -39,15 +39,27 @@
     transform: translateY(-2px);
 }
 
-.form-control {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+.form-control,
+.form-select,
+.admin-modal input,
+.admin-modal textarea,
+.admin-modal select {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+}
+
+.form-select option {
+    background: #274363;
     color: white;
 }
 
-.form-control:focus {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+.form-control:focus,
+.form-select:focus {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 165, 0, 0.25) !important;
+    border-color: orange !important;
 }
 
 .admin-container {

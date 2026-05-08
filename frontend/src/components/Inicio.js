@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import Productos from './Productos';
 import Calculos from './CalculosInic';
 import Botones from './BotonesInic';
-import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal } from '../services/api';
+import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos } from '../services/api';
 
 function Inicio() {
     const navigate = useNavigate();
@@ -31,6 +31,8 @@ function Inicio() {
     const [allIngredientes, setAllIngredientes] = useState([]);
     const [isEditingPerfil, setIsEditingPerfil] = useState(false);
     const [tempPerfil, setTempPerfil] = useState({ nombre: usuario?.nombre, centro: usuario?.centro || 'IES José Zerpa' });
+    const [historial, setHistorial] = useState([]);
+    const [cargandoHistorial, setCargandoHistorial] = useState(false);
 
     const getIniciales = (nombre) => {
         if (!nombre) return '?';
@@ -44,10 +46,12 @@ function Inicio() {
             titulo: 'CafES App',
             menu: 'Menú',
             todo: 'Todo',
-            comida: 'Comida',
-            bebida: 'Bebida',
+            bebidasCalientes: 'Bebidas Calientes ☕',
+            bebidasFrias: 'Bebidas Frías 🥤',
+            golosinas: 'Golosinas 🍬',
+            bocadillos: 'Bocadillos 🥖',
             resumen: 'Resumen',
-            vacio: 'Su pedido está vacío',
+            vacio: 'Su pedido está vacio',
             total: 'Total',
             confirmar: 'Confirmar',
             limpiar: 'Limpiar',
@@ -73,8 +77,6 @@ function Inicio() {
             centroRecogida: 'Centro de Recogida',
             guardar: 'Guardar',
             editar: 'Editar',
-            guardar: 'Guardar',
-            editar: 'Editar',
             nombre: 'Nombre',
             historialVacio: 'Aún no has realizado ningún pedido.',
             contacto: 'Contacto: soporte@cafesapp.es',
@@ -88,8 +90,10 @@ function Inicio() {
             titulo: 'CafES App',
             menu: 'Menu',
             todo: 'All',
-            comida: 'Food',
-            bebida: 'Drinks',
+            bebidasCalientes: 'Hot Drinks ☕',
+            bebidasFrias: 'Cold Drinks 🥤',
+            golosinas: 'Snacks 🍬',
+            bocadillos: 'Sandwiches 🥖',
             resumen: 'Summary',
             vacio: 'Your order is empty',
             total: 'Total',
@@ -115,8 +119,6 @@ function Inicio() {
             confirmarSalir: 'Are you sure you want to exit?',
             pedidoVacio: 'The order is empty.',
             centroRecogida: 'Collection Point',
-            guardar: 'Save',
-            editar: 'Edit',
             guardar: 'Save',
             editar: 'Edit',
             nombre: 'Name',
@@ -207,6 +209,21 @@ function Inicio() {
     }, [idioma]);
 
     useEffect(() => {
+        if (modalActivo === 'historial') {
+            setCargandoHistorial(true);
+            getHistorialPedidos()
+                .then(res => {
+                    setHistorial(res.data || res);
+                    setCargandoHistorial(false);
+                })
+                .catch(err => {
+                    console.error("Error al cargar historial:", err);
+                    setCargandoHistorial(false);
+                });
+        }
+    }, [modalActivo]);
+
+    useEffect(() => {
         fetch("http://localhost:5000/api/ingredientes")
             .then(res => res.json())
             .then(data => {
@@ -224,14 +241,14 @@ function Inicio() {
     }, []);
 
     const abrirModalIngredientes = (producto) => {
-        // Solo abrir para productos de la categoría 3 (Bocadillos/Sandwiches/Croissants)
-        if (producto.categoria_id !== 3) {
+        // Solo abrimos el modal si es categoría 3 (Bocadillos) 
+        // y NO es un producto de tipo "Extra"
+        if (producto.categoria_id !== 3 || producto.nombre.toLowerCase().includes('extra')) {
             aumentarCantidad(producto.id);
             return;
         }
 
         // Si ya tiene ingredientes personalizados, los usamos.
-        // Si no, cargamos los por defecto.
         if (producto.ingredientesPersonalizados && producto.ingredientesPersonalizados.length > 0) {
             setProductoParaPersonalizar({ ...producto });
         } else {
@@ -246,7 +263,6 @@ function Inicio() {
                     };
                     setProductoParaPersonalizar(updatedProducto);
 
-                    // También actualizamos el producto en la lista principal para que Calculos lo sepa
                     const nuevosProductos = productos.map(p => {
                         if (p.id === producto.id) return updatedProducto;
                         return p;
@@ -422,9 +438,37 @@ function Inicio() {
                             )}
 
                             {modalActivo === 'historial' && (
-                                <div className="text-center py-4 text-white-50">
-                                    <span className="history-icon">🕒</span>
-                                    <p className="mt-3">{t.historialVacio}</p>
+                                <div className="history-list-container">
+                                    {cargandoHistorial ? (
+                                        <div className="text-center py-4">
+                                            <div className="spinner-border text-warning" role="status"></div>
+                                            <p className="mt-2 text-white-50">Cargando pedidos...</p>
+                                        </div>
+                                    ) : historial.length > 0 ? (
+                                        <div className="history-items">
+                                            {historial.map((pedido, idx) => (
+                                                <div key={pedido._id || idx} className="history-card mb-3 p-3">
+                                                    <div className="d-flex justify-content-between align-items-center mb-2">
+                                                        <span className="text-warning fw-bold">{new Date(pedido.fecha).toLocaleDateString()}</span>
+                                                        <span className="badge bg-dark border border-secondary text-info">{pedido.estado}</span>
+                                                    </div>
+                                                    <div className="history-products small text-white-50">
+                                                        {pedido.items.map((item, i) => (
+                                                            <div key={i}>• {item.cantidad}x {item.nombre_producto}</div>
+                                                        ))}
+                                                    </div>
+                                                    <div className="text-end mt-2 fw-bold text-white">
+                                                        Total: {pedido.total.toFixed(2)}€
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-4 text-white-50">
+                                            <span className="history-icon" style={{ fontSize: '3rem' }}>🕒</span>
+                                            <p className="mt-3">{t.historialVacio}</p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
@@ -463,16 +507,28 @@ function Inicio() {
                                     {t.todo}
                                 </button>
                                 <button
-                                    className={`btn-filter ${filtro === 'comida' ? 'active' : ''}`}
-                                    onClick={() => setFiltro('comida')}
+                                    className={`btn-filter ${filtro === 'bebidasCalientes' ? 'active' : ''}`}
+                                    onClick={() => setFiltro('bebidasCalientes')}
                                 >
-                                    {t.comida} 🍔
+                                    {t.bebidasCalientes}
                                 </button>
                                 <button
-                                    className={`btn-filter ${filtro === 'bebida' ? 'active' : ''}`}
-                                    onClick={() => setFiltro('bebida')}
+                                    className={`btn-filter ${filtro === 'bebidasFrias' ? 'active' : ''}`}
+                                    onClick={() => setFiltro('bebidasFrias')}
                                 >
-                                    {t.bebida} 🥤
+                                    {t.bebidasFrias}
+                                </button>
+                                <button
+                                    className={`btn-filter ${filtro === 'golosinas' ? 'active' : ''}`}
+                                    onClick={() => setFiltro('golosinas')}
+                                >
+                                    {t.golosinas}
+                                </button>
+                                <button
+                                    className={`btn-filter ${filtro === 'bocadillos' ? 'active' : ''}`}
+                                    onClick={() => setFiltro('bocadillos')}
+                                >
+                                    {t.bocadillos}
                                 </button>
                             </div>
 
@@ -486,23 +542,29 @@ function Inicio() {
                                             style={{ cursor: 'pointer' }}
                                         >
                                             <div className="icon-wrapper">
-                                                {producto.nombre.includes('Café') && '☕'}
-                                                {producto.nombre.includes('Infusión') && '🍵'}
-                                                {producto.nombre.includes('Cacao') && '🍫'}
-                                                {producto.nombre.includes('Botella de Agua') && '💧'}
-                                                {producto.nombre.includes('Refresco') && '🥤'}
-                                                {producto.nombre.includes('Zumo') && '🍹'}
-                                                {producto.nombre.includes('Croissant') && '🥐'}
-                                                {producto.nombre.includes('Sandwich') && '🥪'}
-                                                {producto.nombre.includes('Bocadillo') && '🥖'}
-                                                {producto.nombre.includes('Pulgita') && '🥖'}
-                                                {producto.nombre.includes('Papas') && '🍟'}
-                                                {producto.nombre.includes('Galletas') && '🍪'}
-                                                {producto.nombre.includes('Barquillo') && '🧇'}
-                                                {producto.nombre.includes('Caramelos') && '🍬'}
-                                                {producto.nombre.includes('Tortitas') && '🥞'}
-                                                {producto.nombre.includes('Barritas') && '🍫'}
-                                                {!['Café', 'Infusión', 'Cacao', 'Agua', 'Refresco', 'Zumo', 'Croissant', 'Sandwich', 'Bocadillo', 'Pulgita', 'Papas', 'Galletas', 'Barquillo', 'Caramelos', 'Tortitas', 'Barritas'].some(key => producto.nombre.includes(key)) && '🍴'}
+                                                {producto.imagen ? (
+                                                    <img src={producto.imagen} alt={producto.nombre} className="product-card-img" />
+                                                ) : (
+                                                    <>
+                                                        {producto.nombre.includes('Café') && '☕'}
+                                                        {producto.nombre.includes('Infusión') && '🍵'}
+                                                        {producto.nombre.includes('Cacao') && '🍫'}
+                                                        {producto.nombre.includes('Botella de Agua') && '💧'}
+                                                        {producto.nombre.includes('Refresco') && '🥤'}
+                                                        {producto.nombre.includes('Zumo') && '🍹'}
+                                                        {producto.nombre.includes('Croissant') && '🥐'}
+                                                        {producto.nombre.includes('Sandwich') && '🥪'}
+                                                        {producto.nombre.includes('Bocadillo') && '🥖'}
+                                                        {producto.nombre.includes('Pulgita') && '🥖'}
+                                                        {producto.nombre.includes('Papas') && '🍟'}
+                                                        {producto.nombre.includes('Galletas') && '🍪'}
+                                                        {producto.nombre.includes('Barquillo') && '🧇'}
+                                                        {producto.nombre.includes('Caramelos') && '🍬'}
+                                                        {producto.nombre.includes('Tortitas') && '🥞'}
+                                                        {producto.nombre.includes('Barritas') && '🍫'}
+                                                        {!['Café', 'Infusión', 'Cacao', 'Agua', 'Refresco', 'Zumo', 'Croissant', 'Sandwich', 'Bocadillo', 'Pulgita', 'Papas', 'Galletas', 'Barquillo', 'Caramelos', 'Tortitas', 'Barritas'].some(key => producto.nombre.includes(key)) && '🍴'}
+                                                    </>
+                                                )}
                                             </div>
                                             <h3 className="item-name">{tradNombre(producto.nombre)}</h3>
                                             <div className="item-price">{Dinero(producto.precio)}</div>

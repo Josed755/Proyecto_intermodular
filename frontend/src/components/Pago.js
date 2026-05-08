@@ -76,15 +76,48 @@ function Pago() {
     }, [navigate]);
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        let { name, value } = e.target;
+
+        if (name === 'expiracion') {
+            // Eliminar todo lo que no sea número
+            value = value.replace(/\D/g, '');
+            
+            // Si el primer número es > 1, asumimos que es el mes 0X
+            if (value.length === 1 && value > 1) {
+                value = '0' + value;
+            }
+            
+            // Insertar la barra después del segundo dígito
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+        }
+
+        if (name === 'numero') {
+            // Eliminar todo lo que no sea número
+            value = value.replace(/\D/g, '');
+            
+            // Añadir espacios cada 4 números
+            const chunks = value.match(/.{1,4}/g);
+            if (chunks) {
+                value = chunks.join(' ').substring(0, 19);
+            }
+        }
+
+        if (name === 'cvv') {
+            // Solo números y máximo 3
+            value = value.replace(/\D/g, '').substring(0, 3);
+        }
+
         setCardData(prev => ({ ...prev, [name]: value }));
     };
 
     const isFormValid = () => {
-        return cardData.numero.length >= 16 &&
-            cardData.expiracion.length >= 5 &&
-            cardData.cvv.length >= 3 &&
-            cardData.nombre.length > 3;
+        // 16 dígitos + 3 espacios = 19
+        return cardData.numero.length === 19 &&
+            cardData.expiracion.length === 5 &&
+            cardData.cvv.length === 3 &&
+            cardData.nombre.trim().length > 3;
     };
 
     const handlePago = async () => {

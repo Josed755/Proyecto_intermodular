@@ -3,7 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { pool, testConnection } = require('./database/config');
+const mongoose = require('mongoose');
+const { dbConnection } = require('./database/config');
+const Usuario = require('./models/Usuario');
+const Producto = require('./models/Producto');
+const Pedido = require('./models/Pedido');
+const Ingrediente = require('./models/Ingrediente');
+const { imprimirTicket } = require('./utils/printer');
 
 // CONFIGURACIÓN INICIAL
 const app = express();
@@ -22,7 +28,7 @@ app.use((req, res, next) => {
 });
 
 // Probar conexión a la DB
-testConnection();
+dbConnection();
 
 // MIDDLEWARE
 const verificarAdmin = (req, res, next) => {
@@ -45,32 +51,31 @@ const verificarAdmin = (req, res, next) => {
 
 // Registro
 app.post('/api/registro', async (req, res) => {
-  const { correo, nombre, contrasena } = req.body;
+  const { correo, nombre, contrasena, centro } = req.body;
 
   if (!correo || !nombre || !contrasena) return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   if (contrasena.length < 8) return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
 
-  let connection;
   try {
-    connection = await pool.getConnection();
-
-    const [usuarioExistente] = await connection.execute('SELECT id FROM usuarios WHERE correo = ?', [correo]);
-    if (usuarioExistente.length > 0) return res.status(400).json({ error: 'El correo ya está registrado' });
+    const usuarioExistente = await Usuario.findOne({ correo });
+    if (usuarioExistente) return res.status(400).json({ error: 'El correo ya está registrado' });
 
     const salt = await bcrypt.genSalt(10);
     const contrasenaHash = await bcrypt.hash(contrasena, salt);
 
-    const [result] = await connection.execute(
-      'INSERT INTO usuarios (correo, nombre, contrasena_hash, centro) VALUES (?, ?, ?, ?)',
-      [correo, nombre, contrasenaHash, req.body.centro || 'IES José Zerpa']
-    );
+    const nuevoUsuario = new Usuario({
+      correo,
+      nombre,
+      contrasena_hash: contrasenaHash,
+      centro: centro || 'IES José Zerpa'
+    });
 
-    res.status(201).json({ success: true, message: 'Usuario registrado exitosamente', usuarioId: result.insertId });
+    await nuevoUsuario.save();
+
+    res.status(201).json({ success: true, message: 'Usuario registrado exitosamente', usuarioId: nuevoUsuario._id });
   } catch (error) {
     console.error('Error registro:', error);
     res.status(500).json({ error: 'Error en el registro', details: error.message });
-  } finally {
-    if (connection) connection.release();
   }
 });
 
@@ -80,20 +85,18 @@ app.post('/api/login', async (req, res) => {
   if (!correo || !contrasena) return res.status(400).json({ error: 'Correo y contraseña requeridos' });
 
   try {
-    const [usuarios] = await pool.execute('SELECT * FROM usuarios WHERE correo = ?', [correo]);
-    if (usuarios.length === 0) return res.status(401).json({ error: 'Credenciales incorrectas' });
+    const usuario = await Usuario.findOne({ correo });
+    if (!usuario) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
-    const usuario = usuarios[0];
     const contrasenaValida = await bcrypt.compare(contrasena, usuario.contrasena_hash);
     if (!contrasenaValida) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
     const token = jwt.sign(
-      { id: usuario.id, correo: usuario.correo, nombre: usuario.nombre, tipo: usuario.tipo },
+      { id: usuario._id, correo: usuario.correo, nombre: usuario.nombre, tipo: usuario.tipo },
       process.env.JWT_SECRET || 'secret_key_cafes',
       { expiresIn: '24h' }
     );
-
-    res.json({ success: true, message: 'Login exitoso', token, usuario: { id: usuario.id, correo: usuario.correo, nombre: usuario.nombre, tipo: usuario.tipo } });
+    res.json({ success: true, message: 'Login exitoso', token, usuario: { id: usuario._id, correo: usuario.correo, nombre: usuario.nombre, tipo: usuario.tipo } });
   } catch (error) {
     console.error('Error login:', error);
     res.status(500).json({ error: 'Error en el servidor', details: error.message });
@@ -105,14 +108,8 @@ app.post('/api/login', async (req, res) => {
 // Listar productos activos (frontend)
 app.get('/api/productos', async (req, res) => {
   try {
-    const [rows] = await pool.execute(
-      `SELECT p.*, c.nombre as categoria_nombre 
-       FROM productos p 
-       LEFT JOIN categorias c ON p.categoria_id = c.id 
-       WHERE p.activo = TRUE 
-       ORDER BY p.nombre`
-    );
-    res.json(rows);
+    const productos = await Producto.find({ activo: true }).sort({ nombre: 1 });
+    res.json(productos);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -121,8 +118,13 @@ app.get('/api/productos', async (req, res) => {
 // Listar todos los ingredientes
 app.get('/api/ingredientes', async (req, res) => {
   try {
-    const [rows] = await pool.execute('SELECT * FROM ingredientes WHERE activo = TRUE ORDER BY nombre');
-    res.json(rows);
+    const ingredientes = await Ingrediente.find({ activo: true }).sort({ nombre: 1 });
+    const result = ingredientes.map(ing => ({
+      id: ing.original_id || ing._id,
+      nombre: ing.nombre,
+      activo: ing.activo
+    }));
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -132,41 +134,20 @@ app.get('/api/ingredientes', async (req, res) => {
 app.get('/api/productos/:id/ingredientes', async (req, res) => {
   const { id } = req.params;
   try {
-    const [rows] = await pool.execute(
-      `SELECT i.* FROM ingredientes i
-       JOIN producto_ingredientes pi ON i.id = pi.ingrediente_id
-       WHERE pi.producto_id = ? AND i.activo = TRUE
-       ORDER BY i.nombre`,
-      [id]
-    );
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Listar todos los ingredientes
-app.get('/api/ingredientes', async (req, res) => {
-  try {
-    const [rows] = await pool.execute('SELECT * FROM ingredientes WHERE activo = TRUE ORDER BY nombre');
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Listar ingredientes de un producto específico
-app.get('/api/productos/:id/ingredientes', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const [rows] = await pool.execute(
-      `SELECT i.* FROM ingredientes i
-       JOIN producto_ingredientes pi ON i.id = pi.ingrediente_id
-       WHERE pi.producto_id = ? AND i.activo = TRUE
-       ORDER BY i.nombre`,
-      [id]
-    );
-    res.json(rows);
+    const producto = await Producto.findById(id);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+    
+    // Buscamos los objetos de ingredientes por nombre
+    const ingredientesObj = await Ingrediente.find({ nombre: { $in: producto.ingredientes } });
+    
+    // Mapeamos para que el frontend vea 'id' en lugar de '_id' u 'original_id'
+    const result = ingredientesObj.map(ing => ({
+      id: ing.original_id || ing._id,
+      nombre: ing.nombre,
+      activo: ing.activo
+    }));
+    
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -177,13 +158,8 @@ app.get('/api/productos/:id/ingredientes', async (req, res) => {
 // Listar todos los productos (incluyendo desactivados)
 app.get('/api/admin/productos', verificarAdmin, async (req, res) => {
   try {
-    const [rows] = await pool.execute(
-      `SELECT p.*, c.nombre as categoria_nombre 
-       FROM productos p 
-       LEFT JOIN categorias c ON p.categoria_id = c.id 
-       ORDER BY p.activo DESC, p.nombre ASC`
-    );
-    res.json(rows);
+    const productos = await Producto.find().sort({ activo: -1, nombre: 1 });
+    res.json(productos);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -194,7 +170,7 @@ app.patch('/api/admin/productos/:id/estado', verificarAdmin, async (req, res) =>
   const { id } = req.params;
   const { activo } = req.body;
   try {
-    await pool.execute('UPDATE productos SET activo = ? WHERE id = ?', [activo, id]);
+    await Producto.findByIdAndUpdate(id, { activo });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -203,13 +179,19 @@ app.patch('/api/admin/productos/:id/estado', verificarAdmin, async (req, res) =>
 
 // Crear producto
 app.post('/api/admin/productos', verificarAdmin, async (req, res) => {
-  const { nombre, descripcion, precio, categoria_id } = req.body;
+  const { nombre, descripcion, precio, categoria, categoria_id, imagen } = req.body;
   try {
-    const [result] = await pool.execute(
-      'INSERT INTO productos (nombre, descripcion, precio, categoria_id, activo) VALUES (?, ?, ?, ?, TRUE)',
-      [nombre, descripcion, precio, categoria_id]
-    );
-    res.status(201).json({ success: true, id: result.insertId });
+    const nuevoProducto = new Producto({
+      nombre,
+      descripcion,
+      precio,
+      categoria: categoria || 'General',
+      categoria_id: categoria_id || 1,
+      imagen: imagen || '',
+      activo: true
+    });
+    await nuevoProducto.save();
+    res.status(201).json({ success: true, id: nuevoProducto._id });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -218,12 +200,17 @@ app.post('/api/admin/productos', verificarAdmin, async (req, res) => {
 // Modificar producto
 app.put('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
   const { id } = req.params;
-  const { nombre, descripcion, precio, categoria_id, activo } = req.body;
+  const { nombre, descripcion, precio, categoria, categoria_id, imagen, activo } = req.body;
   try {
-    await pool.execute(
-      'UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, categoria_id = ?, activo = ? WHERE id = ?',
-      [nombre, descripcion, precio, categoria_id, activo, id]
-    );
+    await Producto.findByIdAndUpdate(id, {
+      nombre,
+      descripcion,
+      precio,
+      categoria,
+      categoria_id,
+      imagen,
+      activo
+    });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -234,7 +221,7 @@ app.put('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
 app.delete('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.execute('UPDATE productos SET activo = FALSE WHERE id = ?', [id]);
+    await Producto.findByIdAndUpdate(id, { activo: false });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -251,41 +238,37 @@ app.post('/api/pedidos', async (req, res) => {
     return res.status(400).json({ error: 'Datos de pedido incompletos' });
   }
 
-  let connection;
   try {
-    connection = await pool.getConnection();
-    await connection.beginTransaction();
+    const nuevoPedido = new Pedido({
+      usuario: usuario_id,
+      total,
+      centro: centro || 'IES José Zerpa',
+      metodo_pago: metodo_pago || 'efectivo',
+      estado: 'pendiente',
+      items: items.map(item => ({
+        producto: item.id,
+        nombre_producto: item.nombre,
+        cantidad: item.cantidad,
+        precio_unitario: item.precio,
+        ingredientesPersonalizados: item.ingredientesPersonalizados || []
+      }))
+    });
 
-    // 1. Insertar en pedidos
-    const [result] = await connection.execute(
-      'INSERT INTO pedidos (usuario_id, total, fecha, centro, metodo_pago, estado) VALUES (?, ?, NOW(), ?, ?, ?)',
-      [usuario_id, total, centro || 'IES José Zerpa', metodo_pago || 'efectivo', 'pendiente']
-    );
-
-    const pedidoId = result.insertId;
-
-    // 2. Insertar detalles del pedido
-    // Nota: Asumimos que existe la tabla detalles_pedido con las columnas: 
-    // pedido_id, producto_id, cantidad, precio_unitario, ingredientes
-    for (const item of items) {
-      const ingredientesStr = item.ingredientesPersonalizados
-        ? JSON.stringify(item.ingredientesPersonalizados)
-        : null;
-
-      await connection.execute(
-        'INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario, ingredientes) VALUES (?, ?, ?, ?, ?)',
-        [pedidoId, item.id, item.cantidad, item.precio, ingredientesStr]
-      );
+    await nuevoPedido.save();
+    
+    // Intentar imprimir el ticket en segundo plano (para no retrasar la respuesta)
+    try {
+      const usuario = await Usuario.findById(usuario_id);
+      imprimirTicket({ items, total, centro, subtotal: req.body.subtotal, impuesto: req.body.impuesto }, usuario)
+        .catch(err => console.error('Error al imprimir ticket:', err));
+    } catch (err) {
+      console.error('Error al obtener usuario para imprimir:', err);
     }
 
-    await connection.commit();
-    res.status(201).json({ success: true, message: 'Pedido creado exitosamente', pedidoId });
+    res.status(201).json({ success: true, message: 'Pedido creado exitosamente', pedidoId: nuevoPedido._id });
   } catch (error) {
-    if (connection) await connection.rollback();
     console.error('Error al crear pedido:', error);
     res.status(500).json({ error: 'Error al procesar el pedido', details: error.message });
-  } finally {
-    if (connection) connection.release();
   }
 });
 
@@ -298,11 +281,8 @@ app.get('/api/pedidos/historial', async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key_cafes');
-    const [rows] = await pool.execute(
-      'SELECT * FROM pedidos WHERE usuario_id = ? ORDER BY fecha DESC',
-      [decoded.id]
-    );
-    res.json(rows);
+    const pedidos = await Pedido.find({ usuario: decoded.id }).sort({ fecha: -1 });
+    res.json(pedidos);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -312,22 +292,16 @@ app.get('/api/pedidos/historial', async (req, res) => {
 app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
   const { centro } = req.query;
   try {
-    let query = `
-      SELECT p.*, u.nombre as usuario_nombre 
-      FROM pedidos p 
-      JOIN usuarios u ON p.usuario_id = u.id 
-    `;
-    let params = [];
-
+    let query = {};
     if (centro) {
-      query += ' WHERE p.centro = ? ';
-      params.push(centro);
+      query.centro = centro;
     }
 
-    query += ' ORDER BY p.fecha DESC';
+    const pedidos = await Pedido.find(query)
+      .populate('usuario', 'nombre correo')
+      .sort({ fecha: -1 });
 
-    const [rows] = await pool.execute(query, params);
-    res.json(rows);
+    res.json(pedidos);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -341,10 +315,7 @@ app.put('/api/usuarios/:id/perfil', async (req, res) => {
   if (!nombre || !centro) return res.status(400).json({ error: 'Nombre y centro son requeridos' });
 
   try {
-    await pool.execute(
-      'UPDATE usuarios SET nombre = ?, centro = ? WHERE id = ?',
-      [nombre, centro, id]
-    );
+    await Usuario.findByIdAndUpdate(id, { nombre, centro });
     res.json({ success: true, message: 'Perfil actualizado' });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -354,8 +325,10 @@ app.put('/api/usuarios/:id/perfil', async (req, res) => {
 // RUTAS ADMIN USUARIOS
 app.get('/api/admin/usuarios', verificarAdmin, async (req, res) => {
   try {
-    const [rows] = await pool.execute("SELECT id, correo, nombre, tipo, activo, turno, fecha_registro FROM usuarios WHERE tipo IN ('admin', 'empleado') ORDER BY fecha_registro DESC");
-    res.json(rows);
+    const usuarios = await Usuario.find({ tipo: { $in: ['admin', 'empleado'] } })
+      .select('-contrasena_hash')
+      .sort({ fecha_registro: -1 });
+    res.json(usuarios);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -365,7 +338,7 @@ app.put('/api/admin/usuarios/:id', verificarAdmin, async (req, res) => {
   const { id } = req.params;
   const { tipo, activo, turno } = req.body;
   try {
-    await pool.execute('UPDATE usuarios SET tipo = ?, activo = ?, turno = ? WHERE id = ?', [tipo, activo, turno, id]);
+    await Usuario.findByIdAndUpdate(id, { tipo, activo, turno });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -382,12 +355,17 @@ app.post('/api/admin/usuarios', verificarAdmin, async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const contrasenaHash = await bcrypt.hash(contrasena, salt);
 
-    const [result] = await pool.execute(
-      'INSERT INTO usuarios (correo, nombre, contrasena_hash, tipo, activo, turno) VALUES (?, ?, ?, ?, TRUE, ?)',
-      [correo, nombre, contrasenaHash, tipo, turno || 'mañana']
-    );
+    const nuevoUsuario = new Usuario({
+      correo,
+      nombre,
+      contrasena_hash: contrasenaHash,
+      tipo,
+      activo: true,
+      turno: turno || 'mañana'
+    });
 
-    res.status(201).json({ success: true, id: result.insertId });
+    await nuevoUsuario.save();
+    res.status(201).json({ success: true, id: nuevoUsuario._id });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -396,10 +374,20 @@ app.post('/api/admin/usuarios', verificarAdmin, async (req, res) => {
 // HEALTH CHECK Y TEST
 app.get('/api/health', async (req, res) => {
   try {
-    const [result] = await pool.execute('SELECT 1 as test');
-    const dbStatus = result ? 'CONNECTED' : 'DISCONNECTED';
-    const [tables] = await pool.execute('SELECT COUNT(*) as count FROM information_schema.tables WHERE table_schema = ?', [process.env.DB_NAME || 'cafes_db']);
-    res.json({ status: 'OK', message: 'Backend funcionando', timestamp: new Date().toISOString(), database: dbStatus, table_count: tables[0].count });
+    const dbStatus = mongoose.connection.readyState === 1 ? 'CONNECTED' : 'DISCONNECTED';
+    const userCount = await Usuario.countDocuments();
+    const productCount = await Producto.countDocuments();
+
+    res.json({
+      status: 'OK',
+      message: 'Backend funcionando',
+      timestamp: new Date().toISOString(),
+      database: dbStatus,
+      counts: {
+        usuarios: userCount,
+        productos: productCount
+      }
+    });
   } catch (error) {
     res.json({ status: 'ERROR', message: 'Problema DB', error: error.message });
   }

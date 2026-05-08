@@ -68,6 +68,12 @@ const AdminDashboard = () => {
             cancelar: 'Cancelar',
             crearEmpleado: 'Nuevo Empleado',
             contrasena: 'Contraseña',
+            imagen: 'Ruta de Imagen',
+            categoriaMenu: 'Categoría de Menú',
+            catBebidasCalientes: 'Bebidas Calientes',
+            catBebidasFrias: 'Bebidas Frías',
+            catGolosinas: 'Golosinas',
+            catBocadillos: 'Bocadillos',
             seguroEliminar: '¿Estás seguro de desactivar este producto?',
             errorCargando: 'Error cargando datos: ',
             errorCambioEstado: 'Error cambiando estado: ',
@@ -122,6 +128,12 @@ const AdminDashboard = () => {
             cancelar: 'Cancel',
             crearEmpleado: 'New Employee',
             contrasena: 'Password',
+            imagen: 'Image Path',
+            categoriaMenu: 'Menu Category',
+            catBebidasCalientes: 'Hot Drinks',
+            catBebidasFrias: 'Cold Drinks',
+            catGolosinas: 'Snacks',
+            catBocadillos: 'Sandwiches',
             seguroEliminar: 'Are you sure you want to deactivate this product?',
             errorCargando: 'Error loading data: ',
             errorCambioEstado: 'Error changing status: ',
@@ -183,21 +195,23 @@ const AdminDashboard = () => {
     const handleSaveProducto = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const data = { ...modalProducto, ...Object.fromEntries(formData.entries()) };
+        const data = Object.fromEntries(formData.entries());
+
+        const payload = {
+            ...modalProducto,
+            nombre: data.nombre,
+            precio: parseFloat(data.precio),
+            descripcion: data.descripcion,
+            categoria_id: parseInt(data.categoria_id),
+            categoria: data.categoria,
+            imagen: data.imagen
+        };
 
         try {
             if (modalProducto.id) {
-                await updateProducto(modalProducto.id, {
-                    ...data,
-                    precio: parseFloat(data.precio),
-                    categoria_id: parseInt(data.categoria_id)
-                });
+                await updateProducto(modalProducto.id, payload);
             } else {
-                await addProducto({
-                    ...data,
-                    precio: parseFloat(data.precio),
-                    categoria_id: parseInt(data.categoria_id)
-                });
+                await addProducto(payload);
             }
             setModalProducto(null);
             cargarDatos();
@@ -463,6 +477,20 @@ const AdminDashboard = () => {
                                 <div className="mb-3">
                                     <label>{t.categoriaId}</label>
                                     <input type="number" name="categoria_id" className="form-control" defaultValue={modalProducto.categoria_id} required />
+                                    <small className="text-white-50">3 = Bocadillo personalizable, 1 = Normal</small>
+                                </div>
+                                <div className="mb-3">
+                                    <label>{t.categoriaMenu}</label>
+                                    <select name="categoria" className="form-select" defaultValue={modalProducto.categoria}>
+                                        <option value="bebidasCalientes">{t.catBebidasCalientes}</option>
+                                        <option value="bebidasFrias">{t.catBebidasFrias}</option>
+                                        <option value="golosinas">{t.catGolosinas}</option>
+                                        <option value="bocadillos">{t.catBocadillos}</option>
+                                    </select>
+                                </div>
+                                <div className="mb-3">
+                                    <label>{t.imagen}</label>
+                                    <input type="text" name="imagen" className="form-control" defaultValue={modalProducto.imagen} placeholder="/imagenes/ejemplo.png" />
                                 </div>
                                 <div className="d-flex gap-2">
                                     <button type="submit" className="btn-confirm-prefs">{t.guardar}</button>
