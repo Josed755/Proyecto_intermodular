@@ -3,6 +3,7 @@ import './EstiloSesiones.css';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { loginUsuario, setAuthToken, setUsuario } from '../services/api';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function InicioSesion() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ function InicioSesion() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const menuRef = useRef(null);
 
@@ -186,13 +188,22 @@ function InicioSesion() {
             </div>
             <div className="form-group">
               <label>{t.contrasena}</label>
-              <input
-                type="password"
-                name="contrasena"
-                value={formData.contrasena}
-                onChange={handleChange}
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="contrasena"
+                  value={formData.contrasena}
+                  onChange={handleChange}
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="btn-toggle-password" 
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <div className="btn-container">
               <button

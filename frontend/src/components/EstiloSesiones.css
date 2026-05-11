@@ -124,6 +124,38 @@
   font-weight: bold;
 }
 
+/* Password visibility toggle */
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  padding-right: 45px !important;
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  font-size: 1.1rem;
+  z-index: 5;
+  transition: color 0.2s;
+}
+
+.btn-toggle-password:hover {
+  color: orange;
+}
+
 .btn-volver {
   background-color: #d32f2f;
   border: 4px solid #b71c1c;

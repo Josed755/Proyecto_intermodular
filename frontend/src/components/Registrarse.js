@@ -3,6 +3,7 @@ import './EstiloSesiones.css';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { registrarUsuario } from '../services/api';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function Registrarse() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,8 @@ function Registrarse() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const menuRef = useRef(null);
 
@@ -236,23 +239,41 @@ function Registrarse() {
             </div>
             <div className="form-group">
               <label>{t.contrasena}</label>
-              <input
-                type="password"
-                name="contrasena"
-                value={formData.contrasena}
-                onChange={handleChange}
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="contrasena"
+                  value={formData.contrasena}
+                  onChange={handleChange}
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="btn-toggle-password" 
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <div className="form-group">
               <label>{t.repetirContrasena}</label>
-              <input
-                type="password"
-                name="confirmarContrasena"
-                value={formData.confirmarContrasena}
-                onChange={handleChange}
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmarContrasena"
+                  value={formData.confirmarContrasena}
+                  onChange={handleChange}
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="btn-toggle-password" 
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
             <div className="form-group">
               <label>{t.centroRecogida}</label>

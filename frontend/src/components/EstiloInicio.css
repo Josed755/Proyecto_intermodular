@@ -219,7 +219,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 7rem; /* Para los emojis */
+  font-size: 7rem;
+  /* Para los emojis */
 }
 
 .product-card-img {
@@ -227,13 +228,13 @@
   height: 100%;
   object-fit: cover;
   border-radius: 16px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
 }
 
 .dash-card:hover .product-card-img {
   transform: scale(1.05);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
 
 .item-name {
@@ -538,35 +539,280 @@
 
 /* History Modal Styles */
 .history-list-container {
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 5px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
 }
 
 .history-list-container::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 .history-list-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 165, 0, 0.3);
-    border-radius: 10px;
+  background: rgba(255, 165, 0, 0.3);
+  border-radius: 10px;
 }
 
 .history-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
 
 .history-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 165, 0, 0.2);
-    transform: translateX(5px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 165, 0, 0.2);
+  transform: translateX(5px);
 }
 
 .history-products {
-    border-left: 2px solid rgba(255, 165, 0, 0.3);
-    padding-left: 15px;
-    margin: 10px 0;
+  border-left: 2px solid rgba(255, 165, 0, 0.3);
+  padding-left: 15px;
+  margin: 10px 0;
 }
+
+/* --- MOBILE RESPONSIVE ADAPTATIONS --- */
+@media (max-width: 991px) {
+  .dashboard-container {
+    padding: 10px;
+  }
+
+  /* Stack Summary Panel below Menu */
+  .summary-panel {
+    position: relative;
+    top: 0;
+    margin-top: 30px;
+    max-height: none;
+    box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Compact Product Cards for Mobile - Optimized for 1 per row */
+  .dash-card {
+    min-height: 400px;
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .icon-wrapper {
+    height: 180px;
+    font-size: 5.5rem;
+    margin-bottom: 15px;
+  }
+
+  .item-name {
+    font-size: 1.6rem;
+    height: auto;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .item-price {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+  }
+
+  /* Controls size adjustment */
+  .btn-round {
+    width: 45px;
+    height: 45px;
+    font-size: 1.4rem;
+  }
+
+  .qty-badge {
+    font-size: 1.4rem;
+    min-width: 40px;
+  }
+
+  /* Header adjustments */
+  .header-container {
+    padding: 0 10px;
+    height: 70px;
+  }
+
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .user-name {
+    display: none;
+    /* Hide name to save space */
+  }
+
+  .user-profile {
+    padding: 6px;
+    gap: 0;
+  }
+
+  .filter-container {
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .btn-filter {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+/* --- NEW FLOATING PILL CART --- */
+.cart-floating-wrapper {
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 9999;
+  padding: 0 20px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.cart-floating-wrapper.hide-cart {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(100px);
+}
+
+.cart-floating-wrapper.show-cart {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.cart-floating-pill {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 450px;
+  background: orange;
+  height: 65px;
+  border-radius: 50px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  color: white;
+  font-weight: 900;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cart-floating-pill:active {
+  transform: scale(0.95);
+}
+
+.cart-pill-left {
+  background: rgba(255, 255, 255, 0.25);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-pill-count {
+  font-size: 1.3rem;
+}
+
+.cart-pill-center {
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cart-pill-right {
+  font-size: 1.2rem;
+  padding-right: 15px;
+}
+
+/* Drawer Adjustment for Mobile (Delivery Style) */
+@media (max-width: 991px) {
+  .summary-container {
+    position: fixed !important;
+    bottom: -100% !important;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Full screen overlay container */
+    z-index: 3000;
+    transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+
+  .summary-container.open {
+    bottom: 0 !important;
+  }
+
+  .summary-panel {
+    border-radius: 35px 35px 0 0;
+    margin-top: 0;
+    height: 90vh; /* Takes most of the screen */
+    max-height: 90vh;
+    box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.6);
+    background: #1a1c23; /* Solid dark for the drawer */
+    overflow-y: auto;
+  }
+
+  .summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 15px;
+  }
+
+  .summary-header-title {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: white;
+  }
+
+  .btn-back-cart {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+  }
+
+  /* Items as Cards in the summary */
+  .order-item {
+    background: rgba(255, 255, 255, 0.06);
+    margin: 0 15px 12px 15px;
+    padding: 20px;
+    border-radius: 20px;
+    border-bottom: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .cart-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: -1;
+  }
+
+  .btn-confirm {
+    padding: 20px;
+    font-size: 1.3rem;
+    border-radius: 20px;
+    margin: 20px;
+    width: calc(100% - 40px);
+  }
+}

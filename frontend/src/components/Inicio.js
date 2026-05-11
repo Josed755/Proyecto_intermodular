@@ -11,9 +11,11 @@ import Productos from './Productos';
 import Calculos from './CalculosInic';
 import Botones from './BotonesInic';
 import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos } from '../services/api';
+import { FaUserCircle, FaHistory, FaSignOutAlt, FaInfoCircle, FaChevronDown, FaShoppingCart, FaTimes, FaArrowLeft } from 'react-icons/fa';
 
 function Inicio() {
     const navigate = useNavigate();
+    const [cartOpen, setCartOpen] = useState(false);
     const usuario = getUsuario();
 
     const {
@@ -535,7 +537,7 @@ function Inicio() {
                             <h2 className="text-white mb-4 border-bottom pb-2">Menú</h2>
                             <div className="row g-3">
                                 {productosFiltrados.map(producto => (
-                                    <div className="col-6" key={producto.id}>
+                                    <div className="col-12" key={producto.id}>
                                         <div
                                             className="dash-card"
                                             onClick={() => abrirModalIngredientes(producto)}
@@ -575,15 +577,6 @@ function Inicio() {
                                                 </div>
                                             )}
 
-                                            {producto.categoria_id === 3 && producto.ingredientes && (
-                                                <button
-                                                    className="btn-ingredientes-verde"
-                                                    onClick={(e) => { e.stopPropagation(); abrirModalIngredientes(producto); }}
-                                                >
-                                                    {t.ingredientes}
-                                                </button>
-                                            )}
-
                                             <div className="control-group">
                                                 <button
                                                     className="btn btn-round"
@@ -607,9 +600,20 @@ function Inicio() {
                         </div>
 
                         {/* Right Column: Summary Panel */}
-                        <div className="col-lg-4">
+                        <div className={`col-lg-4 summary-container ${cartOpen ? 'open' : ''}`}>
+                            {/* Overlay para cerrar el carrito al tocar fuera en móvil */}
+                            {cartOpen && <div className="cart-overlay" onClick={() => setCartOpen(false)}></div>}
+                            
                             <div className="summary-panel shadow-lg">
-                                <h2 className="summary-title">{t.resumen}</h2>
+                                <div className="summary-header d-lg-none">
+                                    <button className="btn-back-cart" onClick={() => setCartOpen(false)}>
+                                        <FaArrowLeft />
+                                    </button>
+                                    <span className="summary-header-title">{t.resumen}</span>
+                                    <div style={{ width: '40px' }}></div>
+                                </div>
+                                
+                                <h2 className="summary-title d-none d-lg-block">{t.resumen}</h2>
 
                                 <div className="flex-grow-1">
                                     {hayPedidos ? (
@@ -701,12 +705,6 @@ function Inicio() {
                                         {t.limpiar}
                                     </button>
 
-                                    <button
-                                        className="btn-exit"
-                                        onClick={() => { if (window.confirm(t.confirmarSalir)) window.location.href = '/' }}
-                                    >
-                                        {t.salir}
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -757,6 +755,30 @@ function Inicio() {
             <footer className="App-footer">
                 <div>© IES José Zerpa - Cafetería</div>
             </footer>
+
+            {/* BOTÓN FLOTANTE - Visibilidad simplificada (Solo se oculta si el carrito o el modal están abiertos) */}
+            <div className="cart-floating-wrapper" style={{ 
+                opacity: (!cartOpen && !productoParaPersonalizar) ? 1 : 0,
+                pointerEvents: (!cartOpen && !productoParaPersonalizar) ? 'auto' : 'none',
+                transform: (!cartOpen && !productoParaPersonalizar) ? 'translateY(0)' : 'translateY(100px)',
+                display: 'flex',
+                zIndex: 99999,
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}>
+                <button className="cart-floating-pill" onClick={() => setCartOpen(true)}>
+                    <div className="cart-pill-left">
+                        <span className="cart-pill-count">
+                            {productos.reduce((acc, p) => acc + (p.cantidad || 0), 0)}
+                        </span>
+                    </div>
+                    <span className="cart-pill-center">
+                        {productos.some(p => (p.cantidad || 0) > 0) ? 'VER CARRITO' : 'CARRITO VACÍO'}
+                    </span>
+                    <span className="cart-pill-right">
+                        {Dinero(productos.reduce((acc, p) => acc + ((p.cantidad || 0) * (p.precio || 0)), 0))}
+                    </span>
+                </button>
+            </div>
         </div>
     )
 }
