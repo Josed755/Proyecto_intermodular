@@ -40,6 +40,7 @@ export const loginUsuario = (datos) => api.post('/login', datos);
 
 // Productos
 export const getProductos = () => api.get('/productos');
+export const getIngredientes = () => api.get('/ingredientes');
 
 // ADMIN PRODUCTOS
 export const getAdminProductos = () => api.get('/admin/productos');

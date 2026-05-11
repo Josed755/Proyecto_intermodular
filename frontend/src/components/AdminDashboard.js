@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProductos, addProducto, updateProducto, deleteProducto, getAdminPedidos, getAdminUsuarios, updateUsuarioStatus, addUsuario } from '../services/api';
+import { getProductos, addProducto, updateProducto, deleteProducto, getAdminPedidos, getAdminUsuarios, updateUsuarioStatus, addUsuario, getIngredientes } from '../services/api';
 import './EstiloInicio.css'; // Reutilizamos estilos base
 import './EstiloSesiones.css'; // Para modales y formularios
 import './EstiloAdmin.css';
@@ -16,6 +16,8 @@ const AdminDashboard = () => {
     const [filtroCentro, setFiltroCentro] = useState('');
     const [error, setError] = useState('');
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+    const [todosLosIngredientes, setTodosLosIngredientes] = useState([]);
+    const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState([]);
     const [menuAbierto, setMenuAbierto] = useState(false);
     const menuRef = useRef(null);
     const navigate = useNavigate();
@@ -84,7 +86,8 @@ const AdminDashboard = () => {
             errorCrearEmpleado: 'Error creando empleado: ',
             eliminar: 'Eliminar',
             confirmarBorrado: '¿Seguro?',
-            categoria: 'Categoría'
+            categoria: 'Categoría',
+            ingredientes: 'Ingredientes'
         },
         en: {
             volver: 'Back',
@@ -147,7 +150,8 @@ const AdminDashboard = () => {
             errorCrearEmpleado: 'Error creating employee: ',
             eliminar: 'Delete',
             confirmarBorrado: 'Sure?',
-            categoria: 'Category'
+            categoria: 'Category',
+            ingredientes: 'Ingredients'
         }
     };
 
@@ -190,6 +194,9 @@ const cargarDatos = async () => {
 
         const userData = await getAdminUsuarios();
         setUsuarios(userData.data || userData);
+
+        const ingData = await getIngredientes();
+        setTodosLosIngredientes(ingData.data || ingData);
     } catch (err) {
         setError(t.errorCargando + err.message);
     }
@@ -211,7 +218,8 @@ const handleSaveProducto = async (e) => {
         descripcion: data.descripcion,
         categoria_id: parseInt(data.categoria_id),
         categoria: data.categoria,
-        imagen: data.imagen
+        imagen: data.imagen,
+        ingredientes: ingredientesSeleccionados
     };
 
     try {
@@ -225,6 +233,11 @@ const handleSaveProducto = async (e) => {
     } catch (err) {
         setError(t.errorGuardar + err.message);
     }
+};
+
+const abrirModalProducto = (p) => {
+    setModalProducto(p);
+    setIngredientesSeleccionados(p.ingredientes || []);
 };
 
 const handleDelete = async (id) => {
@@ -337,7 +350,7 @@ return (
                     <div>
                         <div className="d-flex justify-content-between mb-3">
                             <h3>{t.gestionProductos}</h3>
-                            <button className="btn btn-success" onClick={() => setModalProducto({ nombre: '', precio: 0, descripcion: '', categoria_id: 1 })}>{t.nuevoProducto}</button>
+                            <button className="btn btn-success" onClick={() => abrirModalProducto({ nombre: '', precio: 0, descripcion: '', categoria_id: 1, ingredientes: [] })}>{t.nuevoProducto}</button>
                         </div>
                         {/* Vista de Tabla (Desktop) */}
                         <div className="d-none d-md-block">
@@ -363,7 +376,7 @@ return (
                                             <td>{p.activo ? '✅' : '❌'}</td>
                                             <td>
                                                 <div className="d-flex gap-2">
-                                                    <button className="btn btn-sm btn-success" onClick={() => setModalProducto(p)}>{t.editar}</button>
+                                                    <button className="btn btn-sm btn-success" onClick={() => abrirModalProducto(p)}>{t.editar}</button>
                                                     <button
                                                         className={`btn btn-sm ${p.activo ? 'btn-outline-warning' : 'btn-success'}`}
                                                         onClick={() => toggleProducto(p)}
@@ -399,7 +412,7 @@ return (
                                         {p.activo ? <span className="text-success small">● {t.activo}</span> : <span className="text-danger small">● {t.inactivo}</span>}
                                     </div>
                                     <div className="d-flex gap-2 flex-wrap">
-                                        <button className="btn btn-sm btn-success flex-grow-1" onClick={() => setModalProducto(p)}>{t.editar}</button>
+                                        <button className="btn btn-sm btn-success flex-grow-1" onClick={() => abrirModalProducto(p)}>{t.editar}</button>
                                         <button className="btn btn-sm btn-outline-warning flex-grow-1" onClick={() => toggleProducto(p)}>{p.activo ? t.desactivar : t.activar}</button>
                                         <button 
                                             className={`btn btn-sm flex-grow-1 ${confirmDeleteId === (p._id || p.id) ? 'btn-danger' : 'btn-outline-danger'}`}
@@ -555,6 +568,34 @@ return (
                                 <label>{t.imagen}</label>
                                 <input type="text" name="imagen" className="form-control" defaultValue={modalProducto.imagen} placeholder="/imagenes/ejemplo.png" />
                             </div>
+                            
+                            <div className="mb-3">
+                                <label className="text-warning fw-bold">{t.ingredientes}</label>
+                                <div className="ingredients-grid p-2 border border-secondary rounded bg-dark" style={{ maxHeight: '150px', overflowY: 'auto' }}>
+                                    {todosLosIngredientes.map(ing => (
+                                        <div key={ing.id} className="form-check">
+                                            <input 
+                                                className="form-check-input" 
+                                                type="checkbox" 
+                                                id={`ing-${ing.id}`}
+                                                checked={ingredientesSeleccionados.includes(ing.nombre)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setIngredientesSeleccionados([...ingredientesSeleccionados, ing.nombre]);
+                                                    } else {
+                                                        setIngredientesSeleccionados(ingredientesSeleccionados.filter(name => name !== ing.nombre));
+                                                    }
+                                                }}
+                                            />
+                                            <label className="form-check-label text-white small" htmlFor={`ing-${ing.id}`}>
+                                                {ing.nombre}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
+                                <small className="text-white-50">Selecciona los ingredientes que este producto puede llevar.</small>
+                            </div>
+
                             <div className="d-flex gap-2">
                                 <button type="submit" className="btn-confirm-prefs">{t.guardar}</button>
                                 <button type="button" className="btn btn-secondary" onClick={() => setModalProducto(null)}>{t.cancelar}</button>
