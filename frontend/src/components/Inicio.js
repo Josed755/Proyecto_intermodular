@@ -537,7 +537,7 @@ function Inicio() {
                             <h2 className="text-white mb-4 border-bottom pb-2">Menú</h2>
                             <div className="row g-3">
                                 {productosFiltrados.map(producto => (
-                                    <div className="col-12" key={producto.id}>
+                                    <div className="col-12 col-lg-6" key={producto.id}>
                                         <div
                                             className="dash-card"
                                             onClick={() => abrirModalIngredientes(producto)}
@@ -756,8 +756,8 @@ function Inicio() {
                 <div>© IES José Zerpa - Cafetería</div>
             </footer>
 
-            {/* BOTÓN FLOTANTE - Visibilidad simplificada (Solo se oculta si el carrito o el modal están abiertos) */}
-            <div className="cart-floating-wrapper" style={{ 
+            {/* BOTÓN FLOTANTE - Solo visible en móvil (d-lg-none) */}
+            <div className="cart-floating-wrapper d-lg-none" style={{ 
                 opacity: (!cartOpen && !productoParaPersonalizar) ? 1 : 0,
                 pointerEvents: (!cartOpen && !productoParaPersonalizar) ? 'auto' : 'none',
                 transform: (!cartOpen && !productoParaPersonalizar) ? 'translateY(0)' : 'translateY(100px)',
