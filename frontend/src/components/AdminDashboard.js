@@ -15,6 +15,7 @@ const AdminDashboard = () => {
     const [modalUsuario, setModalUsuario] = useState(null); // null o { user data }
     const [filtroCentro, setFiltroCentro] = useState('');
     const [error, setError] = useState('');
+    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
     const [menuAbierto, setMenuAbierto] = useState(false);
     const menuRef = useRef(null);
     const navigate = useNavigate();
@@ -80,7 +81,10 @@ const AdminDashboard = () => {
             errorGuardar: 'Error al guardar: ',
             errorEliminar: 'Error al eliminar: ',
             errorActUsuario: 'Error al actualizar usuario: ',
-            errorCrearEmpleado: 'Error creando empleado: '
+            errorCrearEmpleado: 'Error creando empleado: ',
+            eliminar: 'Eliminar',
+            confirmarBorrado: '¿Seguro?',
+            categoria: 'Categoría'
         },
         en: {
             volver: 'Back',
@@ -140,7 +144,10 @@ const AdminDashboard = () => {
             errorGuardar: 'Error saving: ',
             errorEliminar: 'Error deleting: ',
             errorActUsuario: 'Error updating user: ',
-            errorCrearEmpleado: 'Error creating employee: '
+            errorCrearEmpleado: 'Error creating employee: ',
+            eliminar: 'Delete',
+            confirmarBorrado: 'Sure?',
+            categoria: 'Category'
         }
     };
 
@@ -221,13 +228,18 @@ const handleSaveProducto = async (e) => {
 };
 
 const handleDelete = async (id) => {
-    if (window.confirm(t.seguroEliminar)) {
+    if (confirmDeleteId === id) {
         try {
             await deleteProducto(id);
+            setConfirmDeleteId(null);
             cargarDatos();
         } catch (err) {
             setError(t.errorEliminar + err.message);
         }
+    } else {
+        setConfirmDeleteId(id);
+        // Reset confirmation after 3 seconds
+        setTimeout(() => setConfirmDeleteId(null), 3000);
     }
 };
 
@@ -321,34 +333,77 @@ return (
                             <h3>{t.gestionProductos}</h3>
                             <button className="btn btn-success" onClick={() => setModalProducto({ nombre: '', precio: 0, descripcion: '', categoria_id: 1 })}>{t.nuevoProducto}</button>
                         </div>
-                        <table className="table table-dark table-hover">
-                            <thead>
-                                <tr>
-                                    <th>{t.nombre}</th>
-                                    <th>{t.precio}</th>
-                                    <th>{t.estado}</th>
-                                    <th>{t.acciones}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {productos.map(p => (
-                                    <tr key={p._id || p.id}>
-                                        <td>{p.nombre}</td>
-                                        <td>{p.precio}€</td>
-                                        <td>{p.activo ? '✅' : '❌'}</td>
-                                        <td>
-                                            <button className="btn btn-sm btn-success me-2" onClick={() => setModalProducto(p)}>{t.editar}</button>
-                                            <button
-                                                className={`btn btn-sm ${p.activo ? 'btn-danger' : 'btn-success'}`}
-                                                onClick={() => toggleProducto(p)}
-                                            >
-                                                {p.activo ? t.desactivar : t.activar}
-                                            </button>
-                                        </td>
+                        {/* Vista de Tabla (Desktop) */}
+                        <div className="d-none d-md-block">
+                            <table className="table table-dark table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>{t.nombre}</th>
+                                        <th>{t.precio}</th>
+                                        <th>{t.categoria}</th>
+                                        <th>{t.estado}</th>
+                                        <th>{t.acciones}</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {productos.map(p => (
+                                        <tr key={p._id || p.id}>
+                                            <td>
+                                                <div className="fw-bold">{p.nombre}</div>
+                                                <small className="text-white-50">{p.descripcion?.substring(0, 30)}...</small>
+                                            </td>
+                                            <td>{p.precio}€</td>
+                                            <td><span className="badge bg-secondary">{p.categoria}</span></td>
+                                            <td>{p.activo ? '✅' : '❌'}</td>
+                                            <td>
+                                                <div className="d-flex gap-2">
+                                                    <button className="btn btn-sm btn-success" onClick={() => setModalProducto(p)}>{t.editar}</button>
+                                                    <button
+                                                        className={`btn btn-sm ${p.activo ? 'btn-outline-warning' : 'btn-success'}`}
+                                                        onClick={() => toggleProducto(p)}
+                                                    >
+                                                        {p.activo ? t.desactivar : t.activar}
+                                                    </button>
+                                                    <button 
+                                                        className={`btn btn-sm ${confirmDeleteId === (p._id || p.id) ? 'btn-danger animate__animated animate__pulse animate__infinite' : 'btn-outline-danger'}`}
+                                                        onClick={() => handleDelete(p._id || p.id)}
+                                                    >
+                                                        {confirmDeleteId === (p._id || p.id) ? t.confirmarBorrado : t.eliminar}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Vista de Tarjetas (Móvil) */}
+                        <div className="d-md-none">
+                            {productos.map(p => (
+                                <div key={p._id || p.id} className="admin-mobile-card mb-3 p-3 shadow-sm" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <div className="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 className="mb-0 text-warning">{p.nombre}</h5>
+                                        <span className="badge bg-dark">{p.precio}€</span>
+                                    </div>
+                                    <p className="small text-white-50 mb-2">{p.descripcion}</p>
+                                    <div className="mb-3">
+                                        <span className="badge bg-secondary me-2">{p.categoria}</span>
+                                        {p.activo ? <span className="text-success small">● {t.activo}</span> : <span className="text-danger small">● {t.inactivo}</span>}
+                                    </div>
+                                    <div className="d-flex gap-2 flex-wrap">
+                                        <button className="btn btn-sm btn-success flex-grow-1" onClick={() => setModalProducto(p)}>{t.editar}</button>
+                                        <button className="btn btn-sm btn-outline-warning flex-grow-1" onClick={() => toggleProducto(p)}>{p.activo ? t.desactivar : t.activar}</button>
+                                        <button 
+                                            className={`btn btn-sm flex-grow-1 ${confirmDeleteId === (p._id || p.id) ? 'btn-danger' : 'btn-outline-danger'}`}
+                                            onClick={() => handleDelete(p._id || p.id)}
+                                        >
+                                            {confirmDeleteId === (p._id || p.id) ? t.confirmarBorrado : t.eliminar}
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 

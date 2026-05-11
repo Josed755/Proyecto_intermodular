@@ -106,3 +106,17 @@
 .admin-modal {
     max-width: 500px !important;
 }
+/* Mobile responsive cards */
+.admin-mobile-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+.animate__pulse {
+    animation: pulse-red 1.5s infinite !important;
+}
