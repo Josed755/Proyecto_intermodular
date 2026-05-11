@@ -214,12 +214,12 @@ app.put('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
   }
 });
 
-// Eliminar (desactivar) producto
+// Eliminar (borrar definitivamente) producto
 app.delete('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
   const { id } = req.params;
   try {
-    await Producto.findByIdAndUpdate(id, { activo: false });
-    res.json({ success: true });
+    await Producto.findByIdAndDelete(id);
+    res.json({ success: true, message: 'Producto eliminado definitivamente' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
