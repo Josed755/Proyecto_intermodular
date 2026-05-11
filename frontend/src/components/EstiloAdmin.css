@@ -104,14 +104,45 @@
 }
 
 .admin-modal {
-        max-width: 500px !important;
+    max-width: 500px !important;
     max-height: 85vh;
     overflow-y: auto;
     position: relative;
+    padding-right: 15px; /* Espacio para el scroll */
 }
-/* Mobile responsive cards */
-.admin-mobile-card {
-    transition: transform 0.2s, box-shadow 0.2s;
+
+/* Personalización del Scrollbar para el modal de admin */
+.admin-modal::-webkit-scrollbar {
+    width: 8px;
+}
+
+.admin-modal::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.admin-modal::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff9900, #ff5500);
+    border-radius: 10px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+.admin-modal::-webkit-scrollbar-thumb:hover {
+    background: #ffaa33;
+}
+
+/* Estilo para el scroll de la lista de ingredientes dentro del modal */
+.ingredients-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ingredients-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.ingredients-grid::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 10px;
 }
 
 @keyframes pulse-red {
@@ -122,4 +153,9 @@
 
 .animate__pulse {
     animation: pulse-red 1.5s infinite !important;
+}
+
+/* Mobile responsive cards */
+.admin-mobile-card {
+    transition: transform 0.2s, box-shadow 0.2s;
 }
