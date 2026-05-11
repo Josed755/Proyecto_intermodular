@@ -224,7 +224,7 @@ function Inicio() {
     }, [modalActivo]);
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/ingredientes")
+        fetch("https://proyecto-intermodular-pmt1.onrender.com/api/ingredientes")
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -252,7 +252,7 @@ function Inicio() {
         if (producto.ingredientesPersonalizados && producto.ingredientesPersonalizados.length > 0) {
             setProductoParaPersonalizar({ ...producto });
         } else {
-            fetch(`http://localhost:5000/api/productos/${producto.id}/ingredientes`)
+            fetch(`https://proyecto-intermodular-pmt1.onrender.com/api/productos/${producto.id}/ingredientes`)
                 .then(res => res.json())
                 .then(data => {
                     const idsDefault = Array.isArray(data) ? data.map(i => i.id) : [];
