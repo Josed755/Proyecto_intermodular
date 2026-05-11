@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/static/css/main.1e1295d7.css",
+    "main.js": "/static/js/main.b8e03115.js",
+    "static/js/453.a2b983d9.chunk.js": "/static/js/453.a2b983d9.chunk.js",
+    "static/media/Deus_Coffee.png": "/static/media/Deus_Coffee.b100c2e4eb17b2c05ff0.png",
+    "index.html": "/index.html",
+    "main.1e1295d7.css.map": "/static/css/main.1e1295d7.css.map",
+    "main.b8e03115.js.map": "/static/js/main.b8e03115.js.map",
+    "453.a2b983d9.chunk.js.map": "/static/js/453.a2b983d9.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1e1295d7.css",
+    "static/js/main.b8e03115.js"
+  ]
+}

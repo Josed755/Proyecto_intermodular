@@ -7,7 +7,7 @@ function Productos() {
 
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/productos")
+        fetch("https://proyecto-intermodular-pmt1.onrender.com/api/productos")
             .then(res => res.json())
             .then(data => {
                 // Añadimos cantidad inicial a cada producto
