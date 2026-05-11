@@ -104,7 +104,10 @@
 }
 
 .admin-modal {
-    max-width: 500px !important;
+        max-width: 500px !important;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
 }
 /* Mobile responsive cards */
 .admin-mobile-card {
