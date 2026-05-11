@@ -39,7 +39,8 @@ function Pago() {
             cvv: 'CVV',
             titular: 'Nombre del Titular',
             rellenaCampos: 'Por favor, rellena todos los campos de la tarjeta',
-            nombrePlaceholder: 'Juan Pérez'
+            nombrePlaceholder: 'Juan Pérez',
+            fueraHorario: 'Fuera de horario. Solo se puede pedir antes de las 08:00 o después de las 14:00 de Lunes a Viernes.'
         },
         en: {
             titulo: 'Checkout',
@@ -60,7 +61,8 @@ function Pago() {
             cvv: 'CVV',
             titular: 'Cardholder Name',
             rellenaCampos: 'Please fill all card details',
-            nombrePlaceholder: 'John Doe'
+            nombrePlaceholder: 'John Doe',
+            fueraHorario: 'Out of hours. Orders are only allowed before 08:00 or after 14:00 (Monday to Friday).'
         }
     };
 
@@ -122,6 +124,18 @@ function Pago() {
 
     const handlePago = async () => {
         if (!carrito || procesando) return;
+        
+        const ahora = new Date();
+        const dia = ahora.getDay();
+        const hora = ahora.getHours();
+        
+        if (usuario?.tipo !== 'admin' && dia !== 0 && dia !== 6) {
+            if (hora >= 8 && hora < 14) {
+                alert(t.fueraHorario);
+                return;
+            }
+        }
+        
         if (!isFormValid()) {
             alert(t.rellenaCampos);
             return;

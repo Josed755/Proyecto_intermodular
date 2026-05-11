@@ -86,7 +86,8 @@ function Inicio() {
             guardarCambios: 'Guardar Cambios',
             personaliza: 'Personaliza tus ingredientes',
             usuarioRegistrado: 'USUARIO REGISTRADO',
-            ingredientes: 'Ingredientes'
+            ingredientes: 'Ingredientes',
+            fueraHorario: 'Fuera de horario. Solo se puede pedir antes de las 08:00 o después de las 14:00 (Lunes a Viernes).'
         },
         en: {
             titulo: 'CafES App',
@@ -131,6 +132,7 @@ function Inicio() {
             personaliza: 'Customize your ingredients',
             usuarioRegistrado: 'REGISTERED USER',
             ingredientes: 'Ingredients',
+            fueraHorario: 'Out of hours. Orders are only allowed before 08:00 or after 14:00 (Monday to Friday).',
             nombresProductos: {
                 'Agua': ' Water',
                 'Refresco': ' Soda',
@@ -678,6 +680,18 @@ function Inicio() {
                                         onClick={() => {
                                             const total = calcularTotalConImpuesto();
                                             if (total > 0) {
+                                                const ahora = new Date();
+                                                const dia = ahora.getDay();
+                                                const hora = ahora.getHours();
+                                                
+                                                // Bloquear de 8 a 13:59 a menos que sea admin o finde (0=Dom, 6=Sab)
+                                                if (usuario?.tipo !== 'admin' && dia !== 0 && dia !== 6) {
+                                                    if (hora >= 8 && hora < 14) {
+                                                        alert(t.fueraHorario);
+                                                        return;
+                                                    }
+                                                }
+
                                                 // Guardar pedido en localStorage para la página de pago
                                                 const pedidoParaCheckout = {
                                                     items: productosConPedidos.map(p => ({
