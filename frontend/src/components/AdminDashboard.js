@@ -323,11 +323,11 @@ return (
                         {menuAbierto && (
                             <div className="user-dropdown shadow-lg">
                                 <button className="dropdown-item" onClick={() => navigate('/home')}>
-                                    🏠 {t.inicio}
+                                    {t.inicio}
                                 </button>
                                 <div className="dropdown-divider"></div>
                                 <button className="dropdown-item logout" onClick={handleLogout}>
-                                    🚪 {t.cerrarSesion}
+                                    {t.cerrarSesion}
                                 </button>
                             </div>
                         )}

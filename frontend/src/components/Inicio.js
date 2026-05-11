@@ -48,10 +48,10 @@ function Inicio() {
             titulo: 'CafES App',
             menu: 'Menú',
             todo: 'Todo',
-            bebidasCalientes: 'Bebidas Calientes ☕',
-            bebidasFrias: 'Bebidas Frías 🥤',
-            golosinas: 'Golosinas 🍬',
-            bocadillos: 'Bocadillos 🥖',
+            bebidasCalientes: 'Bebidas Calientes',
+            bebidasFrias: 'Bebidas Frías',
+            golosinas: 'Golosinas',
+            bocadillos: 'Bocadillos',
             resumen: 'Resumen',
             vacio: 'Su pedido está vacio',
             total: 'Total',
@@ -92,10 +92,10 @@ function Inicio() {
             titulo: 'CafES App',
             menu: 'Menu',
             todo: 'All',
-            bebidasCalientes: 'Hot Drinks ☕',
-            bebidasFrias: 'Cold Drinks 🥤',
-            golosinas: 'Snacks 🍬',
-            bocadillos: 'Sandwiches 🥖',
+            bebidasCalientes: 'Hot Drinks',
+            bebidasFrias: 'Cold Drinks',
+            golosinas: 'Snacks',
+            bocadillos: 'Sandwiches',
             resumen: 'Summary',
             vacio: 'Your order is empty',
             total: 'Total',
@@ -373,10 +373,10 @@ function Inicio() {
                                     <label>{t.idioma}</label>
                                     <div className="btn-group-toggle">
                                         <button className={idioma === 'es' ? 'active' : ''} onClick={() => setIdioma('es')}>
-                                            {t.espanyol} 🇪🇸
+                                            {t.espanyol}
                                         </button>
                                         <button className={idioma === 'en' ? 'active' : ''} onClick={() => setIdioma('en')}>
-                                            {t.ingles} 🇬🇧
+                                            {t.ingles}
                                         </button>
                                     </div>
                                 </div>

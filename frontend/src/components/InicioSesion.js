@@ -139,10 +139,10 @@ function InicioSesion() {
                   <label>{t.idioma}</label>
                   <div className="btn-group-toggle">
                     <button className={idioma === 'es' ? 'active' : ''} onClick={() => setIdioma('es')}>
-                      {t.espanyol} 🇪🇸
+                      {t.espanyol}
                     </button>
                     <button className={idioma === 'en' ? 'active' : ''} onClick={() => setIdioma('en')}>
-                      {t.ingles} 🇬🇧
+                      {t.ingles}
                     </button>
                   </div>
                 </div>
