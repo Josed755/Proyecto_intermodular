@@ -228,18 +228,24 @@ const handleSaveProducto = async (e) => {
 };
 
 const handleDelete = async (id) => {
-    if (confirmDeleteId === id) {
+    // Si ya habíamos pulsado una vez (confirmDeleteId ya tiene este ID)
+    if (confirmDeleteId && confirmDeleteId.toString() === id.toString()) {
         try {
+            setConfirmDeleteId('loading'); // Estado temporal para feedback
             await deleteProducto(id);
             setConfirmDeleteId(null);
             cargarDatos();
         } catch (err) {
             setError(t.errorEliminar + err.message);
+            setConfirmDeleteId(null);
         }
     } else {
+        // Primera pulsación: guardamos el ID para confirmar
         setConfirmDeleteId(id);
-        // Reset confirmation after 3 seconds
-        setTimeout(() => setConfirmDeleteId(null), 3000);
+        // Cancelar la confirmación si no pulsa en 4 segundos
+        setTimeout(() => {
+            setConfirmDeleteId(prev => (prev === id ? null : prev));
+        }, 4000);
     }
 };
 
@@ -365,10 +371,11 @@ return (
                                                         {p.activo ? t.desactivar : t.activar}
                                                     </button>
                                                     <button 
-                                                        className={`btn btn-sm ${confirmDeleteId === (p._id || p.id) ? 'btn-danger animate__animated animate__pulse animate__infinite' : 'btn-outline-danger'}`}
+                                                        className={`btn btn-sm ${confirmDeleteId === (p._id || p.id) ? 'btn-danger animate__animated animate__pulse' : 'btn-outline-danger'}`}
                                                         onClick={() => handleDelete(p._id || p.id)}
+                                                        disabled={confirmDeleteId === 'loading'}
                                                     >
-                                                        {confirmDeleteId === (p._id || p.id) ? t.confirmarBorrado : t.eliminar}
+                                                        {confirmDeleteId === 'loading' ? '...' : (confirmDeleteId === (p._id || p.id) ? t.confirmarBorrado : t.eliminar)}
                                                     </button>
                                                 </div>
                                             </td>
@@ -397,8 +404,9 @@ return (
                                         <button 
                                             className={`btn btn-sm flex-grow-1 ${confirmDeleteId === (p._id || p.id) ? 'btn-danger' : 'btn-outline-danger'}`}
                                             onClick={() => handleDelete(p._id || p.id)}
+                                            disabled={confirmDeleteId === 'loading'}
                                         >
-                                            {confirmDeleteId === (p._id || p.id) ? t.confirmarBorrado : t.eliminar}
+                                            {confirmDeleteId === 'loading' ? '...' : (confirmDeleteId === (p._id || p.id) ? t.confirmarBorrado : t.eliminar)}
                                         </button>
                                     </div>
                                 </div>
