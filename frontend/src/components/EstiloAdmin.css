@@ -113,30 +113,35 @@
     scrollbar-color: rgba(255, 153, 0, 0.5) transparent; /* Para Firefox */
 }
 
-/* Personalización del Scrollbar (Chrome/Safari/Edge/Capacitor) */
-.admin-modal::-webkit-scrollbar {
+/* Personalización GLOBAL del Scrollbar para el Panel de Admin */
+.admin-container *::-webkit-scrollbar {
     width: 6px !important;
 }
 
-.admin-modal::-webkit-scrollbar-button {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-
-.admin-modal::-webkit-scrollbar-track {
+.admin-container *::-webkit-scrollbar-track {
     background: transparent !important;
 }
 
-.admin-modal::-webkit-scrollbar-thumb {
-    background: rgba(255, 153, 0, 0.5) !important;
+.admin-container *::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 153, 0, 0.4) !important;
     border-radius: 20px !important;
-    border: 2px solid transparent !important; /* Añade margen interno */
+    border: 1px solid transparent !important;
     background-clip: content-box !important;
 }
 
-.admin-modal::-webkit-scrollbar-thumb:hover {
-    background: rgb(255, 153, 0) !important;
+.admin-container *::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255, 153, 0) !important;
+}
+
+/* Forzar la eliminación de flechas en cualquier elemento del admin */
+.admin-container *::-webkit-scrollbar-button {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+}
+
+.admin-container *::-webkit-scrollbar-corner {
+    background: transparent !important;
 }
 
 /* Estilo para el scroll de la lista de ingredientes */
