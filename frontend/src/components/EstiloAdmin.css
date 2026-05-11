@@ -115,21 +115,25 @@
 
 /* Personalización del Scrollbar (Chrome/Safari/Edge) */
 .admin-modal::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
+}
+
+.admin-modal::-webkit-scrollbar-button {
+    display: none; /* Elimina las flechas */
 }
 
 .admin-modal::-webkit-scrollbar-track {
-    background: transparent; /* Track invisible para mayor cohesión */
+    background: transparent;
 }
 
 .admin-modal::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, rgba(255, 153, 0, 0.2), rgba(255, 85, 0, 0.6));
+    background: rgba(255, 153, 0, 0.4); /* Color naranja base con transparencia */
     border-radius: 20px;
     transition: background 0.3s;
 }
 
 .admin-modal::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 153, 0, 0.8);
+    background: rgb(255, 153, 0); /* Color naranja sólido al pasar el ratón */
 }
 
 /* Estilo para el scroll de la lista de ingredientes */
