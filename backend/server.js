@@ -15,10 +15,7 @@ const { imprimirTicket } = require('./utils/printer');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}));
+app.use(cors()); // Permitir todos los orígenes en producción
 app.use(express.json());
 
 // Log de peticiones
