@@ -108,40 +108,41 @@
     max-height: 85vh;
     overflow-y: auto;
     position: relative;
-    padding-right: 15px; /* Espacio para el scroll */
+    padding: 1.5rem;
+    scrollbar-width: thin; /* Para Firefox */
+    scrollbar-color: rgba(255, 153, 0, 0.5) transparent; /* Para Firefox */
 }
 
-/* Personalización del Scrollbar para el modal de admin */
+/* Personalización del Scrollbar (Chrome/Safari/Edge) */
 .admin-modal::-webkit-scrollbar {
-    width: 8px;
+    width: 4px;
 }
 
 .admin-modal::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
+    background: transparent; /* Track invisible para mayor cohesión */
 }
 
 .admin-modal::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #ff9900, #ff5500);
-    border-radius: 10px;
-    border: 2px solid rgba(0, 0, 0, 0.2);
+    background: linear-gradient(to bottom, rgba(255, 153, 0, 0.2), rgba(255, 85, 0, 0.6));
+    border-radius: 20px;
+    transition: background 0.3s;
 }
 
 .admin-modal::-webkit-scrollbar-thumb:hover {
-    background: #ffaa33;
+    background: rgba(255, 153, 0, 0.8);
 }
 
-/* Estilo para el scroll de la lista de ingredientes dentro del modal */
+/* Estilo para el scroll de la lista de ingredientes */
 .ingredients-grid::-webkit-scrollbar {
-    width: 6px;
+    width: 3px;
 }
 
 .ingredients-grid::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
 }
 
 .ingredients-grid::-webkit-scrollbar-thumb {
-    background: #555;
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
 }
 
