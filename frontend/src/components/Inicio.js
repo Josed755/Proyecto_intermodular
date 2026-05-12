@@ -11,7 +11,7 @@ import Productos from './Productos';
 import Calculos from './CalculosInic';
 import Botones from './BotonesInic';
 import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos, getIngredientes, getProductoIngredientes } from '../services/api';
-import { FaUserCircle, FaHistory, FaSignOutAlt, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
+import { FaUserCircle, FaHistory, FaSignOutAlt, FaInfoCircle, FaArrowLeft, FaFacebookF, FaInstagram, FaTwitter, FaMapMarkerAlt, FaClock, FaPhoneAlt } from 'react-icons/fa';
 
 function Inicio() {
     const navigate = useNavigate();
@@ -87,7 +87,17 @@ function Inicio() {
             personaliza: 'Personaliza tus ingredientes',
             usuarioRegistrado: 'USUARIO REGISTRADO',
             ingredientes: 'Ingredientes',
-            fueraHorario: 'Fuera de horario. Solo se puede pedir antes de las 08:00 o después de las 14:00 (Lunes a Viernes).'
+            fueraHorario: 'Fuera de horario. Solo se puede pedir antes de las 08:00 o después de las 14:00 (Lunes a Viernes).',
+            cargandoPedidos: 'Cargando pedidos...',
+            verCarrito: 'VER CARRITO',
+            carritoVacio: 'CARRITO VACÍO',
+            menuTitulo: 'Menú',
+            estados: {
+                'pendiente': 'Pendiente',
+                'preparando': 'Preparando',
+                'listo': 'Listo',
+                'completado': 'Completado'
+            }
         },
         en: {
             titulo: 'CafES App',
@@ -143,6 +153,16 @@ function Inicio() {
                 'Sandwich': ' Sandwich',
                 'Postre': ' Cake',
                 'Paquete de papas': 'Fries'
+            },
+            cargandoPedidos: 'Loading orders...',
+            verCarrito: 'VIEW CART',
+            carritoVacio: 'EMPTY CART',
+            menuTitulo: 'Menu',
+            estados: {
+                'pendiente': 'Pending',
+                'preparando': 'Preparing',
+                'listo': 'Ready',
+                'completado': 'Completed'
             }
         }
     };
@@ -456,7 +476,7 @@ function Inicio() {
                                     {cargandoHistorial ? (
                                         <div className="text-center py-4">
                                             <div className="spinner-border text-warning" role="status"></div>
-                                            <p className="mt-2 text-white-50">Cargando pedidos...</p>
+                                            <p className="mt-2 text-white-50">{t.cargandoPedidos}</p>
                                         </div>
                                     ) : historial.length > 0 ? (
                                         <div className="history-items">
@@ -464,7 +484,9 @@ function Inicio() {
                                                 <div key={pedido._id || idx} className="history-card mb-3 p-3">
                                                     <div className="d-flex justify-content-between align-items-center mb-2">
                                                         <span className="text-warning fw-bold">{new Date(pedido.fecha).toLocaleDateString()}</span>
-                                                        <span className="badge bg-dark border border-secondary text-info">{pedido.estado}</span>
+                                                        <span className="badge bg-dark border border-secondary text-info">
+                                                            {t.estados ? (t.estados[pedido.estado?.toLowerCase()] || pedido.estado) : pedido.estado}
+                                                        </span>
                                                     </div>
                                                     <div className="history-products small text-white-50">
                                                         {pedido.items.map((item, i) => (
@@ -546,7 +568,7 @@ function Inicio() {
                                 </button>
                             </div>
 
-                            <h2 className="text-white mb-4 border-bottom pb-2">Menú</h2>
+                            <h2 className="text-white mb-4 border-bottom pb-2">{t.menuTitulo}</h2>
                             <div className="row g-3">
                                 {productosFiltrados.map(producto => (
                                     <div className="col-12 col-lg-6" key={producto.id}>
@@ -777,7 +799,35 @@ function Inicio() {
 
             {/* Standard App Footer */}
             <footer className="App-footer">
-                <div>© IES José Zerpa - Cafetería</div>
+                <div className="footer-content">
+                    <div className="footer-section">
+                        <h4>{t.titulo}</h4>
+                        <p>IES José Zerpa</p>
+                        <p>IES Santa Lucía</p>
+                        <p>IES El Doctoral</p>
+                    </div>
+                    <div className="footer-section">
+                        <h4>{idioma === 'es' ? 'Contactos' : 'Contacts'}</h4>
+                        <div className="mb-3">
+                            <p className="fw-bold mb-0 text-white">IES José Zerpa</p>
+                            <p className="small mb-0"><FaPhoneAlt /> 928 75 41 00</p>
+                            <p className="small"><FaMapMarkerAlt /> C. Atindana, s/n, 35110 Vecindario</p>
+                        </div>
+                        <div className="mb-3">
+                            <p className="fw-bold mb-0 text-white">IES Santa Lucía</p>
+                            <p className="small mb-0"><FaPhoneAlt /> 928 12 50 30</p>
+                            <p className="small"><FaMapMarkerAlt /> Avda. de la Unión, 97, 35110 Casa Pastores</p>
+                        </div>
+                        <div className="mb-0">
+                            <p className="fw-bold mb-0 text-white">IES El Doctoral</p>
+                            <p className="small mb-0"><FaPhoneAlt /> 928 79 20 13</p>
+                            <p className="small"><FaMapMarkerAlt /> C/ Tiscamanita, s/n, 35280 El Doctoral</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="footer-bottom text-center">
+                    <div>© {new Date().getFullYear()} IES José Zerpa - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+                </div>
             </footer>
 
             {/* BOTÓN FLOTANTE - Solo visible en móvil (d-lg-none) */}
@@ -796,7 +846,7 @@ function Inicio() {
                         </span>
                     </div>
                     <span className="cart-pill-center">
-                        {productos.some(p => (p.cantidad || 0) > 0) ? 'VER CARRITO' : 'CARRITO VACÍO'}
+                        {productos.some(p => (p.cantidad || 0) > 0) ? t.verCarrito : t.carritoVacio}
                     </span>
                     <span className="cart-pill-right">
                         {productos.reduce((acc, p) => acc + ((p.cantidad || 0) * (p.precio || 0)), 0).toFixed(2)}€

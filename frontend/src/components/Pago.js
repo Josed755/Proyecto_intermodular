@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { crearPedido, getUsuario } from '../services/api';
 import './Pago.css';
 import '../App.css';
+import { FaEye, FaEyeSlash, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 
 function Pago() {
     const navigate = useNavigate();
@@ -285,9 +286,37 @@ function Pago() {
                 </div>
             </main>
 
-            <footer className="App-footer">
-                <div>© IES José Zerpa - Cafetería</div>
-            </footer>
+      <footer className="App-footer">
+        <div className="footer-content">
+          <div className="footer-section">
+            <h4>CafES App</h4>
+            <p>IES José Zerpa</p>
+            <p>IES Santa Lucía</p>
+            <p>IES El Doctoral</p>
+          </div>
+          <div className="footer-section">
+            <h4>{idioma === 'es' ? 'Contactos' : 'Contacts'}</h4>
+            <div className="mb-3">
+              <p className="fw-bold mb-0 text-white">IES José Zerpa</p>
+              <p className="small mb-0"><FaPhoneAlt /> 928 75 41 00</p>
+              <p className="small"><FaMapMarkerAlt /> C. Atindana, s/n, 35110 Vecindario</p>
+            </div>
+            <div className="mb-3">
+              <p className="fw-bold mb-0 text-white">IES Santa Lucía</p>
+              <p className="small mb-0"><FaPhoneAlt /> 928 12 50 30</p>
+              <p className="small"><FaMapMarkerAlt /> Avda. de la Unión, 97, 35110 Casa Pastores</p>
+            </div>
+            <div className="mb-0">
+              <p className="fw-bold mb-0 text-white">IES El Doctoral</p>
+              <p className="small mb-0"><FaPhoneAlt /> 928 79 20 13</p>
+              <p className="small"><FaMapMarkerAlt /> C/ Tiscamanita, s/n, 35280 El Doctoral</p>
+            </div>
+          </div>
+        </div>
+        <div className="footer-bottom text-center">
+          <div>© {new Date().getFullYear()} IES José Zerpa - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+        </div>
+      </footer>
         </div>
     );
 }

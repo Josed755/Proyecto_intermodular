@@ -9,6 +9,7 @@ const Producto = require('./models/Producto');
 const Pedido = require('./models/Pedido');
 const Ingrediente = require('./models/Ingrediente');
 const { imprimirTicket } = require('./utils/printer');
+const { enviarEmail } = require('./utils/emailService');
 
 // CONFIGURACIÓN INICIAL
 const app = express();
@@ -67,6 +68,19 @@ app.post('/api/registro', async (req, res) => {
     });
 
     await nuevoUsuario.save();
+
+    // Enviar email de bienvenida
+    const subject = '¡Bienvenido a CafES App!';
+    const html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+        <h2 style="color: #ffc107;">¡Hola, ${nombre}!</h2>
+        <p>Gracias por registrarte en <strong>CafES App</strong>, la aplicación oficial para pedir tus cafés en el centro <strong>${centro || 'IES José Zerpa'}</strong>.</p>
+        <p>Ya puedes iniciar sesión y empezar a realizar tus pedidos de forma rápida y sencilla.</p>
+        <hr>
+        <p style="font-size: 12px; color: #777;">IES José Zerpa - Proyecto Cafetería 2026</p>
+      </div>
+    `;
+    enviarEmail(correo, subject, '', html).catch(err => console.error('Error welcome email:', err));
 
     res.status(201).json({ success: true, message: 'Usuario registrado exitosamente', usuarioId: nuevoUsuario._id });
   } catch (error) {
@@ -255,10 +269,32 @@ app.post('/api/pedidos', async (req, res) => {
     // Intentar imprimir el ticket en segundo plano (para no retrasar la respuesta)
     try {
       const usuario = await Usuario.findById(usuario_id);
+      
+      // Imprimir ticket
       imprimirTicket({ items, total, centro, subtotal: req.body.subtotal, impuesto: req.body.impuesto }, usuario)
         .catch(err => console.error('Error al imprimir ticket:', err));
+
+      // Enviar confirmación por email
+      if (usuario && usuario.correo) {
+        const subject = `Confirmación de Pedido #${nuevoPedido._id.toString().slice(-6)}`;
+        const emailHtml = `
+          <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #ffc107;">¡Pedido recibido, ${usuario.nombre}!</h2>
+            <p>Tu pedido ha sido registrado correctamente en <strong>${centro || 'IES José Zerpa'}</strong>.</p>
+            <hr>
+            <h3>Detalle:</h3>
+            <ul style="list-style: none; padding: 0;">
+              ${items.map(item => `<li style="margin-bottom: 10px;"><strong>${item.cantidad}x</strong> ${item.nombre} - <span style="color: #555;">${(item.cantidad * item.precio).toFixed(2)}€</span></li>`).join('')}
+            </ul>
+            <hr>
+            <p style="font-size: 18px;"><strong>Total Pagado: ${total}€</strong></p>
+            <p>Podrás recogerlo en la cafetería cuando el estado cambie a "Listo".</p>
+          </div>
+        `;
+        enviarEmail(usuario.correo, subject, '', emailHtml).catch(err => console.error('Error order email:', err));
+      }
     } catch (err) {
-      console.error('Error al obtener usuario para imprimir:', err);
+      console.error('Error en procesos post-pedido:', err);
     }
 
     res.status(201).json({ success: true, message: 'Pedido creado exitosamente', pedidoId: nuevoPedido._id });

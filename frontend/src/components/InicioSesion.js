@@ -3,7 +3,7 @@ import './EstiloSesiones.css';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
 import { loginUsuario, setAuthToken, setUsuario } from '../services/api';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 
 function InicioSesion() {
   const [formData, setFormData] = useState({
@@ -37,7 +37,8 @@ function InicioSesion() {
       ayudaP1: 'Introduce tu correo electrónico y contraseña para acceder a tu cuenta. Si olvidaste tu contraseña, contacta con el administrador de tu centro.',
       ayudaP2: 'Si aún no tienes cuenta, vuelve a la página principal y pulsa "Registrarse". Necesitarás un correo válido y una contraseña de al menos 8 caracteres.',
       acercaH5: 'CafES App v1.0',
-      acercaP: 'Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y El Doctoral. Proyecto intermodular DAW/DAM 2026.'
+      acercaP: 'Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y El Doctoral. Proyecto intermodular DAW/DAM 2026.',
+      errorServidor: 'Error en el servidor'
     },
     en: {
       titulo: 'Login',
@@ -55,7 +56,8 @@ function InicioSesion() {
       ayudaP1: 'Enter your email and password to access your account. If you forgot your password, contact your center administrator.',
       ayudaP2: 'If you don\'t have an account yet, go back to the main page and click "Register". You will need a valid email and a password of at least 8 characters.',
       acercaH5: 'CafES App v1.0',
-      acercaP: 'Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and El Doctoral. DAW/DAM intermodular project 2026.'
+      acercaP: 'Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and El Doctoral. DAW/DAM intermodular project 2026.',
+      errorServidor: 'Server error'
     }
   };
 
@@ -79,7 +81,7 @@ function InicioSesion() {
       setUsuario(response.data.usuario);
       navigate('/home');
     } catch (error) {
-      setError(error.response?.data?.error || 'Error en el servidor');
+      setError(error.response?.data?.error || t.errorServidor);
     } finally {
       setLoading(false);
     }
@@ -226,7 +228,35 @@ function InicioSesion() {
         </div>
       </main>
       <footer className="App-footer">
-        <div>© IES José Zerpa - Cafetería</div>
+        <div className="footer-content">
+          <div className="footer-section">
+            <h4>{t.titulo}</h4>
+            <p>IES José Zerpa</p>
+            <p>IES Santa Lucía</p>
+            <p>IES El Doctoral</p>
+          </div>
+          <div className="footer-section">
+            <h4>{idioma === 'es' ? 'Contactos' : 'Contacts'}</h4>
+            <div className="mb-3">
+              <p className="fw-bold mb-0 text-white">IES José Zerpa</p>
+              <p className="small mb-0"><FaPhoneAlt /> 928 75 41 00</p>
+              <p className="small"><FaMapMarkerAlt /> C. Atindana, s/n, 35110 Vecindario</p>
+            </div>
+            <div className="mb-3">
+              <p className="fw-bold mb-0 text-white">IES Santa Lucía</p>
+              <p className="small mb-0"><FaPhoneAlt /> 928 12 50 30</p>
+              <p className="small"><FaMapMarkerAlt /> Avda. de la Unión, 97, 35110 Casa Pastores</p>
+            </div>
+            <div className="mb-0">
+              <p className="fw-bold mb-0 text-white">IES El Doctoral</p>
+              <p className="small mb-0"><FaPhoneAlt /> 928 79 20 13</p>
+              <p className="small"><FaMapMarkerAlt /> C/ Tiscamanita, s/n, 35280 El Doctoral</p>
+            </div>
+          </div>
+        </div>
+        <div className="footer-bottom text-center">
+          <div>© {new Date().getFullYear()} IES José Zerpa - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+        </div>
       </footer>
     </div>
   );

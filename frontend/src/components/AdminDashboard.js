@@ -96,7 +96,13 @@ const AdminDashboard = () => {
             eliminar: 'Eliminar',
             confirmarBorrado: '¿Seguro?',
             categoria: 'Categoría',
-            ingredientes: 'Ingredientes'
+            ingredientes: 'Ingredientes',
+            estados: {
+                'pendiente': 'Pendiente',
+                'preparando': 'Preparando',
+                'listo': 'Listo',
+                'completado': 'Completado'
+            }
         },
         en: {
             volver: 'Back',
@@ -166,7 +172,13 @@ const AdminDashboard = () => {
             eliminar: 'Delete',
             confirmarBorrado: 'Sure?',
             categoria: 'Category',
-            ingredientes: 'Ingredients'
+            ingredientes: 'Ingredients',
+            estados: {
+                'pendiente': 'Pending',
+                'preparando': 'Preparing',
+                'listo': 'Ready',
+                'completado': 'Completed'
+            }
         }
     };
 
@@ -472,7 +484,7 @@ return (
                                             <td>{p.usuario_nombre}</td>
                                             <td className="small">{new Date(p.fecha).toLocaleString()}</td>
                                             <td>{p.total}€</td>
-                                            <td>{p.estado}</td>
+                                            <td>{t.estados ? (t.estados[p.estado?.toLowerCase()] || p.estado) : p.estado}</td>
                                         </tr>
                                     ))}
                                 </tbody>
