@@ -1,4 +1,3 @@
-// backend/index.js
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
@@ -322,7 +321,7 @@ app.put('/api/usuarios/:id/perfil', async (req, res) => {
 // RUTAS ADMIN USUARIOS
 app.get('/api/admin/usuarios', verificarAdmin, async (req, res) => {
   try {
-    const usuarios = await Usuario.find({ tipo: { $in: ['admin', 'empleado'] } })
+    const usuarios = await Usuario.find()
       .select('-contrasena_hash')
       .sort({ fecha_registro: -1 });
     res.json(usuarios);
@@ -390,9 +389,7 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API funcionando', timestamp: new Date() });
-});
+
 
 // INICIO DEL SERVIDOR
 app.listen(PORT, () => {
