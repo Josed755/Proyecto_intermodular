@@ -44,8 +44,8 @@ function Registrarse() {
       cerrar: 'Cerrar',
       espanyol: 'Español',
       ingles: 'Inglés',
-      ayudaContenido: 'Crea una cuenta para realizar tus pedidos en la cafetería. Necesitarás un correo válido y una contraseña con al menos 8 caracteres.',
-      acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
+      ayudaContenido: 'Crea una cuenta para realizar tus pedidos en la cafetería. Necesitarás un correo válido, una contraseña con al menos 8 caracteres y seleccionar tu centro de recogida (IES José Zerpa, IES Santa Lucia o IES El Doctoral).',
+      acercaContenido: 'CafES App v1.0 - Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y IES El Doctoral. Proyecto intermodular DAW/DAM 2026.',
       centroRecogida: 'Centro de Recogida:',
       seleccionarCentro: 'Selecciona un centro',
       errorRegistro: 'Error en el registro'
@@ -68,8 +68,8 @@ function Registrarse() {
       cerrar: 'Close',
       espanyol: 'Spanish',
       ingles: 'English',
-      ayudaContenido: 'Create an account to place your orders at the cafeteria. You will need a valid email and a password with at least 8 characters.',
-      acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
+      ayudaContenido: 'Create an account to place your orders at the cafeteria. You will need a valid email, a password with at least 8 characters, and select your collection point (IES José Zerpa, IES Santa Lucia or IES El Doctoral).',
+      acercaContenido: 'CafES App v1.0 - Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and IES El Doctoral. DAW/DAM intermodular project 2026.',
       centroRecogida: 'Collection Point:',
       seleccionarCentro: 'Select a center',
       errorRegistro: 'Error registering'
@@ -95,7 +95,7 @@ function Registrarse() {
       return;
     }
 
-    if (formData.contrasena.length < 6) {
+    if (formData.contrasena.length < 8) {
       setError(t.errorLongitud);
       return;
     }
@@ -247,9 +247,9 @@ function Registrarse() {
                   onChange={handleChange}
                   required
                 />
-                <button 
-                  type="button" 
-                  className="btn-toggle-password" 
+                <button
+                  type="button"
+                  className="btn-toggle-password"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -266,9 +266,9 @@ function Registrarse() {
                   onChange={handleChange}
                   required
                 />
-                <button 
-                  type="button" 
-                  className="btn-toggle-password" 
+                <button
+                  type="button"
+                  className="btn-toggle-password"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
@@ -286,8 +286,8 @@ function Registrarse() {
                 style={{ border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '10px' }}
               >
                 <option value="IES José Zerpa">IES José Zerpa</option>
-                <option value="Centro Ejemplo A">Centro Ejemplo A</option>
-                <option value="Centro Ejemplo B">Centro Ejemplo B</option>
+                <option value="IES Santa Lucia">IES Santa Lucia</option>
+                <option value="IES El Doctoral">IES El Doctoral</option>
               </select>
             </div>
             <div className="btn-container">

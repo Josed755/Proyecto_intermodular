@@ -34,10 +34,10 @@ function InicioSesion() {
       cerrar: 'Cerrar',
       espanyol: 'Español',
       ingles: 'Inglés',
-      ayudaP1: 'Introduce tus credenciales para acceder a tu cuenta.',
-      ayudaP2: 'Si no tienes cuenta, ve a la página principal y regístrate.',
-      acercaH5: 'CaffES App v1.0',
-      acercaP: 'IES José Zerpa'
+      ayudaP1: 'Introduce tu correo electrónico y contraseña para acceder a tu cuenta. Si olvidaste tu contraseña, contacta con el administrador de tu centro.',
+      ayudaP2: 'Si aún no tienes cuenta, vuelve a la página principal y pulsa "Registrarse". Necesitarás un correo válido y una contraseña de al menos 8 caracteres.',
+      acercaH5: 'CafES App v1.0',
+      acercaP: 'Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y El Doctoral. Proyecto intermodular DAW/DAM 2026.'
     },
     en: {
       titulo: 'Login',
@@ -52,10 +52,10 @@ function InicioSesion() {
       cerrar: 'Close',
       espanyol: 'Spanish',
       ingles: 'English',
-      ayudaP1: 'Introduce tus credenciales para acceder a tu cuenta.',
-      ayudaP2: 'Si no tienes cuenta, ve a la página principal y regístrate.',
-      acercaH5: 'CaffES App v1.0',
-      acercaP: 'IES José Zerpa'
+      ayudaP1: 'Enter your email and password to access your account. If you forgot your password, contact your center administrator.',
+      ayudaP2: 'If you don\'t have an account yet, go back to the main page and click "Register". You will need a valid email and a password of at least 8 characters.',
+      acercaH5: 'CafES App v1.0',
+      acercaP: 'Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and El Doctoral. DAW/DAM intermodular project 2026.'
     }
   };
 

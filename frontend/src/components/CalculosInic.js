@@ -28,10 +28,7 @@ const Calculos = ({ productos, allIngredientes }) => {
     };
 
     const calcularImpuesto = () => {
-        /*Por algúna razón toFixed tránsforma los números a string en el proceso
-          no se porque, pero ahora tengo que usar parseFloat para que lo pase de 
-          nuevo a número y poder calcular... 
-        */
+        // Convert to float to perform math after toFixed() string conversion
         const total = parseFloat(calcularVentasTotales());
         return (total * 0.07).toFixed(2);
     };

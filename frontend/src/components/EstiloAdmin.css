@@ -1,11 +1,25 @@
-.glass-panel {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 15px;
-    padding: 2rem;
+
+
+.admin-tab-btn {
+    width: min(80%, 220px);
+    height: 45px;
+    font-size: clamp(16px, 3vw, 22px);
+    border-radius: 10px;
+    font-weight: bold;
+    font-family: Arial;
+    margin: 15px;
+    cursor: pointer;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+    transition: 0.3s ease;
+    background-color: orange;
     color: white;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 4px solid rgb(255, 153, 0);
+}
+
+.admin-tab-btn:hover {
+    background-color: #005f7a;
+    border-color: #00546b;
+    transform: translateY(-2px);
 }
 
 .active-tab {
@@ -64,6 +78,7 @@
 
 .admin-container {
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .btn-circle-back {
@@ -95,6 +110,20 @@
 
 .admin-main {
     padding: 20px !important;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    padding: 2rem;
+    color: white;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .tabs-container {
@@ -175,7 +204,56 @@
     animation: pulse-red 1.5s infinite !important;
 }
 
-/* Mobile responsive cards */
+/* Mobile responsive tables */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+.admin-table {
+    font-size: clamp(12px, 2.5vw, 16px);
+    white-space: nowrap;
+}
+
+.product-name-cell {
+    max-width: 150px;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.action-btn {
+    padding: 2px 8px !important;
+    font-size: 0.8rem !important;
+}
+
+@media (max-width: 768px) {
+    .glass-panel {
+        padding: 1rem !important;
+    }
+    
+    .admin-main {
+        padding: 10px !important;
+    }
+    
+    .tabs-container {
+        flex-wrap: wrap;
+        justify-content: center !important;
+    }
+    
+    .admin-tab-btn {
+        margin: 5px !important;
+        width: auto !important;
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .table th, .table td {
+        padding: 8px 4px !important;
+    }
+}
+
+/* Mobile responsive cards (Legacy - kept for reference if needed elsewhere) */
 .admin-mobile-card {
     transition: transform 0.2s, box-shadow 0.2s;
 }

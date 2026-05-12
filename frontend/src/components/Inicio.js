@@ -10,8 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import Productos from './Productos';
 import Calculos from './CalculosInic';
 import Botones from './BotonesInic';
-import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos } from '../services/api';
-import { FaUserCircle, FaHistory, FaSignOutAlt, FaInfoCircle, FaChevronDown, FaShoppingCart, FaTimes, FaArrowLeft } from 'react-icons/fa';
+import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos, getIngredientes, getProductoIngredientes } from '../services/api';
+import { FaUserCircle, FaHistory, FaSignOutAlt, FaInfoCircle, FaArrowLeft } from 'react-icons/fa';
 
 function Inicio() {
     const navigate = useNavigate();
@@ -68,8 +68,8 @@ function Inicio() {
             historial: 'Historial',
             ayuda: 'Ayuda',
             acerca: 'Acerca de',
-            ayudaContenido: 'Para realizar un pedido: 1. Elige tus productos. 2. Revisa el resumen. 3. Pulsa "Confirmar".',
-            acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
+            ayudaContenido: 'Para realizar un pedido: 1. Elige tus productos del menú. 2. Personaliza los ingredientes si lo deseas. 3. Revisa el resumen de tu pedido. 4. Pulsa "Confirmar" para ir al pago. Recuerda que solo se puede pedir antes de las 08:00 o después de las 14:00 de lunes a viernes. Los fines de semana está disponible todo el día.',
+            acercaContenido: 'CafES App v1.0 - Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y El Doctoral. Proyecto intermodular DAW/DAM 2026.',
             subtotal: 'Subtotal',
             impuesto: 'IGIC (7%)',
             pedidoConfirmado: 'Pedido confirmado. Total: ',
@@ -114,8 +114,8 @@ function Inicio() {
             ayuda: 'Help',
             acerca: 'About',
             panelControl: 'Admin Panel',
-            ayudaContenido: 'To place an order: 1. Choose your products. 2. Review the summary. 3. Press "Confirm".',
-            acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
+            ayudaContenido: 'To place an order: 1. Choose your products from the menu. 2. Customize ingredients if desired. 3. Review your order summary. 4. Press "Confirm" to proceed to payment. Remember that orders are only available before 08:00 or after 14:00 on weekdays. Weekends are available all day.',
+            acercaContenido: 'CafES App v1.0 - Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and El Doctoral. DAW/DAM intermodular project 2026.',
             subtotal: 'Subtotal',
             impuesto: 'Tax (7%)',
             pedidoConfirmado: 'Order confirmed. Total: ',
@@ -148,6 +148,7 @@ function Inicio() {
     };
 
     const t = textos[idioma];
+
 
     const tradNombre = (nombreOriginal) => {
         if (!t.nombresProductos) return nombreOriginal;
@@ -191,9 +192,7 @@ function Inicio() {
         ? productos
         : productos.filter(p => p.categoria === filtro);
 
-    const Dinero = (valor) => {
-        return valor + '€';
-    };
+
 
     const productosConPedidos = productos.filter(p => p.cantidad > 0);
     const hayPedidos = productosConPedidos.length > 0;
@@ -228,9 +227,9 @@ function Inicio() {
     }, [modalActivo]);
 
     useEffect(() => {
-        fetch("https://proyecto-intermodular-pmt1.onrender.com/api/ingredientes")
-            .then(res => res.json())
-            .then(data => {
+        getIngredientes()
+            .then(res => {
+                const data = res.data || res;
                 if (Array.isArray(data)) {
                     setAllIngredientes(data);
                 } else {
@@ -252,18 +251,29 @@ function Inicio() {
             return;
         }
 
-        // Si ya tiene ingredientes personalizados, los usamos.
         if (producto.ingredientesPersonalizados && producto.ingredientesPersonalizados.length > 0) {
             setProductoParaPersonalizar({ ...producto });
         } else {
-            fetch(`https://proyecto-intermodular-pmt1.onrender.com/api/productos/${producto.id}/ingredientes`)
-                .then(res => res.json())
-                .then(data => {
+            getProductoIngredientes(producto.id)
+                .then(res => {
+                    const data = res.data || res;
                     const idsDefault = Array.isArray(data) ? data.map(i => i.id) : [];
+                    
+                    // Los ingredientes "Extra" deben aparecer desmarcados por defecto
+                    const idsSeleccionados = Array.isArray(data) 
+                        ? data.filter(i => {
+                            const nombre = (i.nombre || '').toLowerCase();
+                            const esExtraPan = nombre.includes('extra') && nombre.includes('pan') && nombre.includes('especial');
+                            const esExtraQueso = nombre.includes('extra') && nombre.includes('queso');
+                            const esExtraTomateLechuga = nombre.includes('extra') && nombre.includes('tomate') && nombre.includes('lechuga');
+                            return !esExtraPan && !esExtraQueso && !esExtraTomateLechuga;
+                        }).map(i => i.id) 
+                        : [];
+
                     const updatedProducto = {
                         ...producto,
-                        defaultIngredientesIds: idsDefault,
-                        ingredientesPersonalizados: idsDefault
+                        defaultIngredientesIds: idsDefault, // Se mantienen todos para que aparezcan en el modal
+                        ingredientesPersonalizados: idsSeleccionados // Solo estos aparecen marcados
                     };
                     setProductoParaPersonalizar(updatedProducto);
 
@@ -407,8 +417,8 @@ function Inicio() {
                                                     onChange={(e) => setTempPerfil({ ...tempPerfil, centro: e.target.value })}
                                                 >
                                                     <option value="IES José Zerpa">IES José Zerpa</option>
-                                                    <option value="Centro Ejemplo A">Centro Ejemplo A</option>
-                                                    <option value="Centro Ejemplo B">Centro Ejemplo B</option>
+                                                    <option value="IES Santa Lucia">IES Santa Lucia</option>
+                                                    <option value="IES El Doctoral">IES El Doctoral</option>
                                                 </select>
                                             </div>
                                             <button className="btn-confirm-prefs" onClick={async () => {
@@ -571,7 +581,7 @@ function Inicio() {
                                                 )}
                                             </div>
                                             <h3 className="item-name">{tradNombre(producto.nombre)}</h3>
-                                            <div className="item-price">{Dinero(producto.precio)}</div>
+                                            <div className="item-price">{producto.precio}€</div>
 
                                             {alergenosProductos[producto.nombre] && (
                                                 <div className="allergen-warning">
@@ -605,7 +615,7 @@ function Inicio() {
                         <div className={`col-lg-4 summary-container ${cartOpen ? 'open' : ''}`}>
                             {/* Overlay para cerrar el carrito al tocar fuera en móvil */}
                             {cartOpen && <div className="cart-overlay" onClick={() => setCartOpen(false)}></div>}
-                            
+
                             <div className="summary-panel shadow-lg">
                                 <div className="summary-header d-lg-none">
                                     <button className="btn-back-cart" onClick={() => setCartOpen(false)}>
@@ -614,7 +624,7 @@ function Inicio() {
                                     <span className="summary-header-title">{t.resumen}</span>
                                     <div style={{ width: '40px' }}></div>
                                 </div>
-                                
+
                                 <h2 className="summary-title d-none d-lg-block">{t.resumen}</h2>
 
                                 <div className="flex-grow-1">
@@ -626,7 +636,7 @@ function Inicio() {
                                                         <span className="fw-bold text-warning me-2">{producto.cantidad}x</span>
                                                         {tradNombre(producto.nombre)}
                                                     </div>
-                                                    <div>{Dinero(calcularVentasProducto(producto))}</div>
+                                                    <div>{calcularVentasProducto(producto)}€</div>
                                                 </div>
                                                 {producto.ingredientesPersonalizados && allIngredientes.length > 0 && (
                                                     <div className="ps-4 small text-white-50 w-100">
@@ -661,15 +671,15 @@ function Inicio() {
                                     <div className="totals-section mt-3">
                                         <div className="d-flex justify-content-between mb-1">
                                             <span>{t.subtotal}:</span>
-                                            <span>{Dinero(calcularVentasTotales())}</span>
+                                            <span>{parseFloat(calcularVentasTotales()).toFixed(2)}€</span>
                                         </div>
                                         <div className="d-flex justify-content-between mb-2">
                                             <span>{t.impuesto}:</span>
-                                            <span>{Dinero(calcularImpuesto())}</span>
+                                            <span>{calcularImpuesto()}€</span>
                                         </div>
                                         <div className="d-flex justify-content-between fw-bold fs-5 text-warning border-top pt-2">
                                             <span>{t.total}:</span>
-                                            <span>{Dinero(calcularTotalConImpuesto())}</span>
+                                            <span>{calcularTotalConImpuesto()}€</span>
                                         </div>
                                     </div>
                                 )}
@@ -683,7 +693,7 @@ function Inicio() {
                                                 const ahora = new Date();
                                                 const dia = ahora.getDay();
                                                 const hora = ahora.getHours();
-                                                
+
                                                 // Bloquear de 8 a 13:59 a menos que sea admin o finde (0=Dom, 6=Sab)
                                                 if (usuario?.tipo !== 'admin' && dia !== 0 && dia !== 6) {
                                                     if (hora >= 8 && hora < 14) {
@@ -745,7 +755,7 @@ function Inicio() {
                                         >
                                             <div className="ingredient-info">
                                                 <span className="ingredient-name">{ing.nombre}</span>
-                                                {ing.precio > 0 && <span className="ingredient-price">+{Dinero(ing.precio)}</span>}
+                                                {ing.precio > 0 && <span className="ingredient-price">+{ing.precio}€</span>}
                                             </div>
                                             <div className="ingredient-checkbox"></div>
                                         </div>
@@ -771,7 +781,7 @@ function Inicio() {
             </footer>
 
             {/* BOTÓN FLOTANTE - Solo visible en móvil (d-lg-none) */}
-            <div className="cart-floating-wrapper d-lg-none" style={{ 
+            <div className="cart-floating-wrapper d-lg-none" style={{
                 opacity: (!cartOpen && !productoParaPersonalizar) ? 1 : 0,
                 pointerEvents: (!cartOpen && !productoParaPersonalizar) ? 'auto' : 'none',
                 transform: (!cartOpen && !productoParaPersonalizar) ? 'translateY(0)' : 'translateY(100px)',
@@ -789,7 +799,7 @@ function Inicio() {
                         {productos.some(p => (p.cantidad || 0) > 0) ? 'VER CARRITO' : 'CARRITO VACÍO'}
                     </span>
                     <span className="cart-pill-right">
-                        {Dinero(productos.reduce((acc, p) => acc + ((p.cantidad || 0) * (p.precio || 0)), 0))}
+                        {productos.reduce((acc, p) => acc + ((p.cantidad || 0) * (p.precio || 0)), 0).toFixed(2)}€
                     </span>
                 </button>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProductos, addProducto, updateProducto, deleteProducto, getAdminPedidos, getAdminUsuarios, updateUsuarioStatus, addUsuario, getIngredientes } from '../services/api';
+import { addProducto, updateProducto, deleteProducto, getAdminPedidos, getAdminUsuarios, updateUsuarioStatus, addUsuario, getIngredientes } from '../services/api';
 import './EstiloInicio.css'; // Reutilizamos estilos base
 import './EstiloSesiones.css'; // Para modales y formularios
 import './EstiloAdmin.css';
@@ -14,6 +14,9 @@ const AdminDashboard = () => {
     const [modalProducto, setModalProducto] = useState(null); // null o { product data }
     const [modalUsuario, setModalUsuario] = useState(null); // null o { user data }
     const [filtroCentro, setFiltroCentro] = useState('');
+    const [filtroRol, setFiltroRol] = useState('todos');
+    const [filtroCategoria, setFiltroCategoria] = useState('todos');
+    const [busquedaUsuario, setBusquedaUsuario] = useState('');
     const [error, setError] = useState('');
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
     const [todosLosIngredientes, setTodosLosIngredientes] = useState([]);
@@ -32,7 +35,7 @@ const AdminDashboard = () => {
             cerrarSesion: 'Cerrar Sesión',
             productos: 'Productos',
             pedidos: 'Pedidos',
-            empleados: 'Empleados',
+            empleados: 'Usuarios',
             gestionProductos: 'Gestión de Productos',
             nuevoProducto: '+ Nuevo Producto',
             nombre: 'Nombre',
@@ -49,14 +52,20 @@ const AdminDashboard = () => {
             usuario: 'Usuario',
             fecha: 'Fecha',
             total: 'Total',
-            gestionEmpleados: 'Gestión de Empleados',
-            nuevoEmpleado: '+ Añadir Empleado',
+            gestionEmpleados: 'Gestión de Usuarios',
+            nuevoEmpleado: '+ Añadir Usuario',
             correo: 'Correo',
             rol: 'Rol',
             turno: 'Turno',
-            estadoCuenta: 'Estado Account',
+            estadoCuenta: 'Estado Cuenta',
             empleado: 'Empleado',
             admin: 'Administrador',
+            cliente: 'Cliente',
+            todosRoles: 'Todos los roles',
+            filtrarRol: 'Filtrar por rol:',
+            filtrarCategoria: 'Filtrar por categoría:',
+            todos: 'Todos',
+            buscarUsuario: 'Buscar por nombre o correo...',
             manyana: 'Mañana',
             tarde: 'Tarde',
             activo: 'Activo',
@@ -96,7 +105,7 @@ const AdminDashboard = () => {
             cerrarSesion: 'Logout',
             productos: 'Products',
             pedidos: 'Orders',
-            empleados: 'Employees',
+            empleados: 'Users',
             gestionProductos: 'Product Management',
             nuevoProducto: '+ New Product',
             nombre: 'Name',
@@ -113,14 +122,20 @@ const AdminDashboard = () => {
             usuario: 'User',
             fecha: 'Date',
             total: 'Total',
-            gestionEmpleados: 'Employee Management',
-            nuevoEmpleado: '+ Add Employee',
+            gestionEmpleados: 'User Management',
+            nuevoEmpleado: '+ Add User',
             correo: 'Email',
             rol: 'Role',
             turno: 'Shift',
             estadoCuenta: 'Account Status',
             empleado: 'Employee',
             admin: 'Admin',
+            cliente: 'Client',
+            todosRoles: 'All roles',
+            filtrarRol: 'Filter by role:',
+            filtrarCategoria: 'Filter by category:',
+            todos: 'All',
+            buscarUsuario: 'Search by name or email...',
             manyana: 'Morning',
             tarde: 'Afternoon',
             activo: 'Active',
@@ -157,6 +172,7 @@ const AdminDashboard = () => {
 
     const t = textos[idioma];
     const usuarioLogged = JSON.parse(localStorage.getItem('usuario'));
+
 
     const toggleProducto = async (producto) => {
         try {
@@ -341,50 +357,67 @@ return (
 
             <div className="glass-panel p-4">
                 <div className="tabs-container mb-4" style={{ justifyContent: 'flex-start' }}>
-                    <button className={`sesion_inicio ${vista === 'productos' ? 'active-tab' : ''}`} onClick={() => setVista('productos')}>{t.productos}</button>
-                    <button className={`sesion_inicio ${vista === 'pedidos' ? 'active-tab' : ''}`} onClick={() => setVista('pedidos')}>{t.pedidos}</button>
-                    <button className={`sesion_inicio ${vista === 'usuarios' ? 'active-tab' : ''}`} onClick={() => setVista('usuarios')}>{t.empleados}</button>
+                    <button className={`admin-tab-btn ${vista === 'productos' ? 'active-tab' : ''}`} onClick={() => setVista('productos')}>{t.productos}</button>
+                    <button className={`admin-tab-btn ${vista === 'pedidos' ? 'active-tab' : ''}`} onClick={() => setVista('pedidos')}>{t.pedidos}</button>
+                    <button className={`admin-tab-btn ${vista === 'usuarios' ? 'active-tab' : ''}`} onClick={() => setVista('usuarios')}>{t.empleados}</button>
                 </div>
 
                 {vista === 'productos' && (
                     <div>
-                        <div className="d-flex justify-content-between mb-3">
-                            <h3>{t.gestionProductos}</h3>
-                            <button className="btn btn-success" onClick={() => abrirModalProducto({ nombre: '', precio: 0, descripcion: '', categoria_id: 1, ingredientes: [] })}>{t.nuevoProducto}</button>
+                        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+                            <h3 className="mb-0">{t.gestionProductos}</h3>
+                            <div className="d-flex flex-wrap gap-2 align-items-center">
+                                <label className="text-white-50 small mb-0">{t.filtrarCategoria}</label>
+                                <select 
+                                    className="form-select form-select-sm bg-dark text-white border-secondary w-auto"
+                                    value={filtroCategoria}
+                                    onChange={(e) => setFiltroCategoria(e.target.value)}
+                                >
+                                    <option value="todos">{t.todos}</option>
+                                    <option value="bebidasCalientes">{t.catBebidasCalientes}</option>
+                                    <option value="bebidasFrias">{t.catBebidasFrias}</option>
+                                    <option value="golosinas">{t.catGolosinas}</option>
+                                    <option value="bocadillos">{t.catBocadillos}</option>
+                                </select>
+                                <button className="btn btn-success" onClick={() => abrirModalProducto({ nombre: '', precio: 0, descripcion: '', categoria_id: 1, ingredientes: [] })}>{t.nuevoProducto}</button>
+                            </div>
                         </div>
-                        {/* Vista de Tabla (Desktop) */}
-                        <div className="d-none d-md-block">
-                            <table className="table table-dark table-hover align-middle">
+                        {/* Vista de Tabla Unificada */}
+                        <div className="table-responsive">
+                            <table className="table table-dark table-hover align-middle admin-table">
                                 <thead>
                                     <tr>
                                         <th>{t.nombre}</th>
-                                        <th>{t.precio}</th>
-                                        <th>{t.categoria}</th>
+                                        <th className="d-none d-sm-table-cell">{t.precio}</th>
+                                        <th className="d-none d-md-table-cell">{t.categoria}</th>
                                         <th>{t.estado}</th>
                                         <th>{t.acciones}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {productos.map(p => (
+                                    {productos
+                                        .filter(p => filtroCategoria === 'todos' || p.categoria === filtroCategoria)
+                                        .map(p => (
                                         <tr key={p._id || p.id}>
                                             <td>
-                                                <div className="fw-bold">{p.nombre}</div>
-                                                <small className="text-white-50">{p.descripcion?.substring(0, 30)}...</small>
+                                                <div className="fw-bold product-name-cell">{p.nombre}</div>
+                                                <div className="d-sm-none text-warning small">{p.precio}€</div>
+                                                <small className="text-white-50 d-none d-lg-block">{p.descripcion?.substring(0, 30)}...</small>
                                             </td>
-                                            <td>{p.precio}€</td>
-                                            <td><span className="badge bg-secondary">{p.categoria}</span></td>
+                                            <td className="d-none d-sm-table-cell">{p.precio}€</td>
+                                            <td className="d-none d-md-table-cell"><span className="badge bg-secondary">{p.categoria}</span></td>
                                             <td>{p.activo ? '✅' : '❌'}</td>
                                             <td>
-                                                <div className="d-flex gap-2">
-                                                    <button className="btn btn-sm btn-success" onClick={() => abrirModalProducto(p)}>{t.editar}</button>
+                                                <div className="d-flex gap-1 gap-md-2 flex-wrap">
+                                                    <button className="btn btn-sm btn-success action-btn" onClick={() => abrirModalProducto(p)}>{t.editar}</button>
                                                     <button
-                                                        className={`btn btn-sm ${p.activo ? 'btn-outline-warning' : 'btn-success'}`}
+                                                        className={`btn btn-sm action-btn ${p.activo ? 'btn-outline-warning' : 'btn-success'}`}
                                                         onClick={() => toggleProducto(p)}
                                                     >
                                                         {p.activo ? t.desactivar : t.activar}
                                                     </button>
                                                     <button 
-                                                        className={`btn btn-sm ${confirmDeleteId === (p._id || p.id) ? 'btn-danger animate__animated animate__pulse' : 'btn-outline-danger'}`}
+                                                        className={`btn btn-sm action-btn ${confirmDeleteId === (p._id || p.id) ? 'btn-danger animate__animated animate__pulse' : 'btn-outline-danger'}`}
                                                         onClick={() => handleDelete(p._id || p.id)}
                                                         disabled={confirmDeleteId === 'loading'}
                                                     >
@@ -396,34 +429,6 @@ return (
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
-
-                        {/* Vista de Tarjetas (Móvil) */}
-                        <div className="d-md-none">
-                            {productos.map(p => (
-                                <div key={p._id || p.id} className="admin-mobile-card mb-3 p-3 shadow-sm" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                    <div className="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 className="mb-0 text-warning">{p.nombre}</h5>
-                                        <span className="badge bg-dark">{p.precio}€</span>
-                                    </div>
-                                    <p className="small text-white-50 mb-2">{p.descripcion}</p>
-                                    <div className="mb-3">
-                                        <span className="badge bg-secondary me-2">{p.categoria}</span>
-                                        {p.activo ? <span className="text-success small">● {t.activo}</span> : <span className="text-danger small">● {t.inactivo}</span>}
-                                    </div>
-                                    <div className="d-flex gap-2 flex-wrap">
-                                        <button className="btn btn-sm btn-success flex-grow-1" onClick={() => abrirModalProducto(p)}>{t.editar}</button>
-                                        <button className="btn btn-sm btn-outline-warning flex-grow-1" onClick={() => toggleProducto(p)}>{p.activo ? t.desactivar : t.activar}</button>
-                                        <button 
-                                            className={`btn btn-sm flex-grow-1 ${confirmDeleteId === (p._id || p.id) ? 'btn-danger' : 'btn-outline-danger'}`}
-                                            onClick={() => handleDelete(p._id || p.id)}
-                                            disabled={confirmDeleteId === 'loading'}
-                                        >
-                                            {confirmDeleteId === 'loading' ? '...' : (confirmDeleteId === (p._id || p.id) ? t.confirmarBorrado : t.eliminar)}
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
                         </div>
                     </div>
                 )}
@@ -442,93 +447,130 @@ return (
                                 >
                                     <option value="">{t.todosCentros}</option>
                                     <option value="IES José Zerpa">IES José Zerpa</option>
-                                    <option value="Centro Ejemplo A">Centro Ejemplo A</option>
-                                    <option value="Centro Ejemplo B">Centro Ejemplo B</option>
+                                    <option value="IES Santa Lucia">IES Santa Lucia</option>
+                                    <option value="IES El Doctoral">IES El Doctoral</option>
                                 </select>
                             </div>
                         </div>
-                        <table className="table table-dark table-hover">
-                            <thead>
-                                <tr>
-                                    <th>{t.id}</th>
-                                    <th>{t.usuario}</th>
-                                    <th>{t.fecha}</th>
-                                    <th>{t.total}</th>
-                                    <th>{t.estado}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {pedidos.map(p => (
-                                    <tr key={p._id || p.id}>
-                                        <td>#{p._id || p.id}</td>
-                                        <td>{p.usuario_nombre}</td>
-                                        <td>{new Date(p.fecha).toLocaleString()}</td>
-                                        <td>{p.total}€</td>
-                                        <td>{p.estado}</td>
+                        <div className="table-responsive">
+                            <table className="table table-dark table-hover admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>{t.id}</th>
+                                        <th>{t.usuario}</th>
+                                        <th>{t.fecha}</th>
+                                        <th>{t.total}</th>
+                                        <th>{t.estado}</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {pedidos
+                                        .filter(p => !filtroCentro || p.centro === filtroCentro)
+                                        .map(p => (
+                                        <tr key={p._id || p.id}>
+                                            <td className="small text-truncate" style={{maxWidth: '100px'}}>#{p._id || p.id}</td>
+                                            <td>{p.usuario_nombre}</td>
+                                            <td className="small">{new Date(p.fecha).toLocaleString()}</td>
+                                            <td>{p.total}€</td>
+                                            <td>{p.estado}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 
                 {vista === 'usuarios' && (
                     <div>
-                        <div className="d-flex justify-content-between align-items-center mb-3">
+                        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
                             <h3 className="mb-0">{t.gestionEmpleados}</h3>
-                            <button className="btn btn-success" onClick={() => setModalUsuario({ nombre: '', correo: '', contrasena: '', tipo: 'empleado' })}>
-                                {t.nuevoEmpleado}
-                            </button>
+                            <div className="d-flex flex-wrap gap-2 align-items-center">
+                                <input 
+                                    type="text" 
+                                    className="form-control form-control-sm bg-dark text-white border-secondary w-auto"
+                                    placeholder={t.buscarUsuario}
+                                    value={busquedaUsuario}
+                                    onChange={(e) => setBusquedaUsuario(e.target.value)}
+                                />
+                                <label className="text-white-50 small mb-0">{t.filtrarRol}</label>
+                                <select 
+                                    className="form-select form-select-sm bg-dark text-white border-secondary w-auto"
+                                    value={filtroRol}
+                                    onChange={(e) => setFiltroRol(e.target.value)}
+                                >
+                                    <option value="todos">{t.todosRoles}</option>
+                                    <option value="cliente">{t.cliente}</option>
+                                    <option value="empleado">{t.empleado}</option>
+                                    <option value="admin">{t.admin}</option>
+                                </select>
+                                <button className="btn btn-success" onClick={() => setModalUsuario({ nombre: '', correo: '', contrasena: '', tipo: 'cliente' })}>
+                                    {t.nuevoEmpleado}
+                                </button>
+                            </div>
                         </div>
-                        <table className="table table-dark table-hover">
-                            <thead>
-                                <tr>
-                                    <th>{t.nombre}</th>
-                                    <th>{t.correo}</th>
-                                    <th>{t.rol}</th>
-                                    <th>{t.turno}</th>
-                                    <th>{t.estadoCuenta}</th>
-                                    <th>{t.acciones}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {usuarios.map(u => (
-                                    <tr key={u._id || u.id}>
-                                        <td>{u.nombre}</td>
-                                        <td>{u.correo}</td>
-                                        <td>
-                                            <select
-                                                className="form-select form-select-sm bg-dark text-white"
-                                                defaultValue={u.tipo}
-                                                onChange={(e) => handleUpdateUsuario(u._id || u.id, { tipo: e.target.value, activo: u.activo, turno: u.turno })}
-                                            >
-                                                <option value="empleado">{t.empleado}</option>
-                                                <option value="admin">{t.admin}</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select
-                                                className="form-select form-select-sm bg-dark text-white"
-                                                defaultValue={u.turno || 'mañana'}
-                                                onChange={(e) => handleUpdateUsuario(u._id || u.id, { tipo: u.tipo, activo: u.activo, turno: e.target.value })}
-                                            >
-                                                <option value="mañana">{t.manyana}</option>
-                                                <option value="tarde">{t.tarde}</option>
-                                            </select>
-                                        </td>
-                                        <td>{u.activo ? `✅ ${t.activo}` : `❌ ${t.inactivo}`}</td>
-                                        <td>
-                                            <button
-                                                className={`btn btn-sm ${u.activo ? 'btn-danger' : 'btn-success'}`}
-                                                onClick={() => handleUpdateUsuario(u._id || u.id, { tipo: u.tipo, activo: !u.activo, turno: u.turno })}
-                                            >
-                                                {u.activo ? t.bloquear : t.desbloquear}
-                                            </button>
-                                        </td>
+                        <div className="table-responsive">
+                            <table className="table table-dark table-hover admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>{t.nombre}</th>
+                                        <th className="d-none d-sm-table-cell">{t.correo}</th>
+                                        <th>{t.rol}</th>
+                                        <th className="d-none d-md-table-cell">{t.turno}</th>
+                                        <th>{t.estadoCuenta}</th>
+                                        <th>{t.acciones}</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {usuarios && usuarios
+                                        .filter(u => {
+                                            const matchesRol = filtroRol === 'todos' || (u.tipo || 'cliente').toLowerCase() === filtroRol.toLowerCase();
+                                            const matchesBusqueda = !busquedaUsuario || 
+                                                u.nombre.toLowerCase().includes(busquedaUsuario.toLowerCase()) || 
+                                                u.correo.toLowerCase().includes(busquedaUsuario.toLowerCase());
+                                            return matchesRol && matchesBusqueda;
+                                        })
+                                        .map(u => (
+                                        <tr key={u._id || u.id}>
+                                            <td>{u.nombre}</td>
+                                            <td className="d-none d-sm-table-cell small">{u.correo}</td>
+                                            <td>
+                                                <select
+                                                    className="form-select form-select-sm bg-dark text-white"
+                                                    value={u.tipo}
+                                                    onChange={(e) => handleUpdateUsuario(u._id || u.id, { tipo: e.target.value, activo: u.activo, turno: u.turno })}
+                                                >
+                                                    <option value="cliente">{t.cliente}</option>
+                                                    <option value="empleado">{t.empleado}</option>
+                                                    <option value="admin">{t.admin}</option>
+                                                </select>
+                                            </td>
+                                            <td className="d-none d-md-table-cell text-white-50">
+                                                {u.tipo === 'cliente' ? '—' : (
+                                                    <select
+                                                        className="form-select form-select-sm bg-dark text-white border-secondary"
+                                                        defaultValue={u.turno || 'mañana'}
+                                                        onChange={(e) => handleUpdateUsuario(u._id || u.id, { tipo: u.tipo, activo: u.activo, turno: e.target.value })}
+                                                    >
+                                                        <option value="mañana">{t.manyana}</option>
+                                                        <option value="tarde">{t.tarde}</option>
+                                                    </select>
+                                                )}
+                                            </td>
+                                            <td>{u.activo ? `✅` : `❌`}</td>
+                                            <td>
+                                                <button
+                                                    className={`btn btn-sm action-btn ${u.activo ? 'btn-danger' : 'btn-success'}`}
+                                                    onClick={() => handleUpdateUsuario(u._id || u.id, { tipo: u.tipo, activo: !u.activo, turno: u.turno })}
+                                                >
+                                                    {u.activo ? t.bloquear : t.desbloquear}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
             </div>
@@ -623,18 +665,26 @@ return (
                             </div>
                             <div className="mb-3">
                                 <label>{t.rol}</label>
-                                <select name="tipo" className="form-select" defaultValue="empleado">
+                                <select 
+                                    name="tipo" 
+                                    className="form-select" 
+                                    defaultValue="cliente"
+                                    onChange={(e) => setModalUsuario({...modalUsuario, tipo: e.target.value})}
+                                >
+                                    <option value="cliente">{t.cliente}</option>
                                     <option value="empleado">{t.empleado}</option>
                                     <option value="admin">{t.admin}</option>
                                 </select>
                             </div>
-                            <div className="mb-3">
-                                <label>{t.turno}</label>
-                                <select name="turno" className="form-select" defaultValue="mañana">
-                                    <option value="mañana">{t.manyana}</option>
-                                    <option value="tarde">{t.tarde}</option>
-                                </select>
-                            </div>
+                            {modalUsuario && modalUsuario.tipo !== 'cliente' && (
+                                <div className="mb-3">
+                                    <label>{t.turno}</label>
+                                    <select name="turno" className="form-select" defaultValue="mañana">
+                                        <option value="mañana">{t.manyana}</option>
+                                        <option value="tarde">{t.tarde}</option>
+                                    </select>
+                                </div>
+                            )}
                             <div className="d-flex gap-2">
                                 <button type="submit" className="btn-confirm-prefs">{t.guardar}</button>
                                 <button type="button" className="btn btn-secondary" onClick={() => setModalUsuario(null)}>{t.cancelar}</button>

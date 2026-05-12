@@ -3,7 +3,10 @@
   font-family: Arial, sans-serif;
   font-weight: bold;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(0deg, #274363 0%, #4a76a8 70%);
+  overflow-x: hidden;
 }
 
 /* header */
@@ -27,7 +30,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 70vh;
+  flex: 1;
   border-top: 11px solid rgb(255, 153, 0);
   border-bottom: 11px solid rgb(255, 153, 0);
   padding: 20px;

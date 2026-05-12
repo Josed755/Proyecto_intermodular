@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react';
+import { getProductos } from '../services/api';
 
 function Productos() {
     const [productos, setProductos] = useState([]);
     const [productosIniciales, setProductosIniciales] = useState([]);
 
-
-
     useEffect(() => {
-        fetch("https://proyecto-intermodular-pmt1.onrender.com/api/productos")
-            .then(res => res.json())
-            .then(data => {
+        getProductos()
+            .then(res => {
+                const data = res.data || res;
                 // Añadimos cantidad inicial a cada producto
                 const mapCategoria = (nombreCategoria, nombreProd) => {
                     const nombre = nombreProd.toLowerCase();
-                    const cat = (nombreCategoria || "").toLowerCase();
 
                     if (nombre.includes("café") || nombre.includes("infusión") || nombre.includes("cacao") || nombre.includes("descafeinado"))
                         return "bebidasCalientes";

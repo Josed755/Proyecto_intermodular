@@ -60,7 +60,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 100px;
+  padding: 0 clamp(10px, 5vw, 100px);
 }
 
 .hamburger-btn {

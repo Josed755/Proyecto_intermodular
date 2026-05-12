@@ -23,8 +23,6 @@ function App() {
       cerrar: 'Cerrar',
       espanyol: 'Español',
       ingles: 'Inglés',
-      ayudaContenido: 'Bienvenido a la Cafetería del Zerpa. Inicia sesión para pedir tus cafés o regístrate si es tu primera vez.',
-      acercaContenido: 'CaffES App v1.0 - IES José Zerpa',
       ayudaP1: 'Bienvenido a la Cafetería del Zerpa.',
       ayudaP2: 'Inicia sesión para pedir tus cafés o regístrate si es tu primera vez.',
       acercaH5: 'CaffES App v1.0',

@@ -41,6 +41,7 @@ export const loginUsuario = (datos) => api.post('/login', datos);
 // Productos
 export const getProductos = () => api.get('/productos');
 export const getIngredientes = () => api.get('/ingredientes');
+export const getProductoIngredientes = (id) => api.get(`/productos/${id}/ingredientes`);
 
 // ADMIN PRODUCTOS
 export const getAdminProductos = () => api.get('/admin/productos');
@@ -71,11 +72,7 @@ export const updateUsuarioStatus = (id, datos) =>
 export const addUsuario = (datos) => api.post('/admin/usuarios', datos);
 
 // Perfil
-export const getPerfil = () => api.get('/perfil');
 export const updatePerfil = (id, datos) => api.put(`/usuarios/${id}/perfil`, datos);
-
-// Estadisticas
-export const getEstadisticas = () => api.get('/estadisticas');
 
 // Auth helpers
 export const setAuthToken = (token) => {
