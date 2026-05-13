@@ -9,6 +9,7 @@ const Producto = require('./models/Producto');
 const Pedido = require('./models/Pedido');
 const Ingrediente = require('./models/Ingrediente');
 const { imprimirTicket } = require('./utils/printer');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // CONFIGURACIÓN INICIAL
 const app = express();
@@ -42,6 +43,28 @@ const verificarAdmin = (req, res, next) => {
     return res.status(403).json({ error: 'Token inválido o expirado' });
   }
 };
+
+// RUTA DE STRIPE
+app.post('/api/create-payment-intent', async (req, res) => {
+  const { amount } = req.body; // Cantidad en euros (ej: 5.50)
+
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Stripe usa céntimos
+      currency: 'eur',
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error('Error Stripe:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // RUTAS DE AUTENTICACIÓN
 

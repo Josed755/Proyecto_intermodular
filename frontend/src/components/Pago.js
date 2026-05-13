@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { crearPedido, getUsuario } from '../services/api';
-import './Pago.css';
-import '../App.css';
 import { FaEye, FaEyeSlash, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { crearPedido, getUsuario, createPaymentIntent } from '../services/api';
 
 function Pago() {
     const navigate = useNavigate();
@@ -12,11 +11,10 @@ function Pago() {
     const [metodoPago] = useState('tarjeta');
     const [procesando, setProcesando] = useState(false);
     const [idioma] = useState(localStorage.getItem('idioma') || 'es');
+    const stripe = useStripe();
+    const elements = useElements();
 
     const [cardData, setCardData] = useState({
-        numero: '',
-        expiracion: '',
-        cvv: '',
         nombre: ''
     });
 
@@ -116,15 +114,11 @@ function Pago() {
     };
 
     const isFormValid = () => {
-        // 16 dígitos + 3 espacios = 19
-        return cardData.numero.length === 19 &&
-            cardData.expiracion.length === 5 &&
-            cardData.cvv.length === 3 &&
-            cardData.nombre.trim().length > 3;
+        return cardData.nombre.trim().length > 3;
     };
 
     const handlePago = async () => {
-        if (!carrito || procesando) return;
+        if (!carrito || !stripe || !elements || procesando) return;
         
         const ahora = new Date();
         const dia = ahora.getDay();
@@ -144,18 +138,41 @@ function Pago() {
 
         setProcesando(true);
         try {
-            const datosPedido = {
-                usuario_id: usuario.id,
-                total: carrito.total,
-                items: carrito.items,
-                metodo_pago: metodoPago,
-                centro: usuario.centro || 'IES José Zerpa'
-            };
+            // 1. Crear el Payment Intent en el backend
+            const { data } = await createPaymentIntent(carrito.total);
+            const clientSecret = data.clientSecret;
 
-            await crearPedido(datosPedido);
-            alert(t.exito);
-            localStorage.removeItem('carrito');
-            navigate('/home');
+            // 2. Confirmar el pago con Stripe
+            const result = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: elements.getElement(CardElement),
+                    billing_details: {
+                        name: cardData.nombre,
+                        email: usuario.correo
+                    }
+                }
+            });
+
+            if (result.error) {
+                alert(result.error.message);
+                setProcesando(false);
+                return;
+            }
+
+            if (result.paymentIntent.status === 'succeeded') {
+                const datosPedido = {
+                    usuario_id: usuario.id,
+                    total: carrito.total,
+                    items: carrito.items,
+                    metodo_pago: metodoPago,
+                    centro: usuario.centro || 'IES José Zerpa'
+                };
+
+                await crearPedido(datosPedido);
+                alert(t.exito);
+                localStorage.removeItem('carrito');
+                navigate('/home');
+            }
         } catch (error) {
             console.error('Error en el pago:', error);
             alert(t.error);
@@ -222,42 +239,26 @@ function Pago() {
                                     name="nombre"
                                     placeholder={t.nombrePlaceholder}
                                     value={cardData.nombre}
-                                    onChange={handleInputChange}
+                                    onChange={(e) => setCardData({ ...cardData, nombre: e.target.value })}
                                 />
                             </div>
                             <div className="form-group">
-                                <label>{t.numTarjeta}</label>
-                                <input
-                                    type="text"
-                                    name="numero"
-                                    placeholder="0000 0000 0000 0000"
-                                    maxLength="19"
-                                    value={cardData.numero}
-                                    onChange={handleInputChange}
-                                />
-                            </div>
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>{t.fecExp}</label>
-                                    <input
-                                        type="text"
-                                        name="expiracion"
-                                        placeholder="MM/YY"
-                                        maxLength="5"
-                                        value={cardData.expiracion}
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>{t.cvv}</label>
-                                    <input
-                                        type="password"
-                                        name="cvv"
-                                        placeholder="***"
-                                        maxLength="3"
-                                        value={cardData.cvv}
-                                        onChange={handleInputChange}
-                                    />
+                                <label>{idioma === 'es' ? 'Datos de la Tarjeta' : 'Card Details'}</label>
+                                <div className="stripe-element-container">
+                                    <CardElement options={{
+                                        style: {
+                                            base: {
+                                                fontSize: '16px',
+                                                color: '#fff',
+                                                '::placeholder': {
+                                                    color: 'rgba(255, 255, 255, 0.4)',
+                                                },
+                                            },
+                                            invalid: {
+                                                color: '#ff4444',
+                                            },
+                                        },
+                                    }} />
                                 </div>
                             </div>
                         </div>

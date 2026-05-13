@@ -242,3 +242,17 @@
         min-height: 100vh;
     }
 }
+
+.stripe-element-container {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 14px 16px;
+    transition: all 0.3s;
+}
+
+.stripe-element-container:focus-within {
+    border-color: #ffc107;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.1);
+}
