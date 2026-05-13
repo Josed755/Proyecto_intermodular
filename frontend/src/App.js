@@ -27,7 +27,7 @@ function App() {
       ayudaP1: 'Bienvenido a la Cafetería del Zerpa.',
       ayudaP2: 'Inicia sesión para pedir tus cafés o regístrate si es tu primera vez.',
       acercaH5: 'CaffES App v1.0',
-      acercaP: 'IES José Zerpa'
+      acercaP: 'Canarias Educación'
     },
     en: {
       titulo: 'CafES App',
@@ -42,7 +42,7 @@ function App() {
       ayudaP1: 'Welcome to the Zerpa Cafeteria.',
       ayudaP2: 'Log in to order your coffees or register if it is your first time.',
       acercaH5: 'CaffES App v1.0',
-      acercaP: 'IES José Zerpa'
+      acercaP: 'Canarias Education'
     }
   };
 
@@ -141,9 +141,7 @@ function App() {
         <div className="footer-content">
           <div className="footer-section">
             <h4>{t.titulo}</h4>
-            <p>IES José Zerpa</p>
-            <p>IES Santa Lucía</p>
-            <p>IES El Doctoral</p>
+            <p>{idioma === 'es' ? 'Tu cafetería escolar, siempre contigo.' : 'Your school cafeteria, always with you.'}</p>
           </div>
           <div className="footer-section">
             <h4>{idioma === 'es' ? 'Contactos' : 'Contacts'}</h4>
@@ -165,7 +163,7 @@ function App() {
           </div>
         </div>
         <div className="footer-bottom text-center">
-          <div>© {new Date().getFullYear()} IES José Zerpa - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+          <div>© {new Date().getFullYear()} Canarias Educacion - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
         </div>
       </footer>
     </div>

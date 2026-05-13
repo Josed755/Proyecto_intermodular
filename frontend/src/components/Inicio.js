@@ -283,10 +283,9 @@ function Inicio() {
                     const idsSeleccionados = Array.isArray(data) 
                         ? data.filter(i => {
                             const nombre = (i.nombre || '').toLowerCase();
-                            const esExtraPan = nombre.includes('extra') && nombre.includes('pan') && nombre.includes('especial');
                             const esExtraQueso = nombre.includes('extra') && nombre.includes('queso');
                             const esExtraTomateLechuga = nombre.includes('extra') && nombre.includes('tomate') && nombre.includes('lechuga');
-                            return !esExtraPan && !esExtraQueso && !esExtraTomateLechuga;
+                            return !esExtraQueso && !esExtraTomateLechuga;
                         }).map(i => i.id) 
                         : [];
 
@@ -801,9 +800,7 @@ function Inicio() {
                 <div className="footer-content">
                     <div className="footer-section">
                         <h4>{t.titulo}</h4>
-                        <p>IES José Zerpa</p>
-                        <p>IES Santa Lucía</p>
-                        <p>IES El Doctoral</p>
+                        <p>{idioma === 'es' ? 'Tu cafetería escolar, siempre contigo.' : 'Your school cafeteria, always with you.'}</p>
                     </div>
                     <div className="footer-section">
                         <h4>{idioma === 'es' ? 'Contactos' : 'Contacts'}</h4>
@@ -825,7 +822,7 @@ function Inicio() {
                     </div>
                 </div>
                 <div className="footer-bottom text-center">
-                    <div>© {new Date().getFullYear()} IES José Zerpa - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+                    <div>© {new Date().getFullYear()} Canarias Educacion - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
                 </div>
             </footer>
 
