@@ -800,7 +800,7 @@ function Inicio() {
                 <div className="footer-content">
                     <div className="footer-section">
                         <h4>{t.titulo}</h4>
-                        <p>{idioma === 'es' ? 'Tu cafetería escolar, siempre contigo.' : 'Your school cafeteria, always with you.'}</p>
+                        <p>{idioma === 'es' ? 'Horario de pedidos: L-V antes de las 08:00 o después de las 14:00. Fines de semana disponible todo el día.' : 'Order hours: M-F before 08:00 or after 14:00. Weekends available all day.'}</p>
                     </div>
                     <div className="footer-section">
                         <h4>{idioma === 'es' ? 'Contactos' : 'Contacts'}</h4>
