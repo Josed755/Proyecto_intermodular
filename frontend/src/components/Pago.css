@@ -249,10 +249,34 @@
     border-radius: 12px;
     padding: 14px 16px;
     transition: all 0.3s;
+    min-height: 48px; /* Crucial for Stripe elements to be visible */
+    display: flex;
+    align-items: center;
 }
 
 .stripe-element-container:focus-within {
     border-color: #ffc107;
     background: rgba(255, 255, 255, 0.12);
     box-shadow: 0 0 15px rgba(255, 193, 7, 0.1);
+}
+
+.stripe-element-container > div {
+    width: 100%;
+}
+
+.premium-bg {
+    background: radial-gradient(circle at top right, #2c3e50, #000000) !important;
+}
+
+.premium-header {
+    background: rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.premium-card {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(30px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
 }

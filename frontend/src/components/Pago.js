@@ -200,15 +200,15 @@ function Pago() {
     if (!carrito) return null;
 
     return (
-        <div className="App">
-            <header className="App-header">
+        <div className="App premium-bg">
+            <header className="App-header premium-header">
                 <div className="header-container">
                     <div className="title">CafES App</div>
                 </div>
             </header>
 
             <main className="App-main pago-container">
-                <div className="checkout-card shadow-lg">
+                <div className="checkout-card premium-card">
                     <h2 className="checkout-title">{t.titulo}</h2>
 
                     <div className="checkout-section">
