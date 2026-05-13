@@ -13,7 +13,7 @@ import Pago from './components/Pago';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe('pk_test_51TWdiIENWQvXkgqOypfEW96yy20b6vqFap8vhalNra1PrYZigVD1YiiEfRJm0WNr2ttzelI1kudCpHaxINlYePFa00NV2JOXuz');
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
