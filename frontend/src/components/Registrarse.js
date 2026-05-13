@@ -325,9 +325,7 @@ function Registrarse() {
         <div className="footer-content">
           <div className="footer-section">
             <h4>{t.titulo}</h4>
-            <p>IES José Zerpa</p>
-            <p>IES Santa Lucía</p>
-            <p>IES El Doctoral</p>
+            <p>{idioma === 'es' ? 'Horario de pedidos: L-V antes de las 08:00 o después de las 14:00. Fines de semana disponible todo el día.' : 'Order hours: M-F before 08:00 or after 14:00. Weekends available all day.'}</p>
           </div>
           <div className="footer-section">
             <h4>{idioma === 'es' ? 'Contactos' : 'Contacts'}</h4>
@@ -349,7 +347,7 @@ function Registrarse() {
           </div>
         </div>
         <div className="footer-bottom text-center">
-          <div>© {new Date().getFullYear()} IES José Zerpa - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+          <div>© {new Date().getFullYear()} Canarias Educación - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
         </div>
       </footer>
     </div>

@@ -822,7 +822,7 @@ function Inicio() {
                     </div>
                 </div>
                 <div className="footer-bottom text-center">
-                    <div>© {new Date().getFullYear()} Canarias Educacion - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+                    <div>© {new Date().getFullYear()} Canarias Educación - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
                 </div>
             </footer>
 
