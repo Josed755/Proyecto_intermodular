@@ -246,11 +246,13 @@
 .stripe-element-container.debug-white-bg {
     background: white !important;
     min-height: 50px;
+    width: 100% !important; /* Force full width */
     border: 3px solid orange !important;
     border-radius: 12px;
     padding: 10px;
     display: flex;
     align-items: center;
+    margin-top: 10px;
 }
 
 .stripe-element-container.debug-white-bg > div {
