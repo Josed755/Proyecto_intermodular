@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { crearPedido, getUsuario, createPaymentIntent } from '../services/api';
+import './Pago.css';
+import '../App.css';
 
 function Pago() {
     const navigate = useNavigate();
