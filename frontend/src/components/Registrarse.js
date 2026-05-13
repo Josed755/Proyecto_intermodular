@@ -44,8 +44,10 @@ function Registrarse() {
       cerrar: 'Cerrar',
       espanyol: 'Español',
       ingles: 'Inglés',
-      ayudaContenido: 'Crea una cuenta para realizar tus pedidos en la cafetería. Necesitarás un correo válido, una contraseña con al menos 8 caracteres y seleccionar tu centro de recogida (IES José Zerpa, IES Santa Lucia o IES El Doctoral).',
-      acercaContenido: 'CafES App v1.0 - Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y IES El Doctoral. Proyecto intermodular DAW/DAM 2026.',
+      ayudaP1: 'Crea una cuenta para realizar tus pedidos en la cafetería.',
+      ayudaP2: 'Necesitarás un correo válido, una contraseña con al menos 8 caracteres y seleccionar tu centro de recogida (IES José Zerpa, IES Santa Lucia o IES El Doctoral).',
+      acercaH5: 'CafES App v1.0',
+      acercaP: 'Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y IES El Doctoral.',
       centroRecogida: 'Centro de Recogida:',
       seleccionarCentro: 'Selecciona un centro',
       errorRegistro: 'Error en el registro'
@@ -68,8 +70,10 @@ function Registrarse() {
       cerrar: 'Close',
       espanyol: 'Spanish',
       ingles: 'English',
-      ayudaContenido: 'Create an account to place your orders at the cafeteria. You will need a valid email, a password with at least 8 characters, and select your collection point (IES José Zerpa, IES Santa Lucia or IES El Doctoral).',
-      acercaContenido: 'CafES App v1.0 - Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and IES El Doctoral. DAW/DAM intermodular project 2026.',
+      ayudaP1: 'Create an account to place your orders at the cafeteria.',
+      ayudaP2: 'You will need a valid email, a password with at least 8 characters, and select your collection point (IES José Zerpa, IES Santa Lucia or IES El Doctoral).',
+      acercaH5: 'CafES App v1.0',
+      acercaP: 'Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and IES El Doctoral.',
       centroRecogida: 'Collection Point:',
       seleccionarCentro: 'Select a center',
       errorRegistro: 'Error registering',
@@ -143,8 +147,8 @@ function Registrarse() {
   }, [idioma]);
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className="App premium-bg">
+      <header className="App-header premium-header">
         <div className="header-container">
           <div className="title">{t.titulo}</div>
           <div className="header-right">
@@ -174,7 +178,7 @@ function Registrarse() {
 
       {modalActivo && (
         <div className="prefs-overlay">
-          <div className="prefs-modal shadow-lg">
+          <div className="prefs-modal premium-card">
             <h3>{t[modalActivo]}</h3>
             <div className="modal-content-area">
               {modalActivo === 'idioma' && (
@@ -192,12 +196,14 @@ function Registrarse() {
               )}
               {modalActivo === 'ayuda' && (
                 <div className="help-info text-center">
-                  <p>{t.ayudaContenido}</p>
+                  <p>{t.ayudaP1}</p>
+                  <p className="small text-white-50">{t.ayudaP2}</p>
                 </div>
               )}
               {modalActivo === 'acerca' && (
                 <div className="text-center">
-                  <h5 className="text-warning">{t.acercaContenido}</h5>
+                  <h5 className="text-warning">{t.acercaH5}</h5>
+                  <p className="small">{t.acercaP}</p>
                 </div>
               )}
             </div>
@@ -209,7 +215,7 @@ function Registrarse() {
       )}
 
       <main className="App-main">
-        <div className="cont_sesion">
+        <div className="cont_sesion premium-card">
           <form className='form-conte' onSubmit={handleSubmit}>
             {error && (
               <div className="alert alert-danger" style={{ color: 'red', marginBottom: '15px' }}>

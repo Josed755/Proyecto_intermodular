@@ -63,8 +63,8 @@ function App() {
   }, [idioma]);
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className="App premium-bg">
+      <header className="App-header premium-header">
         <div className="header-container">
           <div className="title">{t.titulo}</div>
           <div className="header-right">
@@ -75,7 +75,7 @@ function App() {
                 <span></span>
               </button>
               {menuAbierto && (
-                <div className="user-dropdown session-dropdown shadow-lg">
+                <div className="user-dropdown shadow-lg">
                   <button className="dropdown-item" onClick={() => { setModalActivo('idioma'); setMenuAbierto(false); }}>
                     {t.idioma}
                   </button>
@@ -94,7 +94,7 @@ function App() {
 
       {modalActivo && (
         <div className="prefs-overlay">
-          <div className="prefs-modal shadow-lg">
+          <div className="prefs-modal premium-card">
             <h3>{t[modalActivo]}</h3>
             <div className="modal-content-area">
               {modalActivo === 'idioma' && (
@@ -111,7 +111,7 @@ function App() {
                 </div>
               )}
               {modalActivo === 'ayuda' && (
-                <div className="help-info text-center">
+                <div className="help-info">
                   <p>{t.ayudaP1}</p>
                   <p className="small text-white-50">{t.ayudaP2}</p>
                 </div>
@@ -131,7 +131,7 @@ function App() {
       )}
 
       <main className="App-main">
-        <div className="cont_sesion">
+        <div className="cont_sesion premium-card">
           <img src={cafeImg} alt={""} className="CafeImg" />
           <button className="sesion_inicio" onClick={() => navigate("/login")}>{t.iniciarSesion}</button>
           <button className="sesion_regis" onClick={() => navigate("/register")}>{t.registrarse}</button>

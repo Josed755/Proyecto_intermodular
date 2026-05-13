@@ -69,7 +69,7 @@ function Inicio() {
             ayuda: 'Ayuda',
             acerca: 'Acerca de',
             ayudaContenido: 'Para realizar un pedido: 1. Elige tus productos del menú. 2. Personaliza los ingredientes si lo deseas. 3. Revisa el resumen de tu pedido. 4. Pulsa "Confirmar" para ir al pago. Recuerda que solo se puede pedir antes de las 08:00 o después de las 14:00 de lunes a viernes. Los fines de semana está disponible todo el día.',
-            acercaContenido: 'CafES App v1.0 - Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y El Doctoral. Proyecto intermodular DAW/DAM 2026.',
+            acercaContenido: 'CafES App v1.0 - Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y El Doctoral.',
             subtotal: 'Subtotal',
             impuesto: 'IGIC (7%)',
             pedidoConfirmado: 'Pedido confirmado. Total: ',
@@ -125,7 +125,7 @@ function Inicio() {
             acerca: 'About',
             panelControl: 'Admin Panel',
             ayudaContenido: 'To place an order: 1. Choose your products from the menu. 2. Customize ingredients if desired. 3. Review your order summary. 4. Press "Confirm" to proceed to payment. Remember that orders are only available before 08:00 or after 14:00 on weekdays. Weekends are available all day.',
-            acercaContenido: 'CafES App v1.0 - Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and El Doctoral. DAW/DAM intermodular project 2026.',
+            acercaContenido: 'CafES App v1.0 - Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and El Doctoral.',
             subtotal: 'Subtotal',
             impuesto: 'Tax (7%)',
             pedidoConfirmado: 'Order confirmed. Total: ',
@@ -338,10 +338,10 @@ function Inicio() {
 
     return (
         /* Use the 'App' class to get the main container style */
-        <div className="App">
+        <div className="App premium-bg">
 
             {/* Standard App Header */}
-            <header className="App-header">
+            <header className="App-header premium-header">
                 <div className="header-container">
                     <div className="title">{t.titulo}</div>
 
@@ -396,7 +396,7 @@ function Inicio() {
             {/* Modal de Preferencias y Secciones */}
             {modalActivo && (
                 <div className="prefs-overlay">
-                    <div className="prefs-modal shadow-lg">
+                    <div className="prefs-modal premium-card">
                         <h3>{t[modalActivo]}</h3>
 
                         <div className="modal-content-area">
@@ -511,7 +511,6 @@ function Inicio() {
                             {modalActivo === 'ayuda' && (
                                 <div className="help-info text-center">
                                     <p>{t.ayudaContenido}</p>
-                                    <p className="mt-3 small text-white-50">{t.contacto}</p>
                                 </div>
                             )}
 
@@ -759,7 +758,7 @@ function Inicio() {
 
                 {productoParaPersonalizar && (
                     <div className="ingredients-modal-overlay">
-                        <div className="ingredients-modal">
+                        <div className="ingredients-modal premium-card">
                             <h2>{tradNombre(productoParaPersonalizar.nombre)}</h2>
                             {productoParaPersonalizar.descripcion && (
                                 <p className="product-description">{productoParaPersonalizar.description || productoParaPersonalizar.descripcion}</p>

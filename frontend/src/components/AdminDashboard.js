@@ -447,8 +447,8 @@ return (
 
                 {vista === 'pedidos' && (
                     <div>
-                        <div className="d-flex justify-content-between align-items-center mb-3">
-                            <h3>{t.historialPedidos}</h3>
+                        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+                            <h3 className="mb-0">{t.historialPedidos}</h3>
                             <div className="d-flex align-items-center gap-2">
                                 <label className="text-white-50 small">{t.filtrarCentro}</label>
                                 <select

@@ -1,36 +1,38 @@
 /* EstiloInicio.css - Adapting Dashboard to App Structure */
 
-/* REMOVED: .app-light/.app-dark backgrounds because 'App' class handles the gradient now */
-/* REMOVED: .app-header because we use App-header now */
-
 /* Filter Container */
 .filter-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 12px;
   margin-bottom: 25px;
+  position: relative;
+  z-index: 10; /* Lower than dropdown */
 }
 
 .btn-filter {
-  padding: 8px 20px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  padding: 10px 24px;
+  border-radius: 50px;
+  border: 1px solid var(--premium-border);
+  background: var(--premium-glass);
+  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.7);
   font-weight: bold;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
 .btn-filter:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
   transform: translateY(-2px);
 }
 
 .btn-filter.active {
-  background: orange;
-  border-color: orange;
-  box-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
+  background: var(--premium-accent);
+  border-color: var(--premium-accent);
+  color: white;
+  box-shadow: 0 8px 20px rgba(255, 153, 0, 0.3);
 }
 
 .dashboard-container {
@@ -44,15 +46,12 @@
 .header-container {
   width: 100%;
   max-width: 100%;
-  /* Spans full width */
   padding: 0 20px;
-  /* Reduced from 40px to move items closer to edges */
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   height: 80px;
-  /* Explicit height for centering context */
 }
 
 .title {
@@ -61,28 +60,30 @@
   transform: translateX(-50%);
   margin: 0;
   white-space: nowrap;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
 }
 
 .header-right {
   display: flex;
   align-items: center;
   margin-left: auto;
-  /* Push to the right */
 }
 
 .user-menu-wrapper {
   position: relative;
+  z-index: 2000; /* High z-index for dropdown */
 }
 
 .user-profile {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
   padding: 8px 18px;
-  border-radius: 30px;
+  border-radius: 50px;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--premium-border);
   cursor: pointer;
   transition: all 0.3s ease;
   user-select: none;
@@ -90,59 +91,63 @@
 
 .user-profile:hover,
 .user-profile.active {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--premium-accent);
+  box-shadow: 0 0 15px rgba(255, 153, 0, 0.1);
 }
 
 .user-avatar {
-  width: 35px;
-  height: 35px;
-  background: orange;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #ff9900, #ff6600);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 0.85rem;
-  box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
+  font-weight: 800;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .user-name {
   color: white;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 0.95rem;
 }
 
 .chevron {
   font-size: 0.7rem;
+  opacity: 0.6;
   transition: transform 0.3s ease;
 }
 
 .user-profile.active .chevron {
   transform: rotate(180deg);
+  opacity: 1;
 }
 
 .user-dropdown {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 12px);
   right: 0;
-  width: 220px;
-  background: rgba(40, 44, 52, 0.98);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-right: 5px solid orange;
-  border-radius: 15px;
-  padding: 8px 0;
-  z-index: 1000;
-  animation: slideIn 0.2s ease-out;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  width: 240px;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--premium-border);
+  border-top: 3px solid var(--premium-accent);
+  border-radius: 18px;
+  padding: 10px 0;
+  z-index: 2100;
+  animation: slideIn 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
 }
 
 .dropdown-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 8px 15px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 10px 15px;
 }
 
 @keyframes slideIn {
@@ -188,28 +193,28 @@
 
 /* Dashboard Cards (Product Items) */
 .dash-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
+  background: var(--premium-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--premium-border);
+  border-radius: 28px;
   padding: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  /* Important for consistency */
-  transition: transform 0.2s, background 0.2s;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   height: 100%;
   min-height: 500px;
-  /* Significantly increased height */
   color: white;
-  /* Ensure text is white */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .dash-card:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-5px);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .icon-wrapper {
@@ -220,21 +225,14 @@
   align-items: center;
   justify-content: center;
   font-size: 7rem;
-  /* Para los emojis */
 }
 
 .product-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 16px;
+  border-radius: 20px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-}
-
-.dash-card:hover .product-card-img {
-  transform: scale(1.05);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
 
 .item-name {
@@ -250,25 +248,27 @@
 }
 
 .item-price {
-  color: #ffcc00;
-  font-weight: bold;
-  font-size: 1.6rem;
+  color: var(--premium-accent);
+  font-weight: 900;
+  font-size: 1.7rem;
   margin-bottom: 20px;
+  text-shadow: 0 0 15px rgba(255, 153, 0, 0.2);
 }
 
 /* Controls */
 .control-group {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 5px 10px;
-  border-radius: 30px;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 6px 14px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .qty-badge {
-  font-weight: bold;
-  font-size: 1.5rem;
+  font-weight: 800;
+  font-size: 1.6rem;
   min-width: 40px;
   text-align: center;
   color: white;
@@ -277,99 +277,117 @@
 /* Summary Panel */
 .summary-panel {
   margin-top: 40px;
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  padding: 20px;
+  background: rgba(15, 15, 15, 0.8);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid var(--premium-border);
+  border-radius: 30px;
+  padding: 24px;
   position: sticky;
-  top: 0;
+  top: 100px;
   height: auto;
-  max-height: 75vh;
+  max-height: 80vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   color: white;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
 }
 
 .summary-title {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 15px;
-  margin-bottom: 15px;
-  font-size: 1.3rem;
-  font-weight: bold;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  font-size: 1.4rem;
+  font-weight: 800;
   text-align: center;
+  letter-spacing: 1px;
 }
 
 .order-item {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
-  font-size: 0.95rem;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-  padding-bottom: 5px;
+  margin-bottom: 14px;
+  font-size: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding-bottom: 8px;
 }
 
 .totals-section {
-  margin-top: auto;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 15px;
-  border-radius: 10px;
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Buttons */
 .btn-round {
-  width: 45px;
-  height: 45px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  font-weight: bold;
-  font-size: 1.5rem;
-  border: 2px solid white;
+  font-weight: 800;
+  font-size: 1.6rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
   background: transparent;
   color: white;
+  transition: all 0.2s ease;
 }
 
-.btn-round:hover {
+.btn-round:hover:not(:disabled) {
   background: white;
-  color: #274363;
+  color: black;
+  transform: scale(1.1);
+}
+
+.btn-round:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 
 .btn-confirm {
-  background-color: orange;
-  border: 4px solid rgb(255, 153, 0);
-  /* Match App styles */
+  background: linear-gradient(135deg, #ff9900, #ff6600);
+  border: none;
   color: white;
   width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  font-weight: bold;
-  margin-top: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  border-radius: 16px;
+  font-weight: 800;
+  margin-top: 15px;
+  box-shadow: 0 10px 20px rgba(255, 102, 0, 0.2);
   font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .btn-confirm:hover {
-  background-color: #e65100;
-  transform: translateY(-1px);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(255, 102, 0, 0.3);
 }
 
 .btn-clear {
   background-color: transparent;
-  border: 2px solid #ff4444;
-  color: white;
+  border: 1.5px solid rgba(255, 68, 68, 0.4);
+  color: rgba(255, 68, 68, 0.8);
   width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  margin-top: 10px;
-  font-weight: bold;
+  padding: 14px;
+  border-radius: 16px;
+  margin-top: 12px;
+  font-weight: 700;
+  transition: all 0.3s;
+  cursor: pointer;
 }
 
 .btn-clear:hover {
-  background-color: #ff4444;
+  background-color: rgba(255, 68, 68, 0.1);
+  color: #ff4444;
+  border-color: #ff4444;
 }
 
 /* Preferences Modal */
@@ -388,10 +406,9 @@
 }
 
 .prefs-modal {
-  background: rgba(40, 44, 52, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-right: 5px solid orange;
-  border-radius: 20px;
+  background: var(--premium-glass);
+  border: 1px solid var(--premium-border);
+  border-radius: 24px;
   padding: 30px;
   width: min(90%, 400px);
   color: white;
@@ -659,15 +676,15 @@
 /* --- NEW FLOATING PILL CART --- */
 .cart-floating-wrapper {
   position: fixed;
-  bottom: 30px;
+  bottom: 25px;
   left: 0;
   width: 100%;
   display: flex;
   justify-content: center;
-  z-index: 9999;
+  z-index: 1500; /* Below user-dropdown (2000) but above content */
   padding: 0 20px;
   pointer-events: none;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .cart-floating-wrapper.hide-cart {
@@ -686,18 +703,19 @@
   pointer-events: auto;
   width: 100%;
   max-width: 450px;
-  background: orange;
-  height: 65px;
+  background: linear-gradient(135deg, #ff9900, #ff6600);
+  height: 68px;
   border-radius: 50px;
   border: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  padding: 0 15px;
+  box-shadow: 0 15px 35px rgba(255, 102, 0, 0.4);
   color: white;
   font-weight: 900;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .cart-floating-pill:active {
@@ -705,9 +723,9 @@
 }
 
 .cart-pill-left {
-  background: rgba(255, 255, 255, 0.25);
-  width: 42px;
-  height: 42px;
+  background: rgba(255, 255, 255, 0.2);
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -715,18 +733,22 @@
 }
 
 .cart-pill-count {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
+  color: white !important; /* Ensure visibility */
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .cart-pill-center {
   font-size: 1.2rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  color: white !important;
 }
 
 .cart-pill-right {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   padding-right: 15px;
+  color: white !important;
 }
 
 /* Drawer Adjustment for Mobile (Delivery Style) */
@@ -736,7 +758,7 @@
     bottom: -100% !important;
     left: 0;
     width: 100%;
-    height: 100%; /* Full screen overlay container */
+    height: 100%;
     z-index: 3000;
     transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0;
@@ -752,10 +774,11 @@
   .summary-panel {
     border-radius: 35px 35px 0 0;
     margin-top: 0;
-    height: 90vh; /* Takes most of the screen */
-    max-height: 90vh;
-    box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.6);
-    background: #1a1c23; /* Solid dark for the drawer */
+    height: 85vh;
+    max-height: 85vh;
+    box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.7);
+    background: rgba(15, 15, 15, 0.98);
+    backdrop-filter: blur(30px);
     overflow-y: auto;
   }
 
@@ -763,38 +786,36 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 15px;
+    padding: 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 20px;
   }
 
   .summary-header-title {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 900;
     color: white;
   }
 
   .btn-back-cart {
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: white;
-    width: 45px;
-    height: 45px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
 
-  /* Items as Cards in the summary */
   .order-item {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.04);
     margin: 0 15px 12px 15px;
-    padding: 20px;
-    border-radius: 20px;
-    border-bottom: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 24px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .cart-overlay {
@@ -815,4 +836,4 @@
     margin: 20px;
     width: calc(100% - 40px);
   }
-}
+}
