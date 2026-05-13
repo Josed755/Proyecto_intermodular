@@ -243,15 +243,18 @@
     }
 }
 
-.stripe-element-container {
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.stripe-element-container.debug-white-bg {
+    background: white !important;
+    min-height: 50px;
+    border: 3px solid orange !important;
     border-radius: 12px;
-    padding: 14px 16px;
-    transition: all 0.3s;
-    min-height: 48px; /* Crucial for Stripe elements to be visible */
+    padding: 10px;
     display: flex;
     align-items: center;
+}
+
+.stripe-element-container.debug-white-bg > div {
+    width: 100%;
 }
 
 .stripe-element-container:focus-within {
