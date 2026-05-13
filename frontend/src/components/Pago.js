@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { crearPedido, getUsuario, createPaymentIntent } from '../services/api';
 import './Pago.css';
 import '../App.css';
@@ -20,9 +20,10 @@ function Pago() {
         style: {
             base: {
                 fontSize: '16px',
-                color: '#000', // Black text for debugging visibility
+                color: '#fff',
+                fontFamily: 'Outfit, sans-serif',
                 '::placeholder': {
-                    color: '#666',
+                    color: 'rgba(255, 255, 255, 0.4)',
                 },
             },
             invalid: {
@@ -162,7 +163,7 @@ function Pago() {
             // 2. Confirmar el pago con Stripe
             const result = await stripe.confirmCardPayment(clientSecret, {
                 payment_method: {
-                    card: elements.getElement(CardElement),
+                    card: elements.getElement(CardNumberElement),
                     billing_details: {
                         name: cardData.nombre,
                         email: usuario.correo
@@ -260,9 +261,23 @@ function Pago() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>{idioma === 'es' ? 'Datos de la Tarjeta' : 'Card Details'}</label>
-                                <div className="stripe-element-container debug-white-bg">
-                                    <CardElement options={stripeOptions} />
+                                <label>{t.numTarjeta}</label>
+                                <div className="stripe-element-container">
+                                    <CardNumberElement options={stripeOptions} />
+                                </div>
+                            </div>
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>{t.fecExp}</label>
+                                    <div className="stripe-element-container">
+                                        <CardExpiryElement options={stripeOptions} />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>{t.cvv}</label>
+                                    <div className="stripe-element-container">
+                                        <CardCvcElement options={stripeOptions} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
