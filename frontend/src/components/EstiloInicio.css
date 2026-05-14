@@ -1,4 +1,8 @@
 /* EstiloInicio.css - Adapting Dashboard to App Structure */
+.App-main {
+  align-items: flex-start !important;
+  padding-top: 40px !important;
+}
 
 /* Filter Container */
 .filter-container {
@@ -39,7 +43,7 @@
   width: 100%;
   max-width: 1400px;
   padding: 20px;
-  overflow-y: auto;
+  /* Removed overflow-y: auto to allow position: sticky on children */
 }
 
 /* Header Layout Extensions */
