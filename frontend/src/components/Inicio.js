@@ -308,7 +308,8 @@ function Inicio() {
                             const nombre = (i.nombre || '').toLowerCase();
                             const esExtraQueso = nombre.includes('extra') && nombre.includes('queso');
                             const esExtraTomateLechuga = nombre.includes('extra') && nombre.includes('tomate') && nombre.includes('lechuga');
-                            return !esExtraQueso && !esExtraTomateLechuga;
+                            const esExtraPanEspecial = nombre.includes('extra') && nombre.includes('pan') && nombre.includes('especial');
+                            return !esExtraQueso && !esExtraTomateLechuga && !esExtraPanEspecial;
                         }).map(i => i.id) 
                         : [];
 
