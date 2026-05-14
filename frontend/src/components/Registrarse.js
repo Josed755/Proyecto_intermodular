@@ -293,8 +293,7 @@ function Registrarse() {
                 value={formData.centro}
                 onChange={handleChange}
                 required
-                className="form-control bg-dark text-white"
-                style={{ border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '10px' }}
+                className="premium-select"
               >
                 <option value="IES José Zerpa">IES José Zerpa</option>
                 <option value="IES Santa Lucia">IES Santa Lucia</option>
