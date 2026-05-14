@@ -17,7 +17,6 @@
   flex-direction: column;
   background: var(--premium-gradient) !important;
   color: white;
-  overflow-x: hidden;
 }
 
 .premium-bg {
