@@ -36,8 +36,7 @@
   background: rgba(0, 0, 0, 0.3) !important;
   backdrop-filter: blur(15px);
   border-bottom: 1px solid var(--premium-border);
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 1000;
 }
 
