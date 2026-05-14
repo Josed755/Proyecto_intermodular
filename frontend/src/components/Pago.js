@@ -100,12 +100,12 @@ function Pago() {
         if (name === 'expiracion') {
             // Eliminar todo lo que no sea número
             value = value.replace(/\D/g, '');
-            
+
             // Si el primer número es > 1, asumimos que es el mes 0X
             if (value.length === 1 && value > 1) {
                 value = '0' + value;
             }
-            
+
             // Insertar la barra después del segundo dígito
             if (value.length > 2) {
                 value = value.substring(0, 2) + '/' + value.substring(2, 4);
@@ -115,7 +115,7 @@ function Pago() {
         if (name === 'numero') {
             // Eliminar todo lo que no sea número
             value = value.replace(/\D/g, '');
-            
+
             // Añadir espacios cada 4 números
             const chunks = value.match(/.{1,4}/g);
             if (chunks) {
@@ -137,18 +137,18 @@ function Pago() {
 
     const handlePago = async () => {
         if (!carrito || !stripe || !elements || procesando) return;
-        
+
         const ahora = new Date();
         const dia = ahora.getDay();
         const hora = ahora.getHours();
-        
+
         if (usuario?.tipo !== 'admin' && dia !== 0 && dia !== 6) {
             if (hora >= 8 && hora < 14) {
                 alert(t.fueraHorario);
                 return;
             }
         }
-        
+
         if (!isFormValid()) {
             alert(t.rellenaCampos);
             return;
@@ -306,35 +306,35 @@ function Pago() {
                 </div>
             </main>
 
-      <footer className="App-footer">
-        <div className="footer-content">
-          <div className="footer-section">
-            <h4>CafES App</h4>
-            <p>{idioma === 'es' ? 'Horario de pedidos: L-V antes de las 08:00 o después de las 14:00. Fines de semana disponible todo el día.' : 'Order hours: M-F before 08:00 or after 14:00. Weekends available all day.'}</p>
-          </div>
-          <div className="footer-section">
-            <h4>{idioma === 'es' ? 'Contactos' : 'Contacts'}</h4>
-            <div className="mb-3">
-              <p className="fw-bold mb-0 text-white">IES José Zerpa</p>
-              <p className="small mb-0"><FaPhoneAlt /> 928 75 41 00</p>
-              <p className="small"><FaMapMarkerAlt /> C. Atindana, s/n, 35110 Vecindario</p>
-            </div>
-            <div className="mb-3">
-              <p className="fw-bold mb-0 text-white">IES Santa Lucía</p>
-              <p className="small mb-0"><FaPhoneAlt /> 928 12 50 30</p>
-              <p className="small"><FaMapMarkerAlt /> Avda. de la Unión, 97, 35110 Casa Pastores</p>
-            </div>
-            <div className="mb-0">
-              <p className="fw-bold mb-0 text-white">IES El Doctoral</p>
-              <p className="small mb-0"><FaPhoneAlt /> 928 79 20 13</p>
-              <p className="small"><FaMapMarkerAlt /> C/ Tiscamanita, s/n, 35280 El Doctoral</p>
-            </div>
-          </div>
-        </div>
-        <div className="footer-bottom text-center">
-          <div>© {new Date().getFullYear()} Canarias Educación - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
-        </div>
-      </footer>
+            <footer className="App-footer">
+                <div className="footer-content">
+                    <div className="footer-section">
+                        <h4>CafES App</h4>
+                        <p>{idioma === 'es' ? 'Horario de pedidos: L-V antes de las 08:00 o después de las 14:00. Fines de semana disponible todo el día.' : 'Order hours: M-F before 08:00 or after 14:00. Weekends available all day.'}</p>
+                    </div>
+                    <div className="footer-section">
+                        <h4>{idioma === 'es' ? 'Contactos' : 'Contacts'}</h4>
+                        <div className="mb-3">
+                            <p className="fw-bold mb-0 text-white">IES José Zerpa</p>
+                            <p className="small mb-0"><FaPhoneAlt /> 928 75 41 00</p>
+                            <p className="small"><FaMapMarkerAlt /> C. Atindana, s/n, 35110 Vecindario</p>
+                        </div>
+                        <div className="mb-3">
+                            <p className="fw-bold mb-0 text-white">IES Santa Lucía</p>
+                            <p className="small mb-0"><FaPhoneAlt /> 928 12 50 30</p>
+                            <p className="small"><FaMapMarkerAlt /> Avda. de la Unión, 97, 35110 Casa Pastores</p>
+                        </div>
+                        <div className="mb-0">
+                            <p className="fw-bold mb-0 text-white">IES El Doctoral</p>
+                            <p className="small mb-0"><FaPhoneAlt /> 928 79 20 13</p>
+                            <p className="small"><FaMapMarkerAlt /> C/ Tiscamanita, s/n, 35280 El Doctoral</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="footer-bottom text-center">
+                    <div>© {new Date().getFullYear()} Canarias Educación - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+                </div>
+            </footer>
         </div>
     );
 }
