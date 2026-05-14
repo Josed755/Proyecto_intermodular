@@ -37,7 +37,7 @@ function InicioSesion() {
       ayudaP1: 'Introduce tu correo electrónico y contraseña para acceder a tu cuenta. Si olvidaste tu contraseña, contacta con el administrador de tu centro.',
       ayudaP2: 'Si aún no tienes cuenta, vuelve a la página principal y pulsa "Registrarse". Necesitarás un correo válido y una contraseña de al menos 8 caracteres.',
       acercaH5: 'CafES App v1.0',
-      acercaP: 'Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y El Doctoral.',
+      acercaP: 'CafES App v1.0 - Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y El Doctoral.',
       errorServidor: 'Error en el servidor'
     },
     en: {
@@ -56,7 +56,7 @@ function InicioSesion() {
       ayudaP1: 'Enter your email and password to access your account. If you forgot your password, contact your center administrator.',
       ayudaP2: 'If you don\'t have an account yet, go back to the main page and click "Register". You will need a valid email and a password of at least 8 characters.',
       acercaH5: 'CafES App v1.0',
-      acercaP: 'Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and El Doctoral.',
+      acercaP: 'CafES App v1.0 - Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and El Doctoral.',
       errorServidor: 'Server error'
     }
   };

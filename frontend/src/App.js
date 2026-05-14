@@ -24,10 +24,10 @@ function App() {
       cerrar: 'Cerrar',
       espanyol: 'Español',
       ingles: 'Inglés',
-      ayudaP1: 'Bienvenido a la Cafetería del Zerpa.',
+      ayudaP1: 'Bienvenido a CafES App.',
       ayudaP2: 'Inicia sesión para pedir tus cafés o regístrate si es tu primera vez.',
-      acercaH5: 'CaffES App v1.0',
-      acercaP: 'Canarias Educación'
+      acercaH5: 'CafES App v1.0',
+      acercaP: 'CafES App v1.0 - Aplicación de gestión de pedidos de cafetería desarrollada para los centros IES José Zerpa, IES Santa Lucia y El Doctoral.'
     },
     en: {
       titulo: 'CafES App',
@@ -39,10 +39,10 @@ function App() {
       cerrar: 'Close',
       espanyol: 'Spanish',
       ingles: 'English',
-      ayudaP1: 'Welcome to the Zerpa Cafeteria.',
+      ayudaP1: 'Welcome to CafES App.',
       ayudaP2: 'Log in to order your coffees or register if it is your first time.',
-      acercaH5: 'CaffES App v1.0',
-      acercaP: 'Canarias Education'
+      acercaH5: 'CafES App v1.0',
+      acercaP: 'CafES App v1.0 - Cafeteria order management application developed for IES José Zerpa, IES Santa Lucia and El Doctoral.'
     }
   };
 
@@ -163,7 +163,7 @@ function App() {
           </div>
         </div>
         <div className="footer-bottom text-center">
-          <div>© {new Date().getFullYear()} Canarias Educacion - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+          <div>© {new Date().getFullYear()} Canarias Educación - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
         </div>
       </footer>
     </div>

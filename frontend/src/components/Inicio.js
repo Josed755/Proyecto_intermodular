@@ -97,6 +97,15 @@ function Inicio() {
                 'preparando': 'Preparando',
                 'listo': 'Listo',
                 'completado': 'Completado'
+            },
+            alergenosLabel: 'ALÉRGENOS',
+            alergenos: {
+                'GLUTEN': 'GLUTEN',
+                'SOJA': 'SOJA',
+                'LECHE': 'LECHE',
+                'SULFITOS': 'SULFITOS',
+                'HUEVO': 'HUEVO',
+                'PESCADO': 'PESCADO'
             }
         },
         en: {
@@ -163,6 +172,15 @@ function Inicio() {
                 'preparando': 'Preparing',
                 'listo': 'Ready',
                 'completado': 'Completed'
+            },
+            alergenosLabel: 'ALLERGENS',
+            alergenos: {
+                'GLUTEN': 'GLUTEN',
+                'SOJA': 'SOY',
+                'LECHE': 'MILK',
+                'SULFITOS': 'SULFITES',
+                'HUEVO': 'EGG',
+                'PESCADO': 'FISH'
             }
         }
     };
@@ -206,6 +224,11 @@ function Inicio() {
     const handleLogout = () => {
         logout();
         navigate('/');
+    };
+
+    const tradAlergenos = (alergenosStr) => {
+        if (!alergenosStr) return '';
+        return alergenosStr.split(', ').map(a => t.alergenos?.[a] || a).join(', ');
     };
 
     const productosFiltrados = filtro === 'todo'
@@ -605,7 +628,7 @@ function Inicio() {
 
                                             {alergenosProductos[producto.nombre] && (
                                                 <div className="allergen-warning">
-                                                    ⚠️ ALÉRGENOS: {alergenosProductos[producto.nombre]}
+                                                    ⚠️ {t.alergenosLabel}: {tradAlergenos(alergenosProductos[producto.nombre])}
                                                 </div>
                                             )}
 
