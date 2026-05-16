@@ -9,6 +9,7 @@ import { getAdminProductos, toggleProductoEstado, updatePedidoEstado } from '../
 const AdminDashboard = () => {
     const [productos, setProductos] = useState([]);
     const [pedidos, setPedidos] = useState([]);
+    const [usuarios, setUsuarios] = useState([]);
     const usuarioLogged = JSON.parse(localStorage.getItem('usuario'));
     const [vista, setVista] = useState(usuarioLogged?.tipo === 'admin' ? 'productos' : 'pedidos');
     const [modalProducto, setModalProducto] = useState(null); // null o { product data }
