@@ -1,11 +1,11 @@
 :root {
-  --premium-dark: #000000;
-  --premium-slate: #2c3e50;
-  --premium-gradient: radial-gradient(circle at top right, #2c3e50, #000000);
-  --premium-glass: rgba(255, 255, 255, 0.03);
-  --premium-border: rgba(255, 255, 255, 0.1);
-  --premium-accent: #ff9900;
-  --premium-glow: 0 0 20px rgba(255, 153, 0, 0.2);
+  --app-dark: #000000;
+  --app-slate: #2c3e50;
+  --app-gradient: radial-gradient(circle at top right, #2c3e50, #000000);
+  --app-glass: rgba(255, 255, 255, 0.03);
+  --app-border: rgba(255, 255, 255, 0.1);
+  --app-accent: #ff9900;
+  --app-glow: 0 0 20px rgba(255, 153, 0, 0.2);
 }
 
 .App {
@@ -15,27 +15,27 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--premium-gradient) !important;
+  background: var(--app-gradient) !important;
   color: white;
 }
 
-.premium-bg {
-  background: var(--premium-gradient) !important;
+.app-background {
+  background: var(--app-gradient) !important;
 }
 
-.premium-card {
-  background: var(--premium-glass) !important;
+.app-card-container {
+  background: var(--app-glass) !important;
   backdrop-filter: blur(30px) !important;
   -webkit-backdrop-filter: blur(30px) !important;
-  border: 1px solid var(--premium-border) !important;
+  border: 1px solid var(--app-border) !important;
   border-radius: 24px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
 }
 
-.premium-header {
+.app-header-main {
   background: rgba(0, 0, 0, 0.3) !important;
   backdrop-filter: blur(15px);
-  border-bottom: 1px solid var(--premium-border);
+  border-bottom: 1px solid var(--app-border);
   position: relative;
   z-index: 1000;
 }

@@ -102,8 +102,8 @@ function InicioSesion() {
   }, [idioma]);
 
   return (
-    <div className="App premium-bg">
-      <header className="App-header premium-header">
+    <div className="App app-background">
+      <header className="App-header app-header-main">
         <div className="header-container">
           <div className="title">{t.titulo}</div>
           <div className="header-right">
@@ -133,7 +133,7 @@ function InicioSesion() {
 
       {modalActivo && (
         <div className="prefs-overlay">
-          <div className="prefs-modal premium-card">
+          <div className="prefs-modal app-card-container">
             <h3>{t[modalActivo]}</h3>
             <div className="modal-content-area">
               {modalActivo === 'idioma' && (
@@ -170,7 +170,7 @@ function InicioSesion() {
       )}
 
       <main className="App-main">
-        <div className="cont_sesion premium-card">
+        <div className="cont_sesion app-card-container">
           <form className='form-cont' onSubmit={handleSubmit}>
             {error && (
               <div className="alert alert-danger error-alert">

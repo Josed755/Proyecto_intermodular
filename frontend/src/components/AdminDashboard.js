@@ -4,7 +4,7 @@ import { addProducto, updateProducto, deleteProducto, getAdminPedidos, getAdminU
 import './EstiloInicio.css'; // Reutilizamos estilos base
 import './EstiloSesiones.css'; // Para modales y formularios
 import './EstiloAdmin.css';
-import { getAdminProductos, toggleProductoEstado } from '../services/api';
+import { getAdminProductos, toggleProductoEstado, updatePedidoEstado } from '../services/api';
 
 const AdminDashboard = () => {
     const [productos, setProductos] = useState([]);
@@ -100,7 +100,8 @@ const AdminDashboard = () => {
             estados: {
                 'pendiente': 'Pendiente',
                 'preparando': 'Preparando',
-                'listo': 'Listo',
+                'listo': 'Listo para recoger',
+                'entregado': 'Entregado',
                 'completado': 'Completado'
             }
         },
@@ -177,6 +178,7 @@ const AdminDashboard = () => {
                 'pendiente': 'Pending',
                 'preparando': 'Preparing',
                 'listo': 'Ready',
+                'entregado': 'Delivered',
                 'completado': 'Completed'
             }
         }
@@ -296,6 +298,15 @@ const handleUpdateUsuario = async (uId, campos) => {
         cargarDatos();
     } catch (err) {
         setError(t.errorActUsuario + err.message);
+    }
+};
+
+const handleUpdatePedido = async (pId, nuevoEstado) => {
+    try {
+        await updatePedidoEstado(pId, nuevoEstado);
+        cargarDatos();
+    } catch (err) {
+        setError("Error al actualizar estado del pedido: " + err.message);
     }
 };
 
@@ -484,7 +495,19 @@ return (
                                             <td>{p.usuario_nombre}</td>
                                             <td className="small">{new Date(p.fecha).toLocaleString()}</td>
                                             <td>{p.total}€</td>
-                                            <td>{t.estados ? (t.estados[p.estado?.toLowerCase()] || p.estado) : p.estado}</td>
+                                            <td>
+                                                <select
+                                                    className={`form-select form-select-sm bg-dark text-white border-secondary status-select-${p.estado}`}
+                                                    value={p.estado}
+                                                    onChange={(e) => handleUpdatePedido(p._id || p.id, e.target.value)}
+                                                >
+                                                    <option value="pendiente">{t.estados['pendiente']}</option>
+                                                    <option value="preparando">{t.estados['preparando']}</option>
+                                                    <option value="listo">{t.estados['listo']}</option>
+                                                    <option value="entregado">{t.estados['entregado']}</option>
+                                                    <option value="cancelado">Cancelado</option>
+                                                </select>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

@@ -63,6 +63,7 @@ export const getHistorialPedidos = () => api.get('/pedidos/historial');
 export const createPaymentIntent = (amount) => api.post('/create-payment-intent', { amount });
 
 export const getAdminPedidos = () => api.get('/admin/pedidos');
+export const updatePedidoEstado = (id, estado) => api.patch(`/admin/pedidos/${id}/estado`, { estado });
 
 // Usuarios
 export const getAdminUsuarios = () => api.get('/admin/usuarios');

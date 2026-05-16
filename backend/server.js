@@ -308,19 +308,19 @@ app.get('/api/pedidos/historial', async (req, res) => {
 });
 
 // RUTAS ADMIN PEDIDOS
-app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
-  const { centro } = req.query;
-  try {
-    let query = {};
-    if (centro) {
-      query.centro = centro;
-    }
-
-    const pedidos = await Pedido.find(query)
-      .populate('usuario', 'nombre correo')
-      .sort({ fecha: -1 });
-
     res.json(pedidos);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Actualizar estado de pedido (Admin)
+app.patch('/api/admin/pedidos/:id/estado', verificarAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { estado } = req.body;
+  try {
+    await Pedido.findByIdAndUpdate(id, { estado });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

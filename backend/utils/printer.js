@@ -7,18 +7,28 @@ const PRINTER_PORT = 9100;
 
 const imprimirTicket = async (pedido, usuario) => {
   return new Promise((resolve, reject) => {
-    console.log(`Intentando imprimir en ${PRINTER_IP}...`);
+    console.log(`[PRINTER] Iniciando proceso de impresión para el pedido de ${usuario?.nombre || 'Invitado'}`);
+    console.log(`[PRINTER] Intentando conectar a la impresora en ${PRINTER_IP}:${PRINTER_PORT}...`);
     
+    // Timeout de conexión para no dejar el proceso colgado (especialmente útil en móviles)
     const device = new escpos.Network(PRINTER_IP, PRINTER_PORT);
     const printer = new escpos.Printer(device);
 
+    const timeout = setTimeout(() => {
+      console.warn('[PRINTER] Tiempo de espera de conexión agotado. ¿Está la impresora en la misma red?');
+      resolve(false);
+    }, 5000);
+
     device.open((error) => {
+      clearTimeout(timeout);
       if (error) {
-        console.error('Error al conectar con la impresora:', error);
-        return resolve(false); // No bloqueamos el flujo si no hay impresora
+        console.error('[PRINTER] Error de conexión física:', error.message);
+        console.log('[PRINTER] Sugerencia: Verifica que el servidor y la impresora compartan la misma red local (WiFi).');
+        return resolve(false);
       }
 
       try {
+        console.log('[PRINTER] Conexión establecida. Generando buffer de ticket...');
         printer
           .font('a')
           .align('ct')
@@ -70,10 +80,10 @@ const imprimirTicket = async (pedido, usuario) => {
           .cut()
           .close();
 
-        console.log('Ticket enviado a la impresora.');
+        console.log('[PRINTER] Ticket enviado correctamente a la cola de impresión.');
         resolve(true);
       } catch (err) {
-        console.error('Error al generar el ticket:', err);
+        console.error('[PRINTER] Error fatal durante la generación del ticket:', err);
         device.close();
         resolve(false);
       }
