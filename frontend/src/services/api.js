@@ -39,7 +39,7 @@ export const registrarUsuario = (datos) => api.post('/registro', datos);
 export const loginUsuario = (datos) => api.post('/login', datos);
 
 // Productos
-export const getProductos = () => api.get('/productos');
+export const getProductos = (centro) => api.get('/productos', { params: { centro } });
 export const getIngredientes = () => api.get('/ingredientes');
 export const getProductoIngredientes = (id) => api.get(`/productos/${id}/ingredientes`);
 

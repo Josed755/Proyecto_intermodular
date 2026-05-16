@@ -38,6 +38,10 @@ const ProductoSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
+  centros: {
+    type: [String],
+    default: ['IES José Zerpa', 'IES Santa Lucía', 'IES El Doctoral']
+  },
   fecha_creacion: {
     type: Date,
     default: Date.now

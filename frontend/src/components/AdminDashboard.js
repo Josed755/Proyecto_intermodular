@@ -21,6 +21,7 @@ const AdminDashboard = () => {
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
     const [todosLosIngredientes, setTodosLosIngredientes] = useState([]);
     const [ingredientesSeleccionados, setIngredientesSeleccionados] = useState([]);
+    const [centrosSeleccionados, setCentrosSeleccionados] = useState(['IES José Zerpa', 'IES Santa Lucía', 'IES El Doctoral']);
     const [menuAbierto, setMenuAbierto] = useState(false);
     const menuRef = useRef(null);
     const navigate = useNavigate();
@@ -249,7 +250,8 @@ const handleSaveProducto = async (e) => {
         categoria_id: parseInt(data.categoria_id),
         categoria: data.categoria,
         imagen: data.imagen,
-        ingredientes: ingredientesSeleccionados
+        ingredientes: ingredientesSeleccionados,
+        centros: centrosSeleccionados
     };
 
     try {
@@ -268,6 +270,7 @@ const handleSaveProducto = async (e) => {
 const abrirModalProducto = (p) => {
     setModalProducto(p);
     setIngredientesSeleccionados(p.ingredientes || []);
+    setCentrosSeleccionados(p.centros || ['IES José Zerpa', 'IES Santa Lucía', 'IES El Doctoral']);
 };
 
 const handleDelete = async (id) => {
@@ -671,6 +674,32 @@ return (
                                     ))}
                                 </div>
                                 <small className="text-white-50">Selecciona los ingredientes que este producto puede llevar.</small>
+                            </div>
+
+                            <div className="mb-3">
+                                <label className="text-info fw-bold">Disponible en Centros:</label>
+                                <div className="d-flex flex-wrap gap-3 p-2 border border-secondary rounded bg-dark">
+                                    {['IES José Zerpa', 'IES Santa Lucía', 'IES El Doctoral'].map(c => (
+                                        <div key={c} className="form-check">
+                                            <input 
+                                                className="form-check-input" 
+                                                type="checkbox" 
+                                                id={`centro-${c}`}
+                                                checked={centrosSeleccionados.includes(c)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setCentrosSeleccionados([...centrosSeleccionados, c]);
+                                                    } else {
+                                                        setCentrosSeleccionados(centrosSeleccionados.filter(name => name !== c));
+                                                    }
+                                                }}
+                                            />
+                                            <label className="form-check-label text-white small" htmlFor={`centro-${c}`}>
+                                                {c}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="d-flex gap-2">

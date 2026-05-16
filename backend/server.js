@@ -126,8 +126,13 @@ app.post('/api/login', async (req, res) => {
 
 // Listar productos activos (frontend)
 app.get('/api/productos', async (req, res) => {
+  const { centro } = req.query;
   try {
-    const productos = await Producto.find({ activo: true }).sort({ nombre: 1 });
+    let query = { activo: true };
+    if (centro) {
+      query.centros = centro; // MongoDB filtrará si el centro está incluido en el array 'centros'
+    }
+    const productos = await Producto.find(query).sort({ nombre: 1 });
     res.json(productos);
   } catch (error) {
     res.status(500).json({ error: error.message });

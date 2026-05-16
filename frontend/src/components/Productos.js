@@ -6,7 +6,10 @@ function Productos() {
     const [productosIniciales, setProductosIniciales] = useState([]);
 
     useEffect(() => {
-        getProductos()
+        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+        const centro = usuario.centro;
+        
+        getProductos(centro)
             .then(res => {
                 const data = res.data || res;
                 // Añadimos cantidad inicial a cada producto
