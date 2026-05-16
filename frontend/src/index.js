@@ -13,7 +13,25 @@ import Pago from './components/Pago';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 
-const stripePromise = loadStripe('pk_test_51TWdiIENWQvXkgqOypfEW96yy20b6vqFap8vhalNra1PrYZigVD1YiiEfRJm0WNr2ttzelI1kudCpHaxINlYePFa00NV2JOXuz');
+import { getStripeConfig } from './services/api';
+
+const StripeWrapper = ({ children }) => {
+  const [stripePromise, setStripePromise] = React.useState(null);
+
+  React.useEffect(() => {
+    getStripeConfig().then(res => {
+      setStripePromise(loadStripe(res.data.publishableKey));
+    });
+  }, []);
+
+  if (!stripePromise) return null; // O un cargando...
+
+  return (
+    <Elements stripe={stripePromise}>
+      {children}
+    </Elements>
+  );
+};
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -26,9 +44,9 @@ root.render(
         <Route path="/home" element={<Inicio />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/pago" element={
-          <Elements stripe={stripePromise}>
+          <StripeWrapper>
             <Pago />
-          </Elements>
+          </StripeWrapper>
         } />
       </Routes>
     </React.StrictMode>

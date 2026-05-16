@@ -8,9 +8,8 @@ import "./EstiloIngredientes.css";
 
 import { useNavigate } from 'react-router-dom';
 import Productos from './Productos';
-import Calculos from './CalculosInic';
 import Botones from './BotonesInic';
-import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos, getIngredientes, getProductoIngredientes } from '../services/api';
+import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos, getIngredientes, getProductoIngredientes, cotizarPedido } from '../services/api';
 import { FaUserCircle, FaHistory, FaSignOutAlt, FaInfoCircle, FaArrowLeft, FaFacebookF, FaInstagram, FaTwitter, FaMapMarkerAlt, FaClock, FaPhoneAlt } from 'react-icons/fa';
 
 function Inicio() {
@@ -193,12 +192,24 @@ function Inicio() {
         return t.nombresProductos[nombreOriginal] || nombreOriginal;
     };
 
-    const {
-        calcularVentasProducto,
-        calcularVentasTotales,
-        calcularImpuesto,
-        calcularTotalConImpuesto
-    } = Calculos({ productos, allIngredientes });
+    const [cotizacion, setCotizacion] = useState({ subtotal: '0.00', impuesto: '0.00', total: '0.00' });
+
+    // Efecto para actualizar la cotización oficial desde el backend
+    useEffect(() => {
+        const items = productos.filter(p => p.cantidad > 0).map(p => ({
+            id: p.id,
+            cantidad: p.cantidad,
+            ingredientesPersonalizados: p.ingredientesPersonalizados || []
+        }));
+
+        if (items.length > 0) {
+            cotizarPedido(items)
+                .then(res => setCotizacion(res.data))
+                .catch(err => console.error("Error al cotizar:", err));
+        } else {
+            setCotizacion({ subtotal: '0.00', impuesto: '0.00', total: '0.00' });
+        }
+    }, [productos]);
 
     const {
         aumentarCantidad,
@@ -691,15 +702,15 @@ function Inicio() {
                                     <div className="totals-section mt-3">
                                         <div className="d-flex justify-content-between mb-1">
                                             <span>{t.subtotal}:</span>
-                                            <span>{parseFloat(calcularVentasTotales()).toFixed(2)}€</span>
+                                            <span>{cotizacion.subtotal}€</span>
                                         </div>
                                         <div className="d-flex justify-content-between mb-2">
                                             <span>{t.impuesto}:</span>
-                                            <span>{calcularImpuesto()}€</span>
+                                            <span>{cotizacion.impuesto}€</span>
                                         </div>
                                         <div className="d-flex justify-content-between fw-bold fs-5 text-warning border-top pt-2">
                                             <span>{t.total}:</span>
-                                            <span>{calcularTotalConImpuesto()}€</span>
+                                            <span>{cotizacion.total}€</span>
                                         </div>
                                     </div>
                                 )}
@@ -708,7 +719,7 @@ function Inicio() {
                                     <button
                                         className="btn-confirm"
                                         onClick={() => {
-                                            const total = calcularTotalConImpuesto();
+                                            const total = cotizacion.total;
                                             if (total > 0) {
                                                 const ahora = new Date();
                                                 const dia = ahora.getDay();
@@ -731,9 +742,9 @@ function Inicio() {
                                                         precio: p.precio,
                                                         ingredientesPersonalizados: p.ingredientesPersonalizados
                                                     })),
-                                                    total: total,
-                                                    subtotal: calcularVentasTotales(),
-                                                    impuesto: calcularImpuesto()
+                                                    total: cotizacion.total,
+                                                    subtotal: cotizacion.subtotal,
+                                                    impuesto: cotizacion.impuesto
                                                 };
                                                 localStorage.setItem('carrito', JSON.stringify(pedidoParaCheckout));
                                                 navigate('/pago');

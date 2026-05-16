@@ -1,9 +1,15 @@
 import axios from 'axios';
 
-const API_URL = 'https://proyecto-intermodular-pmt1.onrender.com/api';
+const getBaseURL = () => {
+  if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
+  // Fallback dinámico según el entorno
+  return window.location.hostname === 'localhost' 
+    ? 'http://localhost:5000/api' 
+    : 'https://proyecto-intermodular-pmt1.onrender.com/api';
+};
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json'
   }
@@ -59,8 +65,10 @@ export const toggleProductoEstado = (id, activo) => {
 
 // Pedidos
 export const crearPedido = (datos) => api.post('/pedidos', datos);
+export const cotizarPedido = (items) => api.post('/pedidos/cotizar', { items });
 export const getHistorialPedidos = () => api.get('/pedidos/historial');
 export const createPaymentIntent = (items) => api.post('/create-payment-intent', { items });
+export const getStripeConfig = () => api.get('/config/stripe');
 
 export const getAdminPedidos = () => api.get('/admin/pedidos');
 

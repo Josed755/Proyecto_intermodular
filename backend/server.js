@@ -76,6 +76,33 @@ const calcularMontoTotalServer = async (items) => {
   return subtotal + impuesto;
 };
 
+// RUTA DE CONFIGURACIÓN (Para obtener claves públicas de forma segura)
+app.get('/api/config/stripe', (req, res) => {
+  res.json({
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_51TWdiIENWQvXkgqOypfEW96yy20b6vqFap8vhalNra1PrYZigVD1YiiEfRJm0WNr2ttzelI1kudCpHaxINlYePFa00NV2JOXuz'
+  });
+});
+
+// RUTA PARA COTIZAR PEDIDO (Cálculo centralizado)
+app.post('/api/pedidos/cotizar', async (req, res) => {
+  const { items } = req.body;
+  if (!items || !items.length) return res.json({ subtotal: '0.00', impuesto: '0.00', total: '0.00' });
+
+  try {
+    const totalConImpuestos = await calcularMontoTotalServer(items);
+    const subtotal = totalConImpuestos / 1.07;
+    const impuesto = totalConImpuestos - subtotal;
+
+    res.json({
+      subtotal: subtotal.toFixed(2),
+      impuesto: impuesto.toFixed(2),
+      total: totalConImpuestos.toFixed(2)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // RUTA DE STRIPE
 app.post('/api/create-payment-intent', async (req, res) => {
   const { items } = req.body; // Recibimos los items, no el monto
