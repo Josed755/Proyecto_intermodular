@@ -211,6 +211,22 @@ function Inicio() {
         }
     }, [productos]);
 
+    const calcularVentasProducto = (producto) => {
+        let precioExtra = 0;
+        if (producto.ingredientesPersonalizados && allIngredientes.length > 0) {
+            const defaults = producto.defaultIngredientesIds || [];
+            producto.ingredientesPersonalizados.forEach(ingId => {
+                if (!defaults.includes(ingId)) {
+                    const ingredient = allIngredientes.find(i => i.id === ingId);
+                    if (ingredient) {
+                        precioExtra += parseFloat(ingredient.precio || 0);
+                    }
+                }
+            });
+        }
+        return (producto.cantidad * (parseFloat(producto.precio) + precioExtra)).toFixed(2);
+    };
+
     const {
         aumentarCantidad,
         disminuirCantidad,

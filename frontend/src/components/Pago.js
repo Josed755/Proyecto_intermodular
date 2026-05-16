@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { crearPedido, getUsuario, createPaymentIntent } from '../utils/bridge';
+import { crearPedido, getUsuario, confirmarPagoBackend, cotizarPedido } from '../utils/bridge';
 import './Pago.css';
 import '../App.css';
 
