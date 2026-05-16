@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { crearPedido, getUsuario, createPaymentIntent } from '../services/api';
+import { crearPedido, getUsuario, createPaymentIntent } from '../utils/bridge';
 import './Pago.css';
 import '../App.css';
 
@@ -156,43 +156,40 @@ function Pago() {
 
         setProcesando(true);
         try {
-            // 1. Crear el Payment Intent en el backend enviando los items para cálculo seguro
-            const { data } = await createPaymentIntent(carrito.items);
-            const clientSecret = data.clientSecret;
-
-            // 2. Confirmar el pago con Stripe
-            const result = await stripe.confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: elements.getElement(CardNumberElement),
-                    billing_details: {
-                        name: cardData.nombre,
-                        email: usuario.correo
-                    }
-                }
+            // 1. Crear el Payment Method en el cliente (captura datos cifrados)
+            const cardElement = elements.getElement(CardNumberElement);
+            const { error, paymentMethod } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement,
+                billing_details: {
+                    name: cardData.nombre,
+                    email: usuario?.correo
+                },
             });
 
-            if (result.error) {
-                alert(result.error.message);
+            if (error) {
+                alert(error.message);
                 setProcesando(false);
                 return;
             }
 
-            if (result.paymentIntent.status === 'succeeded') {
-                const datosPedido = {
-                    usuario_id: usuario.id,
-                    total: carrito.total,
-                    items: carrito.items,
-                    metodo_pago: metodoPago,
-                    centro: usuario.centro || 'IES José Zerpa'
-                };
+            // 2. Enviar el ID al backend para que él confirme el cobro y cree el pedido
+            const { data } = await confirmarPagoBackend(
+                carrito.items, 
+                paymentMethod.id, 
+                usuario.id, 
+                usuario.centro
+            );
 
-                await crearPedido(datosPedido);
+            if (data.success) {
                 alert(t.exito);
                 localStorage.removeItem('carrito');
                 navigate('/home');
+            } else {
+                alert(data.error || t.error);
             }
         } catch (error) {
-            console.error('Error en el pago:', error);
+            console.error('Error en el pago (Server-side):', error);
             alert(t.error);
         } finally {
             setProcesando(false);

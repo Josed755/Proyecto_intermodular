@@ -13,7 +13,7 @@ import Pago from './components/Pago';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 
-import { getStripeConfig } from './services/api';
+import { getStripeConfig } from './utils/bridge';
 
 const StripeWrapper = ({ children }) => {
   const [stripePromise, setStripePromise] = React.useState(null);

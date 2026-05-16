@@ -2,7 +2,7 @@ import '../App.css';
 import './EstiloSesiones.css';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
-import { registrarUsuario } from '../services/api';
+import { registrarUsuario } from '../utils/bridge';
 import { FaEye, FaEyeSlash, FaPhoneAlt, FaMapMarkerAlt } from 'react-icons/fa';
 
 function Registrarse() {

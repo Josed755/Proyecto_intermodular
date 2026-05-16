@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getProductos } from '../services/api';
+import { getProductos } from '../utils/bridge';
 
 function Productos() {
     const [productos, setProductos] = useState([]);

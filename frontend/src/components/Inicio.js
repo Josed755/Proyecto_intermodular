@@ -9,7 +9,7 @@ import "./EstiloIngredientes.css";
 import { useNavigate } from 'react-router-dom';
 import Productos from './Productos';
 import Botones from './BotonesInic';
-import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos, getIngredientes, getProductoIngredientes, cotizarPedido } from '../services/api';
+import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos, getIngredientes, getProductoIngredientes, cotizarPedido } from '../utils/bridge';
 import { FaUserCircle, FaHistory, FaSignOutAlt, FaInfoCircle, FaArrowLeft, FaFacebookF, FaInstagram, FaTwitter, FaMapMarkerAlt, FaClock, FaPhoneAlt } from 'react-icons/fa';
 
 function Inicio() {

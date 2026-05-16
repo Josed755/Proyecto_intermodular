@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addProducto, updateProducto, deleteProducto, getAdminPedidos, getAdminUsuarios, updateUsuarioStatus, addUsuario, getIngredientes } from '../services/api';
+import { addProducto, updateProducto, deleteProducto, getAdminPedidos, getAdminUsuarios, updateUsuarioStatus, addUsuario, getIngredientes } from '../utils/bridge';
 import './EstiloInicio.css'; // Reutilizamos estilos base
 import './EstiloSesiones.css'; // Para modales y formularios
 import './EstiloAdmin.css';
-import { getAdminProductos, toggleProductoEstado } from '../services/api';
+import { getAdminProductos, toggleProductoEstado } from '../utils/bridge';
 
 const AdminDashboard = () => {
     const [productos, setProductos] = useState([]);

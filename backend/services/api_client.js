@@ -67,7 +67,8 @@ export const toggleProductoEstado = (id, activo) => {
 export const crearPedido = (datos) => api.post('/pedidos', datos);
 export const cotizarPedido = (items) => api.post('/pedidos/cotizar', { items });
 export const getHistorialPedidos = () => api.get('/pedidos/historial');
-export const createPaymentIntent = (items) => api.post('/create-payment-intent', { items });
+export const confirmarPagoBackend = (items, paymentMethodId, usuario_id, centro) => 
+  api.post('/create-payment-intent', { items, paymentMethodId, usuario_id, centro });
 export const getStripeConfig = () => api.get('/config/stripe');
 
 export const getAdminPedidos = () => api.get('/admin/pedidos');

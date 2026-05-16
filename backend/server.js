@@ -103,9 +103,9 @@ app.post('/api/pedidos/cotizar', async (req, res) => {
   }
 });
 
-// RUTA DE STRIPE
+// RUTA DE STRIPE (PROCESAMIENTO SEGURO EN SERVER-SIDE)
 app.post('/api/create-payment-intent', async (req, res) => {
-  const { items } = req.body; // Recibimos los items, no el monto
+  const { items, paymentMethodId, usuario_id, centro } = req.body;
 
   if (!items || !items.length) {
     return res.status(400).json({ error: 'No hay productos en el pedido' });
@@ -114,20 +114,46 @@ app.post('/api/create-payment-intent', async (req, res) => {
   try {
     const totalReal = await calcularMontoTotalServer(items);
     
+    // Creamos y CONFIRMAMOS el pago en un solo paso en el servidor
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(totalReal * 100), // Stripe usa céntimos
+      amount: Math.round(totalReal * 100),
       currency: 'eur',
+      payment_method: paymentMethodId,
+      confirm: true, // Confirmación inmediata en el servidor
       automatic_payment_methods: {
         enabled: true,
+        allow_redirects: 'never' // Evitamos redirecciones para simplificar en app móvil
       },
     });
 
-    res.json({
-      clientSecret: paymentIntent.client_secret,
-      totalCalculado: totalReal.toFixed(2)
-    });
+    if (paymentIntent.status === 'succeeded') {
+      // Si el pago es exitoso, podemos incluso crear el pedido aquí mismo
+      const nuevoPedido = new Pedido({
+        usuario: usuario_id,
+        total: totalReal,
+        centro: centro || 'IES José Zerpa',
+        metodo_pago: 'tarjeta',
+        estado: 'pendiente',
+        items: items.map(item => ({
+          producto: item.id,
+          nombre_producto: item.nombre,
+          cantidad: item.cantidad,
+          precio_unitario: item.precio,
+          ingredientesPersonalizados: item.ingredientesPersonalizados || []
+        }))
+      });
+      await nuevoPedido.save();
+      
+      res.json({
+        success: true,
+        total: totalReal.toFixed(2),
+        pedidoId: nuevoPedido._id
+      });
+    } else {
+      res.status(400).json({ error: 'El pago no pudo ser procesado: ' + paymentIntent.status });
+    }
   } catch (error) {
-    console.error('Error Stripe:', error);
+    console.error('Error Stripe Server-Side:', error);
     res.status(500).json({ error: error.message });
   }
 });
