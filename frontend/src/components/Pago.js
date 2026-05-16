@@ -132,7 +132,7 @@ function Pago() {
     };
 
     const isFormValid = () => {
-        return cardData.nombre.trim().length > 3;
+        return cardData.nombre.trim().length > 2;
     };
 
     const handlePago = async () => {
