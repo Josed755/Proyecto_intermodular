@@ -8,8 +8,9 @@ import "./EstiloIngredientes.css";
 
 import { useNavigate } from 'react-router-dom';
 import Productos from './Productos';
+import Calculos from './CalculosInic';
 import Botones from './BotonesInic';
-import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos, getIngredientes, getProductoIngredientes, cotizarPedido } from '../utils/bridge';
+import { logout, getUsuario, updatePerfil, setUsuario as setUsuarioLocal, getHistorialPedidos, getIngredientes, getProductoIngredientes } from '../services/api';
 import { FaUserCircle, FaHistory, FaSignOutAlt, FaInfoCircle, FaArrowLeft, FaFacebookF, FaInstagram, FaTwitter, FaMapMarkerAlt, FaClock, FaPhoneAlt } from 'react-icons/fa';
 
 function Inicio() {
@@ -192,40 +193,12 @@ function Inicio() {
         return t.nombresProductos[nombreOriginal] || nombreOriginal;
     };
 
-    const [cotizacion, setCotizacion] = useState({ subtotal: '0.00', impuesto: '0.00', total: '0.00' });
-
-    // Efecto para actualizar la cotización oficial desde el backend
-    useEffect(() => {
-        const items = productos.filter(p => p.cantidad > 0).map(p => ({
-            id: p.id,
-            cantidad: p.cantidad,
-            ingredientesPersonalizados: p.ingredientesPersonalizados || []
-        }));
-
-        if (items.length > 0) {
-            cotizarPedido(items)
-                .then(res => setCotizacion(res.data))
-                .catch(err => console.error("Error al cotizar:", err));
-        } else {
-            setCotizacion({ subtotal: '0.00', impuesto: '0.00', total: '0.00' });
-        }
-    }, [productos]);
-
-    const calcularVentasProducto = (producto) => {
-        let precioExtra = 0;
-        if (producto.ingredientesPersonalizados && allIngredientes.length > 0) {
-            const defaults = producto.defaultIngredientesIds || [];
-            producto.ingredientesPersonalizados.forEach(ingId => {
-                if (!defaults.includes(ingId)) {
-                    const ingredient = allIngredientes.find(i => i.id === ingId);
-                    if (ingredient) {
-                        precioExtra += parseFloat(ingredient.precio || 0);
-                    }
-                }
-            });
-        }
-        return (producto.cantidad * (parseFloat(producto.precio) + precioExtra)).toFixed(2);
-    };
+    const {
+        calcularVentasProducto,
+        calcularVentasTotales,
+        calcularImpuesto,
+        calcularTotalConImpuesto
+    } = Calculos({ productos, allIngredientes });
 
     const {
         aumentarCantidad,
@@ -718,15 +691,15 @@ function Inicio() {
                                     <div className="totals-section mt-3">
                                         <div className="d-flex justify-content-between mb-1">
                                             <span>{t.subtotal}:</span>
-                                            <span>{cotizacion.subtotal}€</span>
+                                            <span>{parseFloat(calcularVentasTotales()).toFixed(2)}€</span>
                                         </div>
                                         <div className="d-flex justify-content-between mb-2">
                                             <span>{t.impuesto}:</span>
-                                            <span>{cotizacion.impuesto}€</span>
+                                            <span>{calcularImpuesto()}€</span>
                                         </div>
                                         <div className="d-flex justify-content-between fw-bold fs-5 text-warning border-top pt-2">
                                             <span>{t.total}:</span>
-                                            <span>{cotizacion.total}€</span>
+                                            <span>{calcularTotalConImpuesto()}€</span>
                                         </div>
                                     </div>
                                 )}
@@ -735,7 +708,7 @@ function Inicio() {
                                     <button
                                         className="btn-confirm"
                                         onClick={() => {
-                                            const total = cotizacion.total;
+                                            const total = calcularTotalConImpuesto();
                                             if (total > 0) {
                                                 const ahora = new Date();
                                                 const dia = ahora.getDay();
@@ -758,9 +731,9 @@ function Inicio() {
                                                         precio: p.precio,
                                                         ingredientesPersonalizados: p.ingredientesPersonalizados
                                                     })),
-                                                    total: cotizacion.total,
-                                                    subtotal: cotizacion.subtotal,
-                                                    impuesto: cotizacion.impuesto
+                                                    total: total,
+                                                    subtotal: calcularVentasTotales(),
+                                                    impuesto: calcularImpuesto()
                                                 };
                                                 localStorage.setItem('carrito', JSON.stringify(pedidoParaCheckout));
                                                 navigate('/pago');

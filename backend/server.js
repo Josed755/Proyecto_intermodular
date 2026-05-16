@@ -44,116 +44,24 @@ const verificarAdmin = (req, res, next) => {
   }
 };
 
-// FUNCIÓN AUXILIAR PARA CÁLCULO DE PRECIOS SEGURO
-const calcularMontoTotalServer = async (items) => {
-  let subtotal = 0;
-  for (const item of items) {
-    const producto = await Producto.findById(item.id || item.producto);
-    if (!producto) continue;
-
-    let precioExtras = 0;
-    if (item.ingredientesPersonalizados && item.ingredientesPersonalizados.length > 0) {
-      // Obtener ingredientes base del producto para identificar extras
-      const ingredientesBase = await Ingrediente.find({ nombre: { $in: producto.ingredientes } });
-      const idsBase = ingredientesBase.map(ing => (ing.original_id || ing._id).toString());
-
-      // Sumar precio de ingredientes que no son base
-      for (const ingId of item.ingredientesPersonalizados) {
-        if (!idsBase.includes(ingId.toString())) {
-          const extra = await Ingrediente.findOne({ 
-            $or: [
-              { _id: mongoose.isValidObjectId(ingId) ? ingId : null }, 
-              { original_id: typeof ingId === 'number' ? ingId : -1 }
-            ].filter(q => q !== null)
-          });
-          if (extra) precioExtras += extra.precio || 0;
-        }
-      }
-    }
-    subtotal += item.cantidad * (producto.precio + precioExtras);
-  }
-  const impuesto = subtotal * 0.07;
-  return subtotal + impuesto;
-};
-
-// RUTA DE CONFIGURACIÓN (Para obtener claves públicas de forma segura)
-app.get('/api/config/stripe', (req, res) => {
-  res.json({
-    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_51TWdiIENWQvXkgqOypfEW96yy20b6vqFap8vhalNra1PrYZigVD1YiiEfRJm0WNr2ttzelI1kudCpHaxINlYePFa00NV2JOXuz'
-  });
-});
-
-// RUTA PARA COTIZAR PEDIDO (Cálculo centralizado)
-app.post('/api/pedidos/cotizar', async (req, res) => {
-  const { items } = req.body;
-  if (!items || !items.length) return res.json({ subtotal: '0.00', impuesto: '0.00', total: '0.00' });
-
-  try {
-    const totalConImpuestos = await calcularMontoTotalServer(items);
-    const subtotal = totalConImpuestos / 1.07;
-    const impuesto = totalConImpuestos - subtotal;
-
-    res.json({
-      subtotal: subtotal.toFixed(2),
-      impuesto: impuesto.toFixed(2),
-      total: totalConImpuestos.toFixed(2)
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// RUTA DE STRIPE (PROCESAMIENTO SEGURO EN SERVER-SIDE)
+// RUTA DE STRIPE
 app.post('/api/create-payment-intent', async (req, res) => {
-  const { items, paymentMethodId, usuario_id, centro } = req.body;
-
-  if (!items || !items.length) {
-    return res.status(400).json({ error: 'No hay productos en el pedido' });
-  }
+  const { amount } = req.body; // Cantidad en euros (ej: 5.50)
 
   try {
-    const totalReal = await calcularMontoTotalServer(items);
-    
-    // Creamos y CONFIRMAMOS el pago en un solo paso en el servidor
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(totalReal * 100),
+      amount: Math.round(amount * 100), // Stripe usa céntimos
       currency: 'eur',
-      payment_method: paymentMethodId,
-      confirm: true, // Confirmación inmediata en el servidor
       automatic_payment_methods: {
         enabled: true,
-        allow_redirects: 'never' // Evitamos redirecciones para simplificar en app móvil
       },
     });
 
-    if (paymentIntent.status === 'succeeded') {
-      // Si el pago es exitoso, podemos incluso crear el pedido aquí mismo
-      const nuevoPedido = new Pedido({
-        usuario: usuario_id,
-        total: totalReal,
-        centro: centro || 'IES José Zerpa',
-        metodo_pago: 'tarjeta',
-        estado: 'pendiente',
-        items: items.map(item => ({
-          producto: item.id,
-          nombre_producto: item.nombre,
-          cantidad: item.cantidad,
-          precio_unitario: item.precio,
-          ingredientesPersonalizados: item.ingredientesPersonalizados || []
-        }))
-      });
-      await nuevoPedido.save();
-      
-      res.json({
-        success: true,
-        total: totalReal.toFixed(2),
-        pedidoId: nuevoPedido._id
-      });
-    } else {
-      res.status(400).json({ error: 'El pago no pudo ser procesado: ' + paymentIntent.status });
-    }
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+    });
   } catch (error) {
-    console.error('Error Stripe Server-Side:', error);
+    console.error('Error Stripe:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -350,11 +258,9 @@ app.post('/api/pedidos', async (req, res) => {
   }
 
   try {
-    const totalReal = await calcularMontoTotalServer(items);
-    
     const nuevoPedido = new Pedido({
       usuario: usuario_id,
-      total: totalReal,
+      total,
       centro: centro || 'IES José Zerpa',
       metodo_pago: metodo_pago || 'efectivo',
       estado: 'pendiente',
