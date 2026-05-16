@@ -9,8 +9,8 @@ import { getAdminProductos, toggleProductoEstado, updatePedidoEstado } from '../
 const AdminDashboard = () => {
     const [productos, setProductos] = useState([]);
     const [pedidos, setPedidos] = useState([]);
-    const [usuarios, setUsuarios] = useState([]);
-    const [vista, setVista] = useState('productos'); // 'productos', 'pedidos' o 'usuarios'
+    const usuarioLogged = JSON.parse(localStorage.getItem('usuario'));
+    const [vista, setVista] = useState(usuarioLogged?.tipo === 'admin' ? 'productos' : 'pedidos');
     const [modalProducto, setModalProducto] = useState(null); // null o { product data }
     const [modalUsuario, setModalUsuario] = useState(null); // null o { user data }
     const [filtroCentro, setFiltroCentro] = useState('');
@@ -186,7 +186,6 @@ const AdminDashboard = () => {
     };
 
     const t = textos[idioma];
-    const usuarioLogged = JSON.parse(localStorage.getItem('usuario'));
 
 
     const toggleProducto = async (producto) => {
@@ -200,8 +199,9 @@ const AdminDashboard = () => {
 
     useEffect(() => {
     // Verificar si es admin al cargar
+    // Verificar si es admin o empleado al cargar
     const user = JSON.parse(localStorage.getItem('usuario'));
-    if (!user || user.tipo !== 'admin') {
+    if (!user || (user.tipo !== 'admin' && user.tipo !== 'empleado')) {
         navigate('/home');
     }
     cargarDatos();
@@ -383,9 +383,13 @@ return (
 
             <div className="glass-panel p-4">
                 <div className="tabs-container mb-4" style={{ justifyContent: 'flex-start' }}>
-                    <button className={`admin-tab-btn ${vista === 'productos' ? 'active-tab' : ''}`} onClick={() => setVista('productos')}>{t.productos}</button>
+                    {usuarioLogged?.tipo === 'admin' && (
+                        <button className={`admin-tab-btn ${vista === 'productos' ? 'active-tab' : ''}`} onClick={() => setVista('productos')}>{t.productos}</button>
+                    )}
                     <button className={`admin-tab-btn ${vista === 'pedidos' ? 'active-tab' : ''}`} onClick={() => setVista('pedidos')}>{t.pedidos}</button>
-                    <button className={`admin-tab-btn ${vista === 'usuarios' ? 'active-tab' : ''}`} onClick={() => setVista('usuarios')}>{t.empleados}</button>
+                    {usuarioLogged?.tipo === 'admin' && (
+                        <button className={`admin-tab-btn ${vista === 'usuarios' ? 'active-tab' : ''}`} onClick={() => setVista('usuarios')}>{t.empleados}</button>
+                    )}
                 </div>
 
                 {vista === 'productos' && (

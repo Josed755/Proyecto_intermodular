@@ -28,6 +28,24 @@ app.use((req, res, next) => {
 dbConnection();
 
 // MIDDLEWARE
+const verificarStaff = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: 'Token no proporcionado' });
+
+  try {
+    const usuario = jwt.verify(token, process.env.JWT_SECRET || 'secret_key_cafes');
+    if (usuario.tipo !== 'admin' && usuario.tipo !== 'empleado') {
+      return res.status(403).json({ error: 'Acceso denegado: se requiere rol de empleado o administrador' });
+    }
+    req.usuario = usuario;
+    next();
+  } catch (error) {
+    return res.status(403).json({ error: 'Token inválido o expirado' });
+  }
+};
+
 const verificarAdmin = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -313,7 +331,7 @@ app.get('/api/pedidos/historial', async (req, res) => {
 });
 
 // RUTAS ADMIN PEDIDOS
-app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
+app.get('/api/admin/pedidos', verificarStaff, async (req, res) => {
   const { centro } = req.query;
   try {
     let query = {};
@@ -331,8 +349,8 @@ app.get('/api/admin/pedidos', verificarAdmin, async (req, res) => {
   }
 });
 
-// Actualizar estado de pedido (Admin)
-app.patch('/api/admin/pedidos/:id/estado', verificarAdmin, async (req, res) => {
+// Actualizar estado de pedido (Admin/Empleado)
+app.patch('/api/admin/pedidos/:id/estado', verificarStaff, async (req, res) => {
   const { id } = req.params;
   const { estado } = req.body;
   try {
