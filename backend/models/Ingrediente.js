@@ -13,6 +13,10 @@ const IngredienteSchema = new mongoose.Schema({
   },
   original_id: {
     type: Number
+  },
+  precio: {
+    type: Number,
+    default: 0
   }
 });
 

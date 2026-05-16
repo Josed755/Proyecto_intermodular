@@ -156,8 +156,8 @@ function Pago() {
 
         setProcesando(true);
         try {
-            // 1. Crear el Payment Intent en el backend
-            const { data } = await createPaymentIntent(carrito.total);
+            // 1. Crear el Payment Intent en el backend enviando los items para cálculo seguro
+            const { data } = await createPaymentIntent(carrito.items);
             const clientSecret = data.clientSecret;
 
             // 2. Confirmar el pago con Stripe

@@ -287,7 +287,7 @@ function Inicio() {
     }, []);
 
     const abrirModalIngredientes = (producto) => {
-        // Solo abrimos el modal si es categoría 3 (Bocadillos) 
+        // Solo abrimos el modal si es categoría 3
         // y NO es un producto de tipo "Extra"
         if (producto.categoria_id !== 3 || producto.nombre.toLowerCase().includes('extra')) {
             aumentarCantidad(producto.id);
@@ -301,16 +301,16 @@ function Inicio() {
                 .then(res => {
                     const data = res.data || res;
                     const idsDefault = Array.isArray(data) ? data.map(i => i.id) : [];
-                    
+
                     // Los ingredientes "Extra" deben aparecer desmarcados por defecto
-                    const idsSeleccionados = Array.isArray(data) 
+                    const idsSeleccionados = Array.isArray(data)
                         ? data.filter(i => {
                             const nombre = (i.nombre || '').toLowerCase();
                             const esExtraQueso = nombre.includes('extra') && nombre.includes('queso');
                             const esExtraTomateLechuga = nombre.includes('extra') && nombre.includes('tomate') && nombre.includes('lechuga');
                             const esExtraPanEspecial = nombre.includes('extra') && nombre.includes('pan') && nombre.includes('especial');
                             return !esExtraQueso && !esExtraTomateLechuga && !esExtraPanEspecial;
-                        }).map(i => i.id) 
+                        }).map(i => i.id)
                         : [];
 
                     const updatedProducto = {
@@ -350,7 +350,7 @@ function Inicio() {
                 return {
                     ...p,
                     ingredientesPersonalizados: productoParaPersonalizar.ingredientesPersonalizados,
-                    cantidad: p.cantidad === 0 ? 1 : p.cantidad // Si es 0, lo ponemos a 1 al personalizar
+                    cantidad: p.cantidad === 0 ? 1 : p.cantidad
                 };
             }
             return p;
@@ -360,10 +360,7 @@ function Inicio() {
     };
 
     return (
-        /* Use the 'App' class to get the main container style */
         <div className="App premium-bg">
-
-            {/* Standard App Header */}
             <header className="App-header premium-header">
                 <div className="header-container">
                     <div className="title">{t.titulo}</div>
@@ -416,7 +413,6 @@ function Inicio() {
                 </div>
             </header>
 
-            {/* Modal de Preferencias y Secciones */}
             {modalActivo && (
                 <div className="prefs-overlay">
                     <div className="prefs-modal premium-card">
@@ -600,28 +596,8 @@ function Inicio() {
                                             style={{ cursor: 'pointer' }}
                                         >
                                             <div className="icon-wrapper">
-                                                {producto.imagen ? (
+                                                {producto.imagen && (
                                                     <img src={producto.imagen} alt={producto.nombre} className="product-card-img" />
-                                                ) : (
-                                                    <>
-                                                        {producto.nombre.includes('Café') && '☕'}
-                                                        {producto.nombre.includes('Infusión') && '🍵'}
-                                                        {producto.nombre.includes('Cacao') && '🍫'}
-                                                        {producto.nombre.includes('Botella de Agua') && '💧'}
-                                                        {producto.nombre.includes('Refresco') && '🥤'}
-                                                        {producto.nombre.includes('Zumo') && '🍹'}
-                                                        {producto.nombre.includes('Croissant') && '🥐'}
-                                                        {producto.nombre.includes('Sandwich') && '🥪'}
-                                                        {producto.nombre.includes('Bocadillo') && '🥖'}
-                                                        {producto.nombre.includes('Pulgita') && '🥖'}
-                                                        {producto.nombre.includes('Papas') && '🍟'}
-                                                        {producto.nombre.includes('Galletas') && '🍪'}
-                                                        {producto.nombre.includes('Barquillo') && '🧇'}
-                                                        {producto.nombre.includes('Caramelos') && '🍬'}
-                                                        {producto.nombre.includes('Tortitas') && '🥞'}
-                                                        {producto.nombre.includes('Barritas') && '🍫'}
-                                                        {!['Café', 'Infusión', 'Cacao', 'Agua', 'Refresco', 'Zumo', 'Croissant', 'Sandwich', 'Bocadillo', 'Pulgita', 'Papas', 'Galletas', 'Barquillo', 'Caramelos', 'Tortitas', 'Barritas'].some(key => producto.nombre.includes(key)) && '🍴'}
-                                                    </>
                                                 )}
                                             </div>
                                             <h3 className="item-name">{tradNombre(producto.nombre)}</h3>

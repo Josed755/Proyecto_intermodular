@@ -44,13 +44,51 @@ const verificarAdmin = (req, res, next) => {
   }
 };
 
+// FUNCIÓN AUXILIAR PARA CÁLCULO DE PRECIOS SEGURO
+const calcularMontoTotalServer = async (items) => {
+  let subtotal = 0;
+  for (const item of items) {
+    const producto = await Producto.findById(item.id || item.producto);
+    if (!producto) continue;
+
+    let precioExtras = 0;
+    if (item.ingredientesPersonalizados && item.ingredientesPersonalizados.length > 0) {
+      // Obtener ingredientes base del producto para identificar extras
+      const ingredientesBase = await Ingrediente.find({ nombre: { $in: producto.ingredientes } });
+      const idsBase = ingredientesBase.map(ing => (ing.original_id || ing._id).toString());
+
+      // Sumar precio de ingredientes que no son base
+      for (const ingId of item.ingredientesPersonalizados) {
+        if (!idsBase.includes(ingId.toString())) {
+          const extra = await Ingrediente.findOne({ 
+            $or: [
+              { _id: mongoose.isValidObjectId(ingId) ? ingId : null }, 
+              { original_id: typeof ingId === 'number' ? ingId : -1 }
+            ].filter(q => q !== null)
+          });
+          if (extra) precioExtras += extra.precio || 0;
+        }
+      }
+    }
+    subtotal += item.cantidad * (producto.precio + precioExtras);
+  }
+  const impuesto = subtotal * 0.07;
+  return subtotal + impuesto;
+};
+
 // RUTA DE STRIPE
 app.post('/api/create-payment-intent', async (req, res) => {
-  const { amount } = req.body; // Cantidad en euros (ej: 5.50)
+  const { items } = req.body; // Recibimos los items, no el monto
+
+  if (!items || !items.length) {
+    return res.status(400).json({ error: 'No hay productos en el pedido' });
+  }
 
   try {
+    const totalReal = await calcularMontoTotalServer(items);
+    
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Stripe usa céntimos
+      amount: Math.round(totalReal * 100), // Stripe usa céntimos
       currency: 'eur',
       automatic_payment_methods: {
         enabled: true,
@@ -59,6 +97,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
 
     res.json({
       clientSecret: paymentIntent.client_secret,
+      totalCalculado: totalReal.toFixed(2)
     });
   } catch (error) {
     console.error('Error Stripe:', error);
@@ -258,9 +297,11 @@ app.post('/api/pedidos', async (req, res) => {
   }
 
   try {
+    const totalReal = await calcularMontoTotalServer(items);
+    
     const nuevoPedido = new Pedido({
       usuario: usuario_id,
-      total,
+      total: totalReal,
       centro: centro || 'IES José Zerpa',
       metodo_pago: metodo_pago || 'efectivo',
       estado: 'pendiente',

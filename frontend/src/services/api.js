@@ -60,7 +60,7 @@ export const toggleProductoEstado = (id, activo) => {
 // Pedidos
 export const crearPedido = (datos) => api.post('/pedidos', datos);
 export const getHistorialPedidos = () => api.get('/pedidos/historial');
-export const createPaymentIntent = (amount) => api.post('/create-payment-intent', { amount });
+export const createPaymentIntent = (items) => api.post('/create-payment-intent', { items });
 
 export const getAdminPedidos = () => api.get('/admin/pedidos');
 
