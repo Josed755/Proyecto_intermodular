@@ -329,8 +329,9 @@ function Pago() {
                         </div>
                     </div>
                 </div>
-                <div className="footer-bottom text-center">
+                <div className="footer-bottom">
                     <div>© {new Date().getFullYear()} Canarias Educación - {idioma === 'es' ? 'Todos los derechos reservados' : 'All rights reserved'}</div>
+                    <div><a href="mailto:josedanielhs755@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>josedanielhs755@gmail.com</a></div>
                 </div>
             </footer>
         </div>
