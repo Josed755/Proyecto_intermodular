@@ -140,6 +140,29 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// --- FUNCIONALIDAD DE STOCK ---
+async function getStockTortilla() {
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0); // Inicio del día actual
+  
+  const pedidosHoy = await Pedido.find({
+    fecha: { $gte: hoy },
+    estado: { $ne: 'cancelado' }
+  });
+
+  let tortillasVendidas = 0;
+  pedidosHoy.forEach(pedido => {
+    pedido.items.forEach(item => {
+      if (item.nombre_producto === 'Bocadillo Tortilla de Papas') {
+        tortillasVendidas += item.cantidad;
+      }
+    });
+  });
+
+  const MAX_TORTILLAS = 28;
+  return Math.max(0, MAX_TORTILLAS - tortillasVendidas);
+}
+
 // RUTAS DE PRODUCTOS
 
 // Listar productos activos (frontend)
@@ -151,7 +174,21 @@ app.get('/api/productos', async (req, res) => {
       query.centros = centro; // MongoDB filtrará si el centro está incluido en el array 'centros'
     }
     const productos = await Producto.find(query).sort({ nombre: 1 });
-    res.json(productos);
+    
+    // Inyectar el stock calculado
+    const stockTortilla = await getStockTortilla();
+    
+    const productosConStock = productos.map(prod => {
+      const p = prod.toObject();
+      if (p.nombre === 'Bocadillo Tortilla de Papas') {
+        p.stock = stockTortilla;
+      } else {
+        p.stock = null; // Sin límite
+      }
+      return p;
+    });
+
+    res.json(productosConStock);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -279,6 +316,16 @@ app.post('/api/pedidos', async (req, res) => {
   if (!usuario_id || !total || !items || !items.length) {
     return res.status(400).json({ error: 'Datos de pedido incompletos' });
   }
+
+  // --- Validación de Stock ---
+  const itemTortilla = items.find(item => item.nombre === 'Bocadillo Tortilla de Papas');
+  if (itemTortilla) {
+    const stockDisponible = await getStockTortilla();
+    if (itemTortilla.cantidad > stockDisponible) {
+      return res.status(400).json({ error: `Stock insuficiente para Bocadillo Tortilla de Papas. Quedan ${stockDisponible} unidades.` });
+    }
+  }
+  // ---------------------------
 
   try {
     const nuevoPedido = new Pedido({

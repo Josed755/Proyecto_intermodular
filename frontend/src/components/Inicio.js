@@ -674,10 +674,22 @@ function Inicio() {
                                 {productosFiltrados.map(producto => (
                                     <div className="col-12 col-lg-6" key={producto.id}>
                                         <div
-                                            className="dash-card"
-                                            onClick={() => abrirModalIngredientes(producto)}
-                                            style={{ cursor: 'pointer' }}
+                                            className={`dash-card ${producto.stock === 0 ? 'opacity-50' : ''}`}
+                                            onClick={() => producto.stock !== 0 && abrirModalIngredientes(producto)}
+                                            style={{ cursor: producto.stock === 0 ? 'not-allowed' : 'pointer', position: 'relative' }}
                                         >
+                                            {/* Etiqueta de Stock */}
+                                            {producto.stock !== undefined && producto.stock !== null && (
+                                                <div style={{
+                                                    position: 'absolute', top: 10, right: 10,
+                                                    backgroundColor: producto.stock === 0 ? '#dc3545' : '#ffc107',
+                                                    color: producto.stock === 0 ? 'white' : 'black',
+                                                    padding: '2px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold'
+                                                }}>
+                                                    {producto.stock === 0 ? 'AGOTADO' : `Quedan ${producto.stock}`}
+                                                </div>
+                                            )}
+
                                             <div className="icon-wrapper">
                                                 {producto.imagen && (
                                                     <img src={producto.imagen} alt={producto.nombre} className="product-card-img" />
@@ -703,7 +715,15 @@ function Inicio() {
                                                 <span className="qty-badge">{producto.cantidad}</span>
                                                 <button
                                                     className="btn btn-round"
-                                                    onClick={(e) => { e.stopPropagation(); aumentarCantidad(producto.id); }}
+                                                    onClick={(e) => { 
+                                                        e.stopPropagation(); 
+                                                        if (producto.stock === null || producto.stock === undefined || producto.cantidad < producto.stock) {
+                                                            aumentarCantidad(producto.id);
+                                                        } else {
+                                                            alert(`Solo quedan ${producto.stock} unidades de ${tradNombre(producto.nombre)}`);
+                                                        }
+                                                    }}
+                                                    disabled={producto.stock === 0 || (producto.stock !== null && producto.stock !== undefined && producto.cantidad >= producto.stock)}
                                                 >
                                                     +
                                                 </button>

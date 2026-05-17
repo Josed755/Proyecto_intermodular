@@ -156,11 +156,9 @@ function Pago() {
 
         setProcesando(true);
         try {
-            // 1. Crear el Payment Intent en el backend
             const { data } = await createPaymentIntent(carrito.total);
             const clientSecret = data.clientSecret;
 
-            // 2. Confirmar el pago con Stripe
             const result = await stripe.confirmCardPayment(clientSecret, {
                 payment_method: {
                     card: elements.getElement(CardNumberElement),
@@ -186,18 +184,8 @@ function Pago() {
                     centro: usuario.centro || 'IES José Zerpa'
                 };
 
-                const res = await crearPedido(datosPedido);
-                
-                // Opción de imprimir antes de volver
-                if (window.confirm(t.exito + "\n\n¿Deseas imprimir el ticket ahora?")) {
-                    imprimirTicketLocal({
-                        ...datosPedido,
-                        fecha: new Date(),
-                        _id: res.data?.pedidoId || 'N/A',
-                        items: carrito.items.map(i => ({...i, nombre_producto: i.nombre, precio_unitario: i.precio}))
-                    });
-                }
-                
+                await crearPedido(datosPedido);
+                alert(t.exito);
                 localStorage.removeItem('carrito');
                 navigate('/home');
             }
@@ -209,69 +197,18 @@ function Pago() {
         }
     };
 
-    const imprimirTicketLocal = (pedido) => {
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) return;
-        
-        const itemsHtml = pedido.items.map(item => `
-            <tr>
-                <td style="padding: 5px 0;">${item.cantidad}x</td>
-                <td style="padding: 5px 0;">${item.nombre_producto || item.nombre}</td>
-                <td style="padding: 5px 0; text-align: right;">${(item.precio_unitario || item.precio).toFixed(2)}€</td>
-            </tr>
-        `).join('');
-
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Ticket CafES</title>
-                    <style>
-                        body { font-family: 'Courier New', Courier, monospace; padding: 20px; width: 280px; color: #000; margin: 0 auto; }
-                        .header { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
-                        table { width: 100%; border-collapse: collapse; margin: 10px 0; border-bottom: 1px dashed #000; padding-bottom: 10px; }
-                        .total { text-align: right; font-weight: bold; font-size: 1.2em; margin-top: 10px; }
-                        .footer { text-align: center; font-size: 0.8em; margin-top: 25px; border-top: 1px dashed #000; padding-top: 10px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h2 style="margin: 0;">CafES App</h2>
-                        <p style="margin: 5px 0;">IES José Zerpa - Cafetería</p>
-                        <p style="font-size: 0.8em; margin: 0;">${new Date(pedido.fecha).toLocaleString()}</p>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr style="border-bottom: 1px solid #000; font-size: 0.8em;">
-                                <th align="left">Cant</th>
-                                <th align="left">Prod</th>
-                                <th align="right">Precio</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHtml}
-                        </tbody>
-                    </table>
-                    <div class="total">TOTAL: ${pedido.total.toFixed(2)}€</div>
-                    <div class="footer">¡Gracias por su compra!<br>Buen provecho</div>
-                    <script>setTimeout(() => { window.print(); window.close(); }, 500);</script>
-                </body>
-            </html>
-        `);
-        printWindow.document.close();
-    };
-
     if (!carrito) return null;
 
     return (
-        <div className="App app-background">
-            <header className="App-header app-header-main">
+        <div className="App premium-bg">
+            <header className="App-header premium-header">
                 <div className="header-container">
                     <div className="title">CafES App</div>
                 </div>
             </header>
 
             <main className="App-main pago-container">
-                <div className="checkout-card app-card-container">
+                <div className="checkout-card premium-card">
                     <h2 className="checkout-title">{t.titulo}</h2>
 
                     <div className="checkout-section">
