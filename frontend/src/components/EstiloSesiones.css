@@ -43,11 +43,12 @@
   gap: 15px;
 }
 
-.error-alert {
-  color: #ff4444 !important;
-  margin-bottom: 15px !important;
-  background: rgba(255, 68, 68, 0.1) !important;
-  border: 1px solid rgba(255, 68, 68, 0.3) !important;
+.form-cont .error-alert,
+.form-conte .error-alert {
+  color: #ff4444;
+  margin-bottom: 15px;
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
 }
 
 .header-container {
@@ -74,10 +75,11 @@
   margin: 5px 0;
 }
 
-.session-dropdown {
-  width: 180px !important;
-  right: 0 !important;
-  top: 50px !important;
+.user-menu-wrapper .session-dropdown,
+.user-profile .session-dropdown {
+  width: 180px;
+  right: 0;
+  top: 50px;
 }
 
 .prefs-overlay {
@@ -128,7 +130,7 @@
 }
 
 .password-input-wrapper input {
-  padding-right: 45px !important;
+  padding-right: 45px;
 }
 
 .btn-toggle-password {
@@ -159,29 +161,29 @@
   font-weight: bold;
 }
 
-.premium-select {
+.form-group select.premium-select {
   width: 100%;
   height: 48px;
   border-radius: 12px;
   font-size: 16px;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
   padding: 0 16px;
   box-sizing: border-box;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
-.premium-select:focus {
+.form-group select.premium-select:focus {
   outline: none;
-  border-color: var(--premium-accent) !important;
-  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: var(--premium-accent);
+  background: rgba(255, 255, 255, 0.1);
   box-shadow: var(--premium-glow);
 }
 
-.premium-select option {
+.form-group select.premium-select option {
   background-color: #1a1f2b; /* Fondo oscuro para que se vea el texto blanco */
-  color: white !important;
+  color: white;
   padding: 10px;
 }
