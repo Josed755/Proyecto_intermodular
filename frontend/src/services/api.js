@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const API_URL = 'https://cafesapp-backend.onrender.com/api/';
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000/api'
+  : '/api';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -43,7 +45,7 @@ export const getProductos = (centro) => api.get('/productos', { params: { centro
 export const getIngredientes = () => api.get('/ingredientes');
 export const getProductoIngredientes = (id) => api.get(`/productos/${id}/ingredientes`);
 
-// ADMIN PRODUCTOS
+// Admin productos
 export const getAdminProductos = () => api.get('/admin/productos');
 
 export const addProducto = (datos) => api.post('/admin/productos', datos);
@@ -52,7 +54,7 @@ export const updateProducto = (id, datos) => api.put(`/admin/productos/${id}`, d
 
 export const deleteProducto = (id) => api.delete(`/admin/productos/${id}`);
 
-// NUEVA FUNCION ACTIVAR / DESACTIVAR
+// Funcion activar y desactivar 
 export const toggleProductoEstado = (id, activo) => {
   return api.patch(`/admin/productos/${id}/estado`, { activo });
 };

@@ -11,11 +11,10 @@ const Ingrediente = require('./models/Ingrediente');
 const { imprimirTicket } = require('./utils/printer');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// CONFIGURACIÓN INICIAL
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors()); // Permitir todos los orígenes en producción
+app.use(cors());
 app.use(express.json());
 
 // Log de peticiones
@@ -27,7 +26,7 @@ app.use((req, res, next) => {
 // Probar conexión a la DB
 dbConnection();
 
-// MIDDLEWARE
+// middleware
 const verificarStaff = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -62,7 +61,7 @@ const verificarAdmin = (req, res, next) => {
   }
 };
 
-// RUTA DE STRIPE
+// ruta de stripe
 app.post('/api/create-payment-intent', async (req, res) => {
   const { amount } = req.body; // Cantidad en euros (ej: 5.50)
 
@@ -83,8 +82,6 @@ app.post('/api/create-payment-intent', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-// RUTAS DE AUTENTICACIÓN
 
 // Registro
 app.post('/api/registro', async (req, res) => {
@@ -140,10 +137,9 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// --- FUNCIONALIDAD DE STOCK ---
 async function getStockTortilla() {
   const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0); // Inicio del día actual
+  hoy.setHours(0, 0, 0, 0);
   
   const pedidosHoy = await Pedido.find({
     fecha: { $gte: hoy },
@@ -163,15 +159,13 @@ async function getStockTortilla() {
   return Math.max(0, MAX_TORTILLAS - tortillasVendidas);
 }
 
-// RUTAS DE PRODUCTOS
-
-// Listar productos activos (frontend)
+// Listar productos activos
 app.get('/api/productos', async (req, res) => {
   const { centro } = req.query;
   try {
     let query = { activo: true };
     if (centro) {
-      query.centros = centro; // MongoDB filtrará si el centro está incluido en el array 'centros'
+      query.centros = centro;
     }
     const productos = await Producto.find(query).sort({ nombre: 1 });
     
@@ -183,7 +177,7 @@ app.get('/api/productos', async (req, res) => {
       if (p.nombre === 'Bocadillo Tortilla de Papas') {
         p.stock = stockTortilla;
       } else {
-        p.stock = null; // Sin límite
+        p.stock = null;
       }
       return p;
     });
@@ -219,7 +213,6 @@ app.get('/api/productos/:id/ingredientes', async (req, res) => {
     // Buscamos los objetos de ingredientes por nombre
     const ingredientesObj = await Ingrediente.find({ nombre: { $in: producto.ingredientes } });
     
-    // Mapeamos para que el frontend vea 'id' en lugar de '_id' u 'original_id'
     const result = ingredientesObj.map(ing => ({
       id: ing.original_id || ing._id,
       nombre: ing.nombre,
@@ -232,9 +225,7 @@ app.get('/api/productos/:id/ingredientes', async (req, res) => {
   }
 });
 
-// RUTAS ADMIN PRODUCTOS
-
-// Listar todos los productos (incluyendo desactivados)
+// Listar todos los productos
 app.get('/api/admin/productos', verificarAdmin, async (req, res) => {
   try {
     const productos = await Producto.find().sort({ activo: -1, nombre: 1 });
@@ -296,7 +287,7 @@ app.put('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
   }
 });
 
-// Eliminar (borrar definitivamente) producto
+// Eliminar producto
 app.delete('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
   const { id } = req.params;
   try {
@@ -307,8 +298,6 @@ app.delete('/api/admin/productos/:id', verificarAdmin, async (req, res) => {
   }
 });
 
-// RUTAS DE PEDIDOS
-
 // Crear nuevo pedido
 app.post('/api/pedidos', async (req, res) => {
   const { usuario_id, total, items, metodo_pago, centro } = req.body;
@@ -317,7 +306,6 @@ app.post('/api/pedidos', async (req, res) => {
     return res.status(400).json({ error: 'Datos de pedido incompletos' });
   }
 
-  // --- Validación de Stock ---
   const itemTortilla = items.find(item => item.nombre === 'Bocadillo Tortilla de Papas');
   if (itemTortilla) {
     const stockDisponible = await getStockTortilla();
@@ -325,7 +313,6 @@ app.post('/api/pedidos', async (req, res) => {
       return res.status(400).json({ error: `Stock insuficiente para Bocadillo Tortilla de Papas. Quedan ${stockDisponible} unidades.` });
     }
   }
-  // ---------------------------
 
   try {
     const nuevoPedido = new Pedido({
@@ -345,7 +332,7 @@ app.post('/api/pedidos', async (req, res) => {
 
     await nuevoPedido.save();
     
-    // Intentar imprimir el ticket en segundo plano (para no retrasar la respuesta)
+    // Intentar imprimir el ticket en segundo plano
     try {
       const usuario = await Usuario.findById(usuario_id);
       imprimirTicket({ items, total, centro, subtotal: req.body.subtotal, impuesto: req.body.impuesto }, usuario)
@@ -377,7 +364,6 @@ app.get('/api/pedidos/historial', async (req, res) => {
   }
 });
 
-// RUTAS ADMIN PEDIDOS
 app.get('/api/admin/pedidos', verificarStaff, async (req, res) => {
   const { centro } = req.query;
   try {
@@ -396,7 +382,7 @@ app.get('/api/admin/pedidos', verificarStaff, async (req, res) => {
   }
 });
 
-// Actualizar estado de pedido (Admin/Empleado)
+// Actualizar estado de pedido
 app.patch('/api/admin/pedidos/:id/estado', verificarStaff, async (req, res) => {
   const { id } = req.params;
   const { estado } = req.body;
@@ -408,7 +394,6 @@ app.patch('/api/admin/pedidos/:id/estado', verificarStaff, async (req, res) => {
   }
 });
 
-// RUTA PERFIL USUARIO
 app.put('/api/usuarios/:id/perfil', async (req, res) => {
   const { id } = req.params;
   const { nombre, centro } = req.body;
@@ -423,7 +408,6 @@ app.put('/api/usuarios/:id/perfil', async (req, res) => {
   }
 });
 
-// RUTAS ADMIN USUARIOS
 app.get('/api/admin/usuarios', verificarAdmin, async (req, res) => {
   try {
     const usuarios = await Usuario.find()
@@ -472,7 +456,7 @@ app.post('/api/admin/usuarios', verificarAdmin, async (req, res) => {
   }
 });
 
-// HEALTH CHECK Y TEST
+// health check
 app.get('/api/health', async (req, res) => {
   try {
     const dbStatus = mongoose.connection.readyState === 1 ? 'CONNECTED' : 'DISCONNECTED';
@@ -494,9 +478,7 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-
-
-// INICIO DEL SERVIDOR
+// inicio del servidor
 app.listen(PORT, () => {
   console.log(`Backend ejecutándose en http://localhost:${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/api/health`);

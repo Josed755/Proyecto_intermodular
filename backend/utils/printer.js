@@ -10,7 +10,7 @@ const imprimirTicket = async (pedido, usuario) => {
     console.log(`[PRINTER] Iniciando proceso de impresión para el pedido de ${usuario?.nombre || 'Invitado'}`);
     console.log(`[PRINTER] Intentando conectar a la impresora en ${PRINTER_IP}:${PRINTER_PORT}...`);
     
-    // Timeout de conexión para no dejar el proceso colgado (especialmente útil en móviles)
+    // Timeout de conexión para no dejar el proceso colgado
     const device = new escpos.Network(PRINTER_IP, PRINTER_PORT);
     const printer = new escpos.Printer(device);
 
